@@ -1,6 +1,17 @@
 {
   "id": "corp",
-  "name": "Corporate blå",
+  "name": {
+    "en": "Corporate blue",
+    "da": "Corporate blå",
+    "de": "Corporate Blau",
+    "fr": "Bleu corporate",
+    "es": "Azul corporativo",
+    "sv": "Corporate blå",
+    "no": "Corporate blå",
+    "fi": "Yrityssininen",
+    "nl": "Zakelijk blauw",
+    "it": "Blu aziendale"
+  },
   "fonts": {
     "heading": "Roboto Slab",
     "body": "Work Sans"
@@ -27,7 +38,7 @@
     "#E63946"
   ],
   "company": {
-    "name": "Corporate blå",
+    "name": "",
     "link": "",
     "logo": {
       "text": "",

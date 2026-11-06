@@ -1,6 +1,17 @@
 {
   "id": "nordic",
-  "name": "Nordisk minimal",
+  "name": {
+    "en": "Nordic minimal",
+    "da": "Nordisk minimal",
+    "de": "Nordisch minimal",
+    "fr": "Minimal nordique",
+    "es": "Minimalismo nórdico",
+    "sv": "Nordisk minimal",
+    "no": "Nordisk minimal",
+    "fi": "Pohjoismainen minimalismi",
+    "nl": "Noords minimalistisch",
+    "it": "Minimal nordico"
+  },
   "fonts": {
     "heading": "DM Serif Display",
     "body": "Work Sans"
@@ -28,7 +39,7 @@
     "#E8B04B"
   ],
   "company": {
-    "name": "Nordisk minimal",
+    "name": "",
     "link": "",
     "logo": {
       "text": "",

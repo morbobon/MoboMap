@@ -19,11 +19,13 @@ Everything ships as one `index.html` (~3.7 MB) that works from `file://` without
 ```bash
 npm install
 npm run build        # -> index.html
+npm run check        # build + syntax check + i18n coverage (all languages, unused keys) + unused declarations
+npm run format       # Prettier on src/ and tools/
 npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public variant)
 node tools/serve.mjs . 8787   # optional local server for development
 ```
 
-Open `index.html` in a browser. To prepare geodata from scratch (only needed if the source files change): `npm run geo`.
+Open `index.html` in a browser. It starts on the world map in English (the language choice is remembered). To prepare geodata from scratch (only needed if the source files change): `npm run geo`.
 
 ## Design systems
 
@@ -40,7 +42,7 @@ Because a `file://` page cannot `fetch()` files from its own folder, logos and f
 ```jsonc
 {
   "id": "acme",                        // unique key (required)
-  "name": "ACME",                      // shown in the dropdown
+  "name": { "en": "ACME", "da": "ACME" },  // shown in the dropdown – a string or one text per language
   "note": "brand guide 2026",          // optional
   "fonts": {
     "heading": "Arvo", "body": "Work Sans",        // bundled: Arvo, Work Sans, Roboto Slab, Space Grotesk, DM Serif Display, IBM Plex Mono
@@ -66,6 +68,8 @@ Because a `file://` page cannot `fetch()` files from its own folder, logos and f
 
 Omitted fields are derived (`landAlt`, `accent2`, `dark`, `heading` …). `logo.box`: `auto` draws a box on light/uneven backgrounds, `always`, `never`. Divider styles: `bar` (rounded), `line`, `none`.
 
+**Translatable texts:** `name`, `note`, `company.name`, `company.logo.text`/`sub`, `footer.label` and `defaults.title`/`sub` accept either a plain string or an object per language, e.g. `{ "en": "In partnership with", "da": "I samarbejde med" }`. The UI language picks the entry; missing languages fall back to `en`, then to the first entry. An empty `company.name` (and no logo) means no logo is drawn. `defaults` only apply when "Auto" text is switched off.
+
 ## Data
 
 `tools/build.mjs` turns the sources in `assets/geo/` into a generic *dataset* per map: units with code, names (per language), group, centroid, bbox, area and two detail levels, plus landmass, inner borders and group borders.
@@ -80,26 +84,44 @@ Denmark uses its municipalities instead of its 5 admin-1 regions. Adding finer d
 
 World attributes come from Natural Earth (continent, UN region, subregion, economy, income group, population, GDP). Membership lists (EU, NATO, G20, Nordic) and the majority-religion table live in `assets/geo/world-extra.json`; the religion table is an approximation and not authoritative.
 
-Adding a dataset: a `dataset({...})` call in `tools/build.mjs` plus an entry in `MAPS`/`ATTRS` in `src/app.html`.
+Adding a dataset: a `dataset({...})` call in `tools/build.mjs`, a branch in `countryData()` (`src/js/40-datasets.js`) and, optionally, extra attributes in `ATTRS` (`src/js/43-attributes.js`).
 
 ## Project layout
 
 ```
-src/app.html          the app; placeholders /*__DATA__*/ /*__FONTS__*/ /*__JSPDF__*/ /*__DESIGNSYSTEMS__*/ /*__I18N__*/ are filled by the build
-src/i18n.json         UI strings per language (+ i18n-extra.json: styles, attributes, toasts)
-designsystems/        public profiles (committed) · designsystems/private/ (gitignored)
-assets/geo/           source and simplified geodata · assets/fonts/ · assets/jspdf.umd.min.js
-tools/prepare-geo.mjs mapshaper pipeline (simplify, dissolve, inner lines, centroids)
-tools/prepare-admin1.mjs downloads NE 10m admin-1 (40 MB, gitignored) and writes assets/geo/admin1.json
-tools/build.mjs       inlines everything into index.html (--public skips private profiles, --out=path)
-tools/release.mjs     builds release/*.zip (full and public)
+src/app.html               markup; /*__CSS__*/ and /*__JS__*/ are filled by the build
+src/app.css                styles (theme via CSS variables --primary, --accent, --accent2 set from the profile)
+src/js/NN-*.js             the app, concatenated in name order:
+  00-boot, 00-util           fonts, colour and escaping helpers
+  02-state                   application state S
+  05-i18n                    t(), loc(), setLang()
+  10-layouts                 page sizes, viewport globals
+  20-design-systems          profiles: normalise, import/export, editor, theme
+  30-map-styles, 31-highlight-modes   style ids + SP style table, palette, highlight modes
+  40-datasets                MAPS, country decoding (admin-1), setData(), name lookup
+  41-projections             world projections + local equal-area
+  42-viewport                focus/framing, layout, map -> screen
+  43-attributes              "Colour by" attributes and "→ groups"
+  50-flags, 51-pixel, 52-neighbours, 53-auto-text   style helpers and automatic title/subtitle
+  60-render                  render(): builds the SVG
+  70-ui                      side panel, focus/drill-down, groups, map events
+  80-export, 81-project      PNG/JPG/PDF export, project save/open
+  99-start                   boot
+src/i18n.json, i18n-extra.json   UI strings per language
+designsystems/             public profiles (committed) · designsystems/private/ (gitignored)
+assets/geo/                source and simplified geodata · assets/fonts/ · assets/jspdf.umd.min.js
+tools/prepare-geo.mjs      mapshaper pipeline (simplify, dissolve, inner lines, centroids)
+tools/prepare-admin1.mjs   downloads NE 10m admin-1 (40 MB, gitignored) and writes assets/geo/admin1.json
+tools/build.mjs            inlines everything into index.html (--public skips private profiles, --out=path)
+tools/check.mjs            npm run check
+tools/release.mjs          builds release/*.zip (full and public)
 ```
 
-Map styles are a config table (`SP` in `src/app.html`): colours, texture filter, labels, title alignment – a new look is usually one line.
+Map styles are a config table (`SP` in `src/js/30-map-styles.js`): colours, texture filter, labels, title alignment – a new look is usually one entry plus its i18n keys `st_<id>` and `st_<id>_d`.
 
 ## Translations
 
-UI strings: `src/i18n.json` and `src/i18n-extra.json`, key → text per language. Missing keys fall back to English. Country names follow the UI language where Natural Earth provides them (da/de/fr/es/sv/nl/it); municipality names are Danish.
+UI strings: `src/i18n.json` and `src/i18n-extra.json`, key → text per language. Missing keys fall back to English; `npm run check` fails if any language lacks a key. Country names follow the UI language where Natural Earth provides them (da/de/fr/es/sv/nl/it). Region and municipality names are shown in their local form (Bayern, Hovedstaden); Natural Earth's UN region and subregion names are English.
 
 ## License
 

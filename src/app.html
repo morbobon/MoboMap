@@ -1,799 +1,308 @@
-<!DOCTYPE html>
-<html lang="da">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MoboMap – Design Studio</title>
-<script>/*__JSPDF__*/</script>
-<!-- Valgfri: designsystems.js i samme mappe (window.DESIGN_SYSTEMS = [...]). Ignoreres hvis den mangler. -->
-<script src="designsystems.js" onerror="void 0"></script>
-<style>
-:root{--pet:#224B5A;--tyr:#37AFB5;--gul:#FFE600;--on-pet:#fff;--acc-on-pet:#FFE600;--on-gul:#224B5A;--on-tyr:#fff;--fh:'Arvo';--fb:'Work Sans';
- --bg:#eef2f4;--panel:#fff;--ink:#162e38;--mute:#5d7580;--line:#d9e2e7;}
-*{box-sizing:border-box}
-body{margin:0;font-family:var(--fb),'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-h1,h2,.slab{font-family:var(--fh),'Arvo','Roboto Slab',serif;font-weight:700;letter-spacing:-.02em}
-header{background:var(--pet);color:var(--on-pet);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;transition:background .3s}
-header h1{font-size:17px;margin:0;color:var(--acc-on-pet)}
-header small{display:block;font-family:var(--fb),'Work Sans';font-weight:400;color:var(--on-pet);opacity:.8;font-size:11px;letter-spacing:0}
-.btns{display:flex;gap:6px}
-button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:6px 10px;font-size:12px}
-button:hover{border-color:var(--tyr)}
-.exp{background:var(--gul);border-color:var(--gul);color:var(--on-gul);font-weight:700}
-.exp.alt{background:var(--tyr);border-color:var(--tyr);color:var(--on-tyr)}
-main{flex:1;display:flex;min-height:0}
-aside{width:390px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px 16px 30px}
-section{margin-bottom:18px}
-section h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--pet);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
-section h2 span{font-family:var(--fb),'Work Sans';font-weight:600;color:var(--tyr);font-size:11px;letter-spacing:0;text-transform:none}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.tile{text-align:left;padding:7px 9px;border-radius:9px;line-height:1.25}
-.tile b{display:block;font-size:12px;color:var(--pet)}
-.tile i{font-style:normal;font-size:10px;color:var(--mute)}
-.tile.on{background:var(--pet);border-color:var(--pet)}
-.tile.on b{color:var(--acc-on-pet)}.tile.on i{color:var(--on-pet);opacity:.8}
-.chip{padding:5px 9px;border-radius:999px;font-size:11px}
-.chip.on{background:var(--tyr);border-color:var(--tyr);color:var(--on-tyr);font-weight:600}
-.chip.sm{padding:3px 7px;font-size:10.5px}
-.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-textarea,input[type=text],input[type=url],select{width:100%;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#f7f9fa;color:var(--ink)}
-textarea:focus,input:focus,select:focus{outline:2px solid var(--tyr);background:#fff}
-.sw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #0002;padding:0}
-.sw.on{box-shadow:0 0 0 2px var(--pet)}
-.sw.sm{width:18px;height:18px}
-.note{font-size:11px;color:var(--mute);margin:6px 0 0}
-.warn{font-size:11px;color:#8a5a00;background:#fff6dd;border:1px solid #f4dd8f;border-radius:8px;padding:6px 8px;margin-top:6px;display:none}
-label.ck{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:8px;cursor:pointer}
-.grp{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#fafbfc}
-.grp.active{border-color:var(--tyr);box-shadow:0 0 0 2px color-mix(in srgb,var(--tyr) 30%,transparent)}
-.grp .hd{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.grp .hd input[type=text]{flex:1;padding:4px 8px;font-size:12px;font-weight:600}
-.grp .hd .x{padding:2px 7px;font-size:12px;line-height:1}
-.grp textarea{font-size:12px;padding:6px 8px}
-.grp .cnt{font-size:10.5px;color:var(--mute)}
-.partner{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 0;border-bottom:1px dashed var(--line)}
-.partner img{height:22px;max-width:70px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
-.partner span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(color-mix(in srgb,var(--pet) 12%,transparent) 1px,transparent 1px) 0 0/18px 18px,var(--bg);min-width:0}
-#wrap{position:relative;box-shadow:0 20px 60px #0003;border-radius:6px;overflow:hidden;background:#fff;max-width:100%;max-height:100%}
-#wrap svg{display:block;width:100%;height:100%}
-.k{cursor:pointer;transition:fill .2s,stroke .2s,filter .2s}
-.k:hover{filter:brightness(1.15)}
-#wrap:hover .k{transition:none}
-#hoverline{fill:none;stroke:var(--hl);stroke-width:2.2;stroke-linejoin:round;pointer-events:none;filter:drop-shadow(0 0 3px var(--hl))}
-#tip{position:fixed;pointer-events:none;display:none;background:var(--pet);color:var(--on-pet);font-size:11px;padding:4px 8px;border-radius:6px;z-index:9;white-space:nowrap}
-#tip b{color:var(--acc-on-pet)}
-#toast{position:fixed;bottom:16px;right:16px;background:var(--pet);color:var(--on-pet);padding:9px 14px;border-radius:9px;font-size:12px;opacity:0;transition:.3s;transform:translateY(10px);z-index:10}
-#toast.show{opacity:1;transform:none}
-@keyframes pulse{0%{transform:scale(.5);opacity:.9}100%{transform:scale(2.6);opacity:0}}
-.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-out infinite}
-.sel{font-size:11px;background:var(--gul);color:var(--on-gul);font-weight:700;padding:2px 8px;border-radius:999px}
-code{font-family:'IBM Plex Mono',monospace;font-size:10.5px}
-</style>
-</head>
-<body>
-<header>
-  <div><h1><span data-i18n="app_title">MoboMap – Design Studio</span><small data-i18n="app_sub">Vælg designsystem, kort, layout, kortstil og markeringsgrupper · klik på kortet eller indsæt lister · eksportér</small></h1></div>
-  <div class="btns">
-    <select id="langSel" onchange="setLang(this.value)" style="width:auto;padding:5px 8px;font-size:12px"></select>
-    <button onclick="document.getElementById('projFile').click()" data-i18n="open_project">Åbn projekt</button>
-    <button onclick="saveProject()" data-i18n="save_project">Gem projekt</button>
-    <input type="file" id="projFile" accept=".json,application/json" style="display:none" onchange="openProjectFile(this.files[0]);this.value=''">
-    <span style="width:8px"></span>
-    <button class="exp alt" onclick="exportMap('png')">PNG</button>
-    <button class="exp alt" onclick="exportMap('jpg')">JPG</button>
-    <button class="exp" onclick="exportMap('pdf')">PDF</button>
-  </div>
-</header>
-<main>
-<aside>
-  <section>
-    <h2><span data-i18n="sec_ds">1. Designsystem / virksomhedsprofil</span> <span id="dsName"></span></h2>
-    <select id="ds" onchange="setDS(this.value)"></select>
-    <div class="row" id="dsSw" style="margin-top:8px"></div>
-    <div class="row" style="margin-top:8px">
-      <button class="chip" onclick="document.getElementById('dsFile').click()"><span data-i18n="import">Importér (.json/.js)</span></button>
-      <button class="chip" onclick="openEditor()"><span data-i18n="edit_new">Redigér / ny</span></button>
-      <button class="chip" onclick="exportDS()"><span data-i18n="export_json">Eksportér JSON</span></button>
-      <button class="chip" onclick="exportSidecar()" title="Alle egne designsystemer som designsystems.js">designsystems.js</button>
-      <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete">Slet</span></button>
-      <input type="file" id="dsFile" accept=".json,.js,application/json" style="display:none" onchange="importDSFile(this.files[0]);this.value=''">
-    </div>
-    <details id="editor" style="margin-top:8px">
-      <summary style="font-size:11px;cursor:pointer;color:var(--mute)" data-i18n="editor_sum">JSON-editor (profil: navn, logo, link, farver, fonte, partnere)</summary>
-      <textarea id="dsJson" rows="12" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:6px"></textarea>
-      <div class="row" style="margin-top:6px">
-        <button class="chip" onclick="document.getElementById('logoFile').click()"><span data-i18n="pick_logo">Vælg logo (PNG/SVG)</span></button>
-        <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="pickLogo(this.files[0]);this.value=''">
-        <button class="chip on" onclick="applyEditor()"><span data-i18n="save">Gem</span></button>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoboMap – Design Studio</title>
+    <script>
+      /*__JSPDF__*/
+    </script>
+    <!-- Valgfri: designsystems.js i samme mappe (window.DESIGN_SYSTEMS = [...]). Ignoreres hvis den mangler. -->
+    <script src="designsystems.js" onerror="void 0"></script>
+    <style>
+      /*__CSS__*/
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>
+          <span data-i18n="app_title">MoboMap – Design Studio</span
+          ><small data-i18n="app_sub"
+            >Choose design system, map, layout, style and highlight groups · click the map or paste lists ·
+            export</small
+          >
+        </h1>
       </div>
-      <p class="note" data-i18n="editor_note">Gemmes i browseren (localStorage). Del via "Eksportér JSON", eller læg designsystems.js ved siden af index.html – så indlæses den automatisk. Du kan også trække en .json-fil ind på siden.</p>
-    </details>
-  </section>
-  <section>
-    <h2><span data-i18n="sec_map">2. Kort</span> <span id="mapInfo"></span></h2>
-    <div class="row" style="margin-bottom:6px"><select id="focusSel2" onchange="setFocus(this.value)" style="flex:1;font-weight:600"></select></div>
-    <div class="row">
-      <select id="attrSel" onchange="S.attr=this.value;ui();render()" style="flex:1"></select>
-      <button class="chip" onclick="attrToGroups()" title="" id="attrBtn"><span data-i18n="attr_to_groups">→ grupper</span></button>
-    </div>
-    <div class="row" style="margin-top:6px">
-      <select id="projSel" onchange="S.proj=this.value;ui();render()" style="flex:1"></select>
-      <label class="ck" style="margin:0"><input type="checkbox" id="focusHide" onchange="S.focusHide=this.checked;render()"> <span data-i18n="focus_hide">Skjul resten</span></label>
-    </div>
-    <p class="note" data-i18n="map_note">Vælg kort (Danmark med kommuner, eller verden med lande) og evt. en egenskab som alle enheder farvelægges efter.</p>
-  </section>
-  <section>
-    <h2><span data-i18n="sec_layout">3. Layout</span> <span id="layoutInfo"></span></h2>
-    <div class="grid4" id="layouts"></div>
-  </section>
-  <section>
-    <h2><span data-i18n="sec_groups">4. Markeringsgrupper</span> <span class="sel" id="count"></span></h2>
-    <div id="groups"></div>
-    <div class="row">
-      <button class="chip" onclick="addGroup()"><span data-i18n="new_group">+ Ny gruppe</span></button>
-      <button class="chip" onclick="S.groups=[newGroup(t('group')+' 1',['fill'],DS[S.ds].highlight[0])];S.active=0;ui();render()"><span data-i18n="clear_groups">Ryd grupper</span></button>
-      <span id="regionPresets" class="row"></span>
-    </div>
-    <p class="note" data-i18n="groups_note">Klik på kortet lægger enheden i den aktive gruppe (klik igen fjerner). Hver gruppe har sin egen farve og markeringsformer. Navne adskilles med komma/linjeskift.</p>
-    <label class="ck"><input type="checkbox" id="labels" onchange="render()"> <span data-i18n="show_all_names">Vis navne på alle kommuner</span></label>
-    <label class="ck"><input type="checkbox" id="showNeighbours" checked onchange="render()"> <span data-i18n="show_neighbours">Vis nabolande</span></label>
-    <label class="ck"><input type="checkbox" id="showCities" checked onchange="render()"> <span data-i18n="show_cities">Vis større byer</span></label>
-    <label class="ck"><input type="checkbox" id="detail" checked onchange="render()"> <span data-i18n="detail_coast">Detaljeret kystlinje</span></label>
-    <label class="ck"><input type="checkbox" id="legend" checked onchange="render()"> <span data-i18n="show_legend">Vis signaturforklaring (gruppenavne)</span></label>
-  </section>
-  <section>
-    <h2><span data-i18n="sec_style">5. Kortstil</span> <span id="styleNo"></span></h2>
-    <div class="grid" id="styles"></div>
-  </section>
-  <section>
-    <h2 data-i18n="sec_text">6. Tekst på kortet</h2>
-    <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="showText" checked onchange="render()"> <span data-i18n="show_title">Vis overskrift og undertekst</span></label>
-    <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="autoText" checked onchange="render()"> <span data-i18n="auto_text">Auto: følg fokus og markering</span></label>
-    <input type="text" id="title" value="" oninput="document.getElementById('autoText').checked=false;render()" data-i18n-ph="ph_title" placeholder="Overskrift">
-    <input type="text" id="sub" value="" oninput="document.getElementById('autoText').checked=false;render()" data-i18n-ph="ph_sub" placeholder="Undertekst" style="margin-top:6px">
-    <label class="ck"><input type="checkbox" id="showLogo" checked onchange="render()"> <span data-i18n="show_logo">Vis virksomhedslogo (højre side)</span></label>
-  </section>
-  <section>
-    <h2><span data-i18n="sec_footer">7. Footer / partnere</span> <span id="partnerCount"></span></h2>
-    <label class="ck" style="margin:0 0 6px"><input type="checkbox" id="showFooter" checked onchange="render()"> <span data-i18n="show_footer">Vis footer med partnerlogoer</span></label>
-    <input type="text" id="footerLabel" value="" oninput="render()" data-i18n-ph="ph_footer" placeholder="Footer-tekst">
-    <div id="partners" style="margin-top:6px"></div>
-    <details style="margin-top:6px">
-      <summary style="font-size:11px;cursor:pointer;color:var(--mute)"><span data-i18n="add_partner">Tilføj partner</span></summary>
-      <input type="text" id="pName" data-i18n-ph="ph_name" placeholder="Navn" style="margin-top:6px">
-      <input type="url" id="pLink" data-i18n-ph="ph_link" placeholder="Link (https://…)" style="margin-top:6px">
-      <div class="row" style="margin-top:6px">
-        <button class="chip" onclick="document.getElementById('pFile').click()"><span data-i18n="pick_logo_p">Vælg logo</span></button>
-        <input type="file" id="pFile" accept="image/*" style="display:none" onchange="pickPartnerLogo(this.files[0]);this.value=''">
-        <span id="pFileName" class="note" style="margin:0"></span>
-        <button class="chip on" onclick="addPartner()"><span data-i18n="add">Tilføj</span></button>
+      <div class="btns">
+        <select
+          id="langSel"
+          onchange="setLang(this.value)"
+          style="width: auto; padding: 5px 8px; font-size: 12px"
+        ></select>
+        <button onclick="document.getElementById('projFile').click()" data-i18n="open_project">Open project</button>
+        <button onclick="saveProject()" data-i18n="save_project">Save project</button>
+        <input
+          type="file"
+          id="projFile"
+          accept=".json,application/json"
+          style="display: none"
+          onchange="
+            openProjectFile(this.files[0]);
+            this.value = '';
+          "
+        />
+        <span style="width: 8px"></span>
+        <button class="exp alt" onclick="exportMap('png')">PNG</button>
+        <button class="exp alt" onclick="exportMap('jpg')">JPG</button>
+        <button class="exp" onclick="exportMap('pdf')">PDF</button>
       </div>
-      <p class="note" data-i18n="partner_note">Partnere følger profilen i session; "Eksportér JSON" i afsnit 1 gemmer dem i profilen. Links kommer med i PDF-eksport.</p>
-    </details>
-  </section>
-</aside>
-<div class="stage"><div id="wrap"><svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
-</main>
-<div id="tip"></div>
-<div id="toast"></div>
-<script>
-/*__DATA__*/
-/*__FONTS__*/
-const fontCSS=Object.entries(FONTS).map(([n,b])=>`@font-face{font-family:'${n}';src:url(data:font/woff2;base64,${b}) format('woff2');font-weight:${n==='Work Sans'?'400 700':'700'}}`).join('');
-document.head.insertAdjacentHTML('beforeend','<style>'+fontCSS+'</style>');
-
-// ---------- Hjælpere ----------
-const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const hex2rgb=h=>{h=String(h).trim();if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))};
-const light=h=>{const[r,g,b]=hex2rgb(h);return (0.299*r+0.587*g+0.114*b)/255>0.6};
-const mix=(a,b,t)=>{const A=hex2rgb(a),B=hex2rgb(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
-
-// ---------- Sprog (UI) ----------
-const LANGN={en:'English',da:'Dansk',de:'Deutsch',fr:'Français',es:'Español',sv:'Svenska',no:'Norsk',fi:'Suomi',nl:'Nederlands',it:'Italiano'};
-const T=/*__I18N__*/{};
-function t(k){return (T[S.lang]&&T[S.lang][k])||T.en[k]||k}
-function setLang(l,silent){if(!T[l])l='en';S.lang=l;localStorage.setItem('mobomap.lang',l);document.documentElement.lang=l;
- document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});document.title=t('app_title');document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh)});
- if(!silent){ui();render()}}
-// ---------- Layouts ----------
-const LAYOUTS=[
- {id:'land',n:'Liggende',d:'1000×800',w:1000,h:800},
- {id:'port',n:'Stående',d:'800×1100 (A4)',w:800,h:1130},
- {id:'square',n:'Kvadrat',d:'1000×1000 (SoMe)',w:1000,h:1000},
- {id:'wide',n:'Bred',d:'1200×675 (16:9)',w:1200,h:675},
-];
-let W=1000,H=800,PAD={l:60,r:60,t:120,b:60},FOOT=0,sc=1,ox=0,oy=0;const cache={};
-
-// ---------- Designsystemer / virksomhedsprofiler ----------
-// Skema (JSON): se README. Alle felter undtagen id/name/colors er valgfrie og udfyldes af normDS().
-const BUILTIN=/*__DESIGNSYSTEMS__*/[];
-const LS_KEY='mobomap.designsystems';
-function normLogo(l,c){return Object.assign({src:null,aspect:4,width:220,box:'auto',boxColor:c.primary,text:'',sub:''},l||{})}
-function normDS(d,source){
- if(!d||!d.id||!d.colors)throw new Error('Designsystem skal have id og colors');
- const c=Object.assign({bg:'#FFFFFF',land:'#224B5A',stroke:'#FFFFFF',ink:'#224B5A'},d.colors);
- c.landAlt=c.landAlt||mix(c.land,c.bg,0.2);c.primary=c.primary||c.land;c.accent=c.accent||'#FFE600';c.accent2=c.accent2||mix(c.accent,c.primary,0.5);
- if(c.dark==null)c.dark=!light(c.bg);c.heading=c.heading||(c.dark?c.accent:c.primary);c.headingOnDark=c.headingOnDark||c.accent;
- const f=Object.assign({heading:'Arvo',body:'Work Sans',faces:[]},d.fonts||{});
- const co=Object.assign({name:d.name||d.id,link:''},d.company||{});co.logo=normLogo(co.logo||d.logo,c);
- const partners=(d.partners||[]).map(p=>({name:p.name||'',link:p.link||'',logo:typeof p.logo==='string'?{src:p.logo}:(p.logo||{})})).filter(p=>p.name||p.logo.src);
- const footer=Object.assign({label:''},d.footer||{});footer.divider=Object.assign({style:'line',color:'',opacity:0.8,height:5,width:0.18,align:'left'},footer.divider||{});
- return {id:String(d.id),name:d.name||d.id,note:d.note||'',private:!!d.private,defaults:d.defaults||null,colors:c,fonts:f,company:co,partners,footer,highlight:(d.highlight&&d.highlight.length?d.highlight:[c.accent,c.accent2,c.primary,'#FFFFFF']),swatches:d.swatches||[c.primary,c.accent,c.accent2],source};
-}
-const DS={};const DSORDER=[];
-function addDS(d,source){try{const n=normDS(d,source);if(!DS[n.id])DSORDER.push(n.id);DS[n.id]=n;(n.fonts.faces||[]).forEach(injectFace);return n}catch(e){console.warn('Designsystem ignoreret:',e.message,d);return null}}
-const extraFaces={};
-function injectFace(f){if(!f||!f.family||!f.src)return;const key=f.family+'|'+(f.weight||'');if(extraFaces[key])return;extraFaces[key]=`@font-face{font-family:'${f.family}';src:url(${f.src});font-weight:${f.weight||'400 700'}}`;document.head.insertAdjacentHTML('beforeend','<style>'+extraFaces[key]+'</style>')}
-function allFontCSS(){return fontCSS+Object.values(extraFaces).join('')}
-function loadDS(){
- BUILTIN.forEach(d=>addDS(d,'builtin'));
- (window.DESIGN_SYSTEMS||[]).forEach(d=>addDS(d,'file'));   // designsystems.js i samme mappe (valgfri)
- try{JSON.parse(localStorage.getItem(LS_KEY)||'[]').forEach(d=>addDS(d,'user'))}catch(e){}
-}
-function saveUserDS(){localStorage.setItem(LS_KEY,JSON.stringify(DSORDER.filter(i=>DS[i].source==='user').map(i=>stripDS(DS[i]))))}
-function stripDS(d){const{source,...rest}=d;return rest}
-function currentDSExport(){const d=stripDS(DS[S.ds]);d.partners=S.partners.map(p=>({name:p.name,link:p.link,logo:p.logo}));d.footer=Object.assign({},DS[S.ds].footer,{label:document.getElementById('footerLabel').value});return d}
-function importDSObject(obj){const list=Array.isArray(obj)?obj:(obj.designSystems||[obj]);let n=null;for(const d of list){const r=addDS(d,'user');if(r)n=r}if(!n)return toast(t('ts_none'));saveUserDS();setDS(n.id);toast(t('ts_imported')+': '+n.name)}
-function importDSFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{let t=rd.result;if(/\.js$/i.test(file.name)){const m=t.match(/=\s*(\[[\s\S]*\])\s*;?\s*$/);t=m?m[1]:t}importDSObject(JSON.parse(t))}catch(e){toast(t('ts_readfail')+': '+e.message)}};rd.readAsText(file)}
-function exportDS(){const d=currentDSExport();dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(d,null,2)),'designsystem-'+d.id+'.json')}
-function exportSidecar(){const list=DSORDER.filter(i=>DS[i].source!=='builtin').map(i=>i===S.ds?currentDSExport():stripDS(DS[i]));if(!list.length)return toast(t('ts_noown'));dl('data:text/javascript;charset=utf-8,'+encodeURIComponent('// Læg denne fil ved siden af index.html – den indlæses automatisk.\nwindow.DESIGN_SYSTEMS = '+JSON.stringify(list,null,2)+';\n'),'designsystems.js')}
-function deleteDS(){const d=DS[S.ds];if(d.source!=='user')return toast(t('ts_onlyown'));if(!confirm(t('ts_confirm_del')+' "'+d.name+'"?'))return;delete DS[d.id];DSORDER.splice(DSORDER.indexOf(d.id),1);saveUserDS();setDS(DSORDER.find(i=>!DS[i].private)||DSORDER[0])}
-const shortSrc=o=>{if(o&&o.src&&o.src.length>200)return Object.assign({},o,{src:'(behold)'});return o};
-function openEditor(){const d=currentDSExport();const isB=DS[S.ds].source!=='user';const copy=Object.assign({},d,{id:isB?d.id+'-kopi':d.id,name:isB?d.name+' (kopi)':d.name});
- copy.company=Object.assign({},copy.company,{logo:shortSrc(copy.company.logo)});copy.partners=copy.partners.map(p=>Object.assign({},p,{logo:shortSrc(p.logo)}));
- document.getElementById('dsJson').value=JSON.stringify(copy,null,2);document.getElementById('editor').open=true}
-function applyEditor(){try{const obj=JSON.parse(document.getElementById('dsJson').value);const cur=DS[S.ds];
- if(obj.company&&obj.company.logo&&obj.company.logo.src==='(behold)')obj.company.logo.src=cur.company.logo.src;
- (obj.partners||[]).forEach((p,i)=>{if(p.logo&&p.logo.src==='(behold)'){const o=S.partners[i]||cur.partners[i];p.logo.src=o?o.logo.src:null}});
- if(pendingLogo){obj.company=obj.company||{};obj.company.logo=Object.assign({},obj.company.logo||{},pendingLogo);pendingLogo=null}
- importDSObject(obj);document.getElementById('editor').open=false}catch(e){toast(t('ts_badjson')+': '+e.message)}}
-let pendingLogo=null,pendingPartnerLogo=null;
-function readImage(file,cb){const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>cb({src:rd.result,aspect:img.width/img.height},img);img.src=rd.result};rd.readAsDataURL(file)}
-function pickLogo(file){if(!file)return;readImage(file,(l,img)=>{pendingLogo=l;toast(t('ts_logo_picked')+' ('+img.width+'×'+img.height+')')})}
-function pickPartnerLogo(file){if(!file)return;readImage(file,(l)=>{pendingPartnerLogo=l;document.getElementById('pFileName').textContent=file.name})}
-function addPartner(){const name=document.getElementById('pName').value.trim(),link=document.getElementById('pLink').value.trim();if(!name&&!pendingPartnerLogo)return toast(t('ts_need_name'));
- S.partners.push({name,link,logo:pendingPartnerLogo||{}});pendingPartnerLogo=null;document.getElementById('pName').value='';document.getElementById('pLink').value='';document.getElementById('pFileName').textContent='';ui();render()}
-function removePartner(i){S.partners.splice(i,1);ui();render()}
-function applyTheme(){const d=DS[S.ds],c=d.colors,r=document.documentElement.style;
- r.setProperty('--pet',c.primary);r.setProperty('--gul',c.accent);r.setProperty('--tyr',c.accent2);
- r.setProperty('--on-pet',light(c.primary)?'#111111':'#ffffff');r.setProperty('--acc-on-pet',light(c.accent)!==light(c.primary)?c.accent:(light(c.primary)?'#111111':'#ffffff'));
- r.setProperty('--on-gul',light(c.accent)?'#111111':'#ffffff');r.setProperty('--on-tyr',light(c.accent2)?'#111111':'#ffffff');
- r.setProperty('--fh',"'"+d.fonts.heading+"'");r.setProperty('--fb',"'"+d.fonts.body+"'");r.setProperty('--ink',light(c.primary)?'#222':mix(c.primary,'#000',0.3));}
-
-// ---------- Kortstile ----------
-const STYLES=[
- {id:'flat',n:'Flad',d:'Rene flader, grænser i baggrundsfarve',e:'Clean shapes, borders in background colour'},
- {id:'silhouette',n:'Silhuet',d:'Én samlet form, grænser kun ved markering',e:'One solid shape, borders only when highlighted'},
- {id:'shades',n:'Nuancer',d:'Kommuner i skiftende nuancer',e:'Units in alternating tints'},
- {id:'regions',n:'Regioner',d:'Fem regioner i toner af én farve',e:'Groups in tints of one colour'},
- {id:'patchwork',n:'Patchwork',d:'Kommuner i kraftige, skiftende farver',e:'Units in strong alternating colours'},
- {id:'atlas',n:'Atlas',d:'Lyst kort, regionsgrænser, havnavne',e:'Light map, group borders, sea names'},
- {id:'paper',n:'Papirklip',d:'Lagdelt papir med bløde skygger',e:'Layered paper with soft shadows'},
- {id:'glass',n:'Glas & lang skygge',d:'Blankt glas, diagonal skygge',e:'Glossy glass, diagonal shadow'},
- {id:'neon',n:'Mørk neon',d:'Mørkt kort, selvlysende kyst',e:'Dark map, glowing coast'},
- {id:'blueprint',n:'Blueprint',d:'Teknisk tegning, gitter, koordinater',e:'Technical drawing, grid, coordinates'},
- {id:'halftone',n:'Halftone',d:'Grafisk prikraster',e:'Graphic dot screen'},
- {id:'outline',n:'Stregtegning',d:'Kun konturer, ingen fyld',e:'Outlines only, no fill'},
- {id:'extrude',n:'3D-blok',d:'Ekstruderet landmasse med sidekanter',e:'Extruded landmass with side faces'},
- {id:'slate',n:'Skifer',d:'Mørk stentekstur, hvide byprikker, spatierede navne',e:'Dark stone texture, white dots, spaced names'},
- {id:'poster',n:'Plakat mørk',d:'Koksgrå kommuner, alle navne i hvid',e:'Charcoal units, all names in white'},
- {id:'golf',n:'Golfplakat',d:'Støvet grøn/blågrøn, centreret titel, ramme',e:'Dusty green/teal, centred title, frame'},
- {id:'cutout',n:'Silhuet på papir',d:'Petroleumsblå silhuet på beige, ramme',e:'Petrol silhouette on beige, frame'},
- {id:'retro',n:'Retro plakat',d:'Oliven land, bølger i havet, cremefarvet titel',e:'Olive land, waves in the sea, cream title'},
- {id:'topo',n:'Topografisk',d:'Grønt land med relief, blåt hav, regioner',e:'Green land with relief, blue sea, groups'},
- {id:'doodle',n:'Doodle',d:'Håndtegnede mønstre i sort/hvid',e:'Hand-drawn black & white patterns'},
- {id:'typo',n:'Typografisk',d:'Kommunenavnet fylder formen',e:'The name fills the shape'},
- {id:'vintage',n:'Vintage 1919',d:'Sort land, hvide grænser, kapitæler',e:'Black land, white borders, small caps'},
- {id:'words',n:'Ordkort',d:'Formen bygget af navne i tre farver',e:'Shape built from names in three colours'},
- {id:'flag',n:'Flag',d:'',e:''},
- {id:'network',n:'Netværk',d:'',e:''},
- {id:'pixel',n:'Pixel',d:'',e:''},
- {id:'stone',n:'Sten',d:'',e:''},
- {id:'midnight',n:'Midnat 3D',d:'Dyb navy, glød, ekstruderet kant, stjerner',e:'Deep navy, glow, extruded edge, stars'},
-];
-// Stil-egenskaber for de nye stile (bruges generisk i render)
-const SP={
- flag:{bg:'#a9c8c6',land:'#ffffff',stroke:'#ffffff',ink:'#24403f',dark:false,flag:true,strokeW:0.6},
- network:{bg:'#0b2f78',land:'#123f95',stroke:'#2b67c4',ink:'#dcecff',dark:true,bgGradient:['#1757c4','#061c4f'],network:true,strokeW:0.4},
- pixel:{pixel:true,strokeW:0},
- stone:{bg:'#7a7872',land:'#dcd8cf',stroke:'#4a4842',ink:'#f3f0e9',dark:true,extrude:true,extrudeColor:'#4d4b45',filter:'stonef',strokeW:0.9,concrete:true},
- slate:{bg:'#ececec',land:'#3a3d44',stroke:'#ececec',ink:'#333',dark:false,filter:'slatef',labels:'caps',labelColor:'#fff',cityDots:true,strokeW:1.2},
- poster:{bg:'#ffffff',land:'#3b3b3b',stroke:'#ffffff',ink:'#444',dark:false,labels:'bold',labelColor:'#fff',strokeW:0.6},
- golf:{bg:'#9fb4b6',land:'#4c6a4b',stroke:'#4c6a4b',ink:'#ffffff',dark:true,frame:true,titleAlign:'center',titleCaps:true,strokeW:0},
- cutout:{bg:'#e9e2cf',land:'#2a6f8a',stroke:'#2a6f8a',ink:'#2a4a58',dark:false,frame:true,strokeW:0},
- midnight:{bg:'#071a3c',land:'#123d78',stroke:'#1d5aa8',ink:'#dbe9ff',dark:true,bgGradient:['#0d2f66','#040d22'],extrude:true,extrudeColor:'#071a3c',stars:true,landGlow:'#3b8bff',strokeW:0.5},
- retro:{bg:'#4f9aa6',land:'#8a9a3c',stroke:'#7a8a30',ink:'#f3e9c6',dark:true,waves:true,frame:true,titleAlign:'center',strokeW:0.5},
- topo:{bg:'#cfe3ef',land:'#bcd7a4',landAlt:'#a9c98f',stroke:'#8fb77a',ink:'#2d4a3a',dark:false,filter:'hillshade',regionLines:true,sea:true,labels:'bold',labelColor:'#2d4a3a',strokeW:0.8},
- doodle:{bg:'#ffffff',land:'#ffffff',stroke:'#111111',ink:'#111111',dark:false,patterns:true,filter:'hand',strokeW:1.6,titleAlign:'center',titleCaps:true},
- typo:{bg:'#f6f4ef',land:'#3d3d3f',stroke:'#f6f4ef',ink:'#3d3d3f',dark:false,text:'typo',textColor:'#ffffff',strokeW:1,titleAlign:'center',titleCaps:true},
- vintage:{bg:'#f4f1ea',land:'#111111',stroke:'#ffffff',ink:'#111111',dark:false,labels:'caps',labelColor:'#fff',sea:true,seaItalic:true,strokeW:1.4,dotted:true},
- words:{bg:'#f7f4ec',land:'#f7f4ec',stroke:'none',ink:'#1f2d5a',dark:false,text:'words',wordColors:['#c8102e','#1f2d5a','#e8657a'],strokeW:0,titleAlign:'center'},
-};
-const DOODLE=['#dStripe','#dDots','#dCross','#dWave','#dScale','#dBrick','#dZig','#dCheck'];
-// ---------- Markeringsformer ----------
-const HLS=[
- {id:'fill',n:'Fuldfarve',t:'Kommunen fyldes med gruppens farve'},
- {id:'hatch',n:'Skravering',t:'Diagonale streger i gruppens farve'},
- {id:'dots',n:'Prikker',t:'Prikraster i gruppens farve'},
- {id:'tint',n:'Halvtone',t:'Blandet 50 % med kortets farve'},
- {id:'glow',n:'Lyser op',t:'Blød glød omkring kommunen'},
- {id:'outline',n:'Kontur',t:'Tyk streg i gruppens farve'},
- {id:'emboss',n:'Løftet',t:'Kommunen løftes med skygge'},
- {id:'pin',n:'Pin',t:'Pulserende prik i centrum'},
- {id:'label',n:'Navneskilt',t:'Navn på kommunen'},
- {id:'callout',n:'Callout',t:'Linje til navn i margen'},
- {id:'dim',n:'Dæmp resten',t:'Alle umarkerede kommuner tones ned'},
-];
-const S={ds:null,map:'dk',attr:'none',proj:'robinson',lon0:0,focus:'',lang:'en',layout:'land',style:'flat',groups:[],active:0,partners:[]};
-const newGroup=(name,hl,color)=>({name,sel:new Set(),hl:new Set(hl),color,bad:[]});
-
-// ---------- Datasæt (kort) ----------
-const MAPS={
- dk:{unitKey:'municipality',defaults:['101','751'],ex:'København, Aarhus'},
- world:{unitKey:'country',defaults:['DNK','SWE','NOR'],ex:'Denmark, Germany, Brazil'},
- adm1:{unitKey:'region_units',defaults:[],ex:''},
-};
-let TH={l:0,h:0,big:0};
-// Datasæt for et land: Danmark = kommuner (DATA.dk), ellers admin-1 afkodet fra DATA.adm1 (delta-kodede heltal i 0,01°)
-const ADMC={};
-function decRings(str){if(!str)return[];return str.split(';').map(r=>{const v=r.split(',').map(Number);const o=new Array(v.length);let x=0,y=0;for(let i=0;i<v.length;i+=2){if(i===0){x=v[0];y=v[1]}else{x+=v[i];y+=v[i+1]}o[i]=x/100;o[i+1]=y/100}return o})}
-function bboxR(rings){const b=[Infinity,Infinity,-Infinity,-Infinity];for(const r of rings)for(let i=0;i<r.length;i+=2){if(r[i]<b[0])b[0]=r[i];if(r[i+1]<b[1])b[1]=r[i+1];if(r[i]>b[2])b[2]=r[i];if(r[i+1]>b[3])b[3]=r[i+1]}return b}
-function areaR(rings){let a=0;for(const r of rings){let s=0;for(let i=0;i<r.length;i+=2){const j=(i+2)%r.length;s+=r[i]*r[j+1]-r[j]*r[i+1]}a+=s/2}return Math.abs(a)}
-function countryData(iso){if(iso==='DNK')return DATA.dk;if(ADMC[iso])return ADMC[iso];const c=DATA.adm1[iso];if(!c)return null;
- const allR=decRings(c.l);let big=null,ba=0,tot=0;for(const r of allR){const a=areaR([r]);tot+=a;if(a>ba){ba=a;big=r}}const bb=big?bboxR([big]):[0,0,0,0],c0=[(bb[0]+bb[2])/2,(bb[1]+bb[3])/2];
- const near=r=>{const b=bboxR([r]);let dx=Math.abs((b[0]+b[2])/2-c0[0]);dx=Math.min(dx,360-dx);const dy=Math.abs((b[1]+b[3])/2-c0[1]);return Math.hypot(dx,dy)<25||areaR([r])>0.15*tot};
- const units=c.u.map(u=>{const d=decRings(u[7]).filter(near);const b=bboxR(d);return{c:u[0],n:u[1],names:u[2]||null,r:u[3]||'_',typ:u[4],p:u[5]?[u[5]/100,u[6]/100]:[(b[0]+b[2])/2,(b[1]+b[3])/2],b,a:areaR(d),d,s:d}}).filter(u=>u.d.length);
- const groups=Object.keys(c.g).length?Object.assign({},c.g):{_:c.n};if(units.some(u=>u.r==='_')&&!groups._)groups._=c.n;
- const land=decRings(c.l).filter(near);const lb=bboxR(land);const wu=DATA.world.units.find(u=>u.c===iso);
- return ADMC[iso]={iso,geo:true,units,groups,land:{d:land,s:land},inner:{d:[],s:[]},rlines:{d:decRings(c.r),s:decRings(c.r)},main:lb,inset:null,sea:[],alias:{},cityList:(DATA.world.cities||{})[iso]||[],cname:c.n,cnames:wu&&wu.names}}
-const countryName=iso=>{const w=DATA.world.units.find(u=>u.c===iso);return w?nm(w):((DATA.adm1[iso]||{}).n||iso)};
-// ---------- Projektioner (kun datasæt i grader) ----------
-const RAD=Math.PI/180;
-const ROB_X=[1,0.9986,0.9954,0.99,0.9822,0.973,0.96,0.9427,0.9216,0.8962,0.8679,0.835,0.7986,0.7597,0.7186,0.6732,0.6213,0.5722,0.5322];
-const ROB_Y=[0,0.062,0.124,0.186,0.248,0.31,0.372,0.434,0.4958,0.5571,0.6176,0.6769,0.7346,0.7903,0.8435,0.8936,0.9394,0.9761,1];
-const robin=(a,i,t)=>a[i]+(a[Math.min(i+1,18)]-a[i])*t;
-const PROJS={
- robinson:{n:'Robinson',f:(l,p)=>{const d=Math.abs(p)/RAD,i=Math.min(17,Math.floor(d/5)),t=(d-i*5)/5;return[0.8487*robin(ROB_X,i,t)*l,1.3523*robin(ROB_Y,i,t)*Math.sign(p)]}},
- equalEarth:{n:'Equal Earth',f:(l,p)=>{const A1=1.340264,A2=-0.081106,A3=0.000893,A4=0.003796,M=Math.sqrt(3)/2;const th=Math.asin(M*Math.sin(p)),t2=th*th,t6=t2*t2*t2;return[l*Math.cos(th)/(M*(A1+3*A2*t2+t6*(7*A3+9*A4*t2))),th*(A1+A2*t2+t6*(A3+A4*t2))]}},
- naturalEarth:{n:'Natural Earth',f:(l,p)=>{const p2=p*p,p4=p2*p2;return[l*(0.8707-0.131979*p2+p4*(-0.013791+p4*(0.003971*p2-0.001529*p4))),p*(1.007226+p2*(0.015085+p4*(-0.044475+0.028874*p2-0.005916*p4)))]}},
- mollweide:{n:'Mollweide',f:(l,p)=>{let th=p;for(let i=0;i<8;i++){const d=(2*th+Math.sin(2*th)-Math.PI*Math.sin(p))/(2+2*Math.cos(2*th));th-=d;if(Math.abs(d)<1e-7)break}return[2*Math.SQRT2/Math.PI*l*Math.cos(th),Math.SQRT2*Math.sin(th)]}},
- winkel3:{n:'Winkel Tripel',f:(l,p)=>{const c=Math.acos(Math.cos(p)*Math.cos(l/2)),sc=c?Math.sin(c)/c:1;const cp=Math.acos(2/Math.PI);return[(l*cp+2*Math.cos(p)*Math.sin(l/2)/sc)/2,(p+Math.sin(p)/sc)/2]}},
- mercator:{n:'Mercator',f:(l,p)=>{p=Math.max(-83*RAD,Math.min(83*RAD,p));return[l,Math.log(Math.tan(Math.PI/4+p/2))]}},
- local:{n:'Local',local:1,f:(l,p)=>{const C=localCenter(),l0=C[0],p0=C[1];let dl=l-l0;dl=((dl+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;const k=Math.sqrt(2/Math.max(1e-9,1+Math.sin(p0)*Math.sin(p)+Math.cos(p0)*Math.cos(p)*Math.cos(dl)));return[k*Math.cos(p)*Math.sin(dl),k*(Math.cos(p0)*Math.sin(p)-Math.sin(p0)*Math.cos(p)*Math.cos(dl))]}},
- equirect:{n:'Plate carrée',f:(l,p)=>[l,p]},
- miller:{n:'Miller',f:(l,p)=>[l,1.25*Math.log(Math.tan(Math.PI/4+0.4*p))]},
-};
-let LC=null;
-function localCenter(){if(LC)return LC;const fu=(typeof focusUnits==='function'&&focusUnits())||GEO.units;let sx=0,sy=0,sz=0,sa=0;for(const k of fu){const lo=(k.p[0]-180)*RAD,la=(90-k.p[1])*RAD,w=Math.sqrt(k.a)||1;sx+=Math.cos(la)*Math.cos(lo)*w;sy+=Math.cos(la)*Math.sin(lo)*w;sz+=Math.sin(la)*w;sa+=w}return LC=[Math.atan2(sy,sx),Math.atan2(sz,Math.hypot(sx,sy))]}
-function prj(x,y){const f=(PROJS[S.proj]||PROJS.robinson).f;const[px,py]=f((x-180+S.lon0*0)*RAD,(90-y)*RAD);return[px*100,-py*100]}
-const focusUnits=()=>{if(!S.focus)return null;if(GEO.groups[S.focus])return GEO.units.filter(k=>k.r===S.focus);const u=GEO.units.find(k=>k.c===S.focus);return u?[u]:null};
-const inFocus=k=>{const f=focusUnits();return !f||f.includes(k)};
-function computeMain(){const key='main|'+(S.country||'world')+'|'+S.proj+'|'+S.focus;if(cache[key])return cache[key];LC=null;
- const fu=focusUnits();let b;
- if(!GEO.geo&&!fu)b=GEO.main.slice();
- else{b=[Infinity,Infinity,-Infinity,-Infinity];const units=fu||GEO.units;const wide=k=>fu&&fu.length>1&&S.map==='world'&&(k.b[2]-k.b[0])>120;for(const k of units){if(!fu&&isBH(k))continue;if(wide(k)){let[x,y]=k.p;[x,y]=prj(x,y);if(x<b[0])b[0]=x;if(y<b[1])b[1]=y;if(x>b[2])b[2]=x;if(y>b[3])b[3]=y;continue}const d=k.s;for(const r of d)for(let i=0;i<r.length;i+=2){let x=r[i],y=r[i+1];if(GEO.geo)[x,y]=prj(x,y);if(x<b[0])b[0]=x;if(y<b[1])b[1]=y;if(x>b[2])b[2]=x;if(y>b[3])b[3]=y}}
-  if(fu){const px=(b[2]-b[0])*0.08,py=(b[3]-b[1])*0.08;b=[b[0]-px,b[1]-py,b[2]+px,b[3]+py]}}
- return cache[key]=b}
-let GEO,M,I,mw,mh,byName={},REGC={},REGI={};
-const nm=k=>(k.names&&k.names[S.lang])||k.n;
-const norm=s=>s.toLowerCase().replace(/\s+(kommune|municipality|county)$/,'').replace(/aa/g,'å').replace(/[^\p{L}\-\s]/gu,'').trim();
-function setData(id){if(id==='dk')id='DNK';if(!id||id==='world'){S.country='';S.map='world';GEO=DATA.world}else{const g=countryData(id);if(!g){S.country='';S.map='world';GEO=DATA.world}else{S.country=id;S.map=id==='DNK'?'dk':'adm1';GEO=g}}
- I=GEO.inset;S.focus='';LC=null;for(const k in cache)delete cache[k];M=computeMain();mw=M[2]-M[0];mh=M[3]-M[1];
- const ar=GEO.units.map(u=>u.a).sort((a,b)=>a-b);const q=f=>ar[Math.min(ar.length-1,Math.floor(ar.length*f))]||0;TH={l:q(0.3),h:q(0.5),big:q(0.85)};
- byName={};GEO.units.forEach(k=>{byName[norm(k.n)]=k.c;byName[k.c.toLowerCase()]=k.c;if(k.names)for(const v of Object.values(k.names))if(v)byName[norm(v)]=k.c});
- REGC={};REGI={};Object.keys(GEO.groups).forEach((r,i)=>{REGI[r]=i;let sx=0,sy=0,sa=0;for(const k of GEO.units)if(k.r===r&&!isBH(k)){sx+=k.p[0]*k.a;sy+=k.p[1]*k.a;sa+=k.a}if(sa)REGC[r]=[sx/sa,sy/sa]});
- for(const k in cache)delete cache[k]}
-function lookup(t){const n=norm(t);if(!n)return null;if(byName[n])return byName[n];if(GEO.alias&&GEO.alias[n])return GEO.alias[n];
- const cand=GEO.units.filter(k=>norm(nm(k)).startsWith(n)||norm(k.n).startsWith(n)||norm(k.n).split(/[\s\-]/).includes(n));return cand.length===1?cand[0].c:null;}
-// Attribut-farvelægning (farvelæg alle enheder efter en egenskab)
-const band=(v,cuts,labels)=>{let i=0;while(i<cuts.length&&v>=cuts[i])i++;return labels[i]};
-const REL={christian:'Christian',muslim:'Muslim',hindu:'Hindu',buddhist:'Buddhist',jewish:'Jewish',folk:'Folk / traditional',unaffiliated:'Unaffiliated',unknown:'Unknown'};
-const YN=k=>t(k?'yes':'no');
-const areaBand=k=>{const a=GEO.units.map(u=>u.a).sort((x,y)=>x-y);const q=i=>a[Math.floor(a.length*i)];return k.a<q(0.25)?t('area_s'):k.a<q(0.5)?t('area_m'):k.a<q(0.75)?t('area_l'):t('area_xl')};
-const ATTRS={
- dk:[{id:'group',n:'attr_region',f:k=>GEO.groups[k.r]},
-  {id:'landsdel',n:'attr_landsdel',f:k=>k.c==='400'?'Bornholm':GEO.lists.fyn.includes(k.c)?'Fyn':['360','376'].includes(k.c)?'Lolland-Falster':['DK-81','DK-82','DK-83'].includes(k.r)?'Jylland':'Sjælland'},
-  {id:'storkbh',n:'attr_storkbh',f:k=>YN(GEO.lists.storkbh.includes(k.c))},
-  {id:'area',n:'attr_area',ordKeys:['area_s','area_m','area_l','area_xl'],f:areaBand},
-  {id:'initial',n:'attr_initial',f:k=>nm(k)[0].toUpperCase()}],
- adm1:[{id:'group',n:'attr_region',f:k=>GEO.groups[k.r]},
-  {id:'type',n:'attr_type',f:k=>k.typ||'–'},
-  {id:'area',n:'attr_area',ordKeys:['area_s','area_m','area_l','area_xl'],f:areaBand},
-  {id:'initial',n:'attr_initial',f:k=>nm(k)[0].toUpperCase()}],
- world:[
-  {id:'group',n:'attr_continent',f:k=>GEO.groups[k.r]},
-  {id:'un',n:'attr_un',f:k=>k.at.un},
-  {id:'sub',n:'attr_sub',f:k=>k.at.sub},
-  {id:'eco',n:'attr_eco',ord:['Developed region: G7','Developed region: nonG7','Emerging region: BRIC','Emerging region: MIKT','Emerging region: G20','Developing region','Least developed region'],f:k=>k.at.eco},
-  {id:'inc',n:'attr_inc',ord:['High income: OECD','High income: nonOECD','Upper middle income','Lower middle income','Low income'],f:k=>k.at.inc},
-  {id:'pop',n:'attr_pop',ord:['< 1 M','1–10 M','10–50 M','50–200 M','> 200 M'],f:k=>band(k.at.pop,[1e6,1e7,5e7,2e8],['< 1 M','1–10 M','10–50 M','50–200 M','> 200 M'])},
-  {id:'gdp',n:'attr_gdp',ord:['< $2k','$2–8k','$8–20k','$20–45k','> $45k'],f:k=>band(k.at.gdp*1e6/Math.max(1,k.at.pop),[2000,8000,20000,45000],['< $2k','$2–8k','$8–20k','$20–45k','> $45k'])},
-  {id:'rel',n:'attr_rel',f:k=>REL[k.at.rel]||k.at.rel},
-  {id:'eu',n:'attr_eu',f:k=>YN(GEO.lists.eu.includes(k.c))},{id:'nato',n:'attr_nato',f:k=>YN(GEO.lists.nato.includes(k.c))},{id:'g20',n:'attr_g20',f:k=>YN(GEO.lists.g20.includes(k.c))},{id:'nordic',n:'attr_nordic',f:k=>YN(GEO.lists.nordic.includes(k.c))},
-  {id:'hemi',n:'attr_hemi',f:k=>t(k.p[1]<90?'hemi_n':'hemi_s')},
-  {id:'area',n:'attr_area',ordKeys:['area_s','area_m','area_l','area_xl'],f:areaBand},
-  {id:'initial',n:'attr_initial',f:k=>nm(k)[0].toUpperCase()},
- ]};
-function attrToGroups(){const a=attrDef();if(!a)return;const cats=attrCats(a);const D=DS[S.ds];
- cats.forEach((v,i)=>{const col=a.ord||a.ordKeys?mix(mix(D.colors.land,'#ffffff',0.72),D.colors.land,cats.length>1?i/(cats.length-1):1):PATCH[(i+S.groups.length)%PATCH.length];const g=newGroup(String(v),['fill'],col);GEO.units.forEach(k=>{if(a.f(k)===v){S.groups.forEach(o=>o.sel.delete(k.c));g.sel.add(k.c)}});S.groups.push(g)});
- S.attr='none';S.active=S.groups.length-1;ui();render();toast(t('groups_added').replace('{n}',cats.length))}
-function attrDef(){return (ATTRS[S.map]||[]).find(a=>a.id===S.attr)||null}
-function attrCats(a){const vals=[...new Set(GEO.units.map(a.f))];const ord=a.ord||(a.ordKeys&&a.ordKeys.map(t));return ord?ord.filter(v=>vals.includes(v)):vals.sort()}
-
-// ---------- Projektion (afhænger af layout) ----------
-function setLayout(id){const L=LAYOUTS.find(l=>l.id===id)||LAYOUTS[0];S.layout=L.id;W=L.w;H=L.h;M=computeMain();mw=M[2]-M[0];mh=M[3]-M[1];
- const foot=document.getElementById('showFooter').checked&&S.partners.length?Math.round(H*0.11)+20:0;FOOT=foot;
- PAD={l:Math.round(W*0.06),r:Math.round(W*0.06),t:Math.round(H*0.15),b:Math.round(H*0.06)+foot};
- sc=Math.min((W-PAD.l-PAD.r)/mw,(H-PAD.t-PAD.b)/mh);
- ox=PAD.l+((W-PAD.l-PAD.r)-mw*sc)/2-M[0]*sc;oy=PAD.t+((H-PAD.t-PAD.b)-mh*sc)/2-M[1]*sc;
- for(const k in cache)if(!k.startsWith('main|'))delete cache[k];
- const svg=document.getElementById('svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const wrap=document.getElementById('wrap');wrap.style.aspectRatio=W+'/'+H;wrap.style.width=`min(100%,calc((100vh - 110px) * ${(W/H).toFixed(4)}))`;}
-const P=(x,y,bh)=>{if(bh&&I){x+=I.dx;y+=I.dy}if(GEO.geo){[x,y]=prj(x,y)}return[x*sc+ox,y*sc+oy]};
-function pathOf(rings,bh){let s='';for(const r of rings){for(let i=0;i<r.length;i+=2){const[x,y]=P(r[i],r[i+1],bh);s+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}s+='Z'}return s}
-function pathLines(ls){let s='';for(const l of ls){for(let i=0;i<l.length;i+=2){const[x,y]=P(l[i],l[i+1]);s+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}}return s}
-const isBH=k=>!!I&&k.c===I.unit;
-const PATCH=['#E63946','#F4A261','#2A9D8F','#457B9D','#8E44AD','#F2C94C','#3DA35D','#FF7F50','#1F4E79','#C2185B','#6D597A','#B56576','#355070','#EAAC8B','#43AA8B','#90BE6D','#F9C74F','#577590'];
-function kp(k,det){const key=k.c+(det?'d':'s');return cache[key]||(cache[key]=pathOf(det?k.d:k.s,isBH(k)))}
-function kc(k){return P(k.p[0],k.p[1],isBH(k))}
-function landPath(det){return cache['land'+det]||(cache['land'+det]=pathOf(det?GEO.land.d:GEO.land.s,false))}
-const bhRect=()=>{const[a,b]=P(I.box[0],I.box[1]),[c,d]=P(I.box[2],I.box[3]);return{x:a,y:b,w:c-a,h:d-b}};
-const groupOf=c=>S.groups.findIndex(g=>g.sel.has(c));
-
-// ---------- Flag (forenklede, uden våbenskjolde) ----------
-// h|farver… vandrette striber · v|… lodrette · x|bund|kors[|indre] nordisk kors · p|bund|plus · c|bund|skive[|dx] · d|bund|prik øverst til venstre · s|farve
-const FLAGS={DNK:'x|#C8102E|#FFFFFF',SWE:'x|#006AA7|#FECC00',NOR:'x|#BA0C2F|#FFFFFF|#00205B',FIN:'x|#FFFFFF|#002F6C',ISL:'x|#02529C|#FFFFFF|#DC1E35',FRO:'x|#FFFFFF|#0065BD|#EF303E',
- DEU:'h|#000000|#DD0000|#FFCE00',FRA:'v|#0055A4|#FFFFFF|#EF4135',ITA:'v|#009246|#FFFFFF|#CE2B37',IRL:'v|#169B62|#FFFFFF|#FF883E',BEL:'v|#000000|#FDDA24|#EF3340',NLD:'h|#AE1C28|#FFFFFF|#21468B',LUX:'h|#EF3340|#FFFFFF|#00A3E0',AUT:'h|#ED2939|#FFFFFF|#ED2939',HUN:'h|#CE2939|#FFFFFF|#477050',BGR:'h|#FFFFFF|#00966E|#D62612',EST:'h|#0072CE|#000000|#FFFFFF',LTU:'h|#FDB913|#006A44|#C1272D',LVA:'h|#9E3039|#9E3039|#FFFFFF|#9E3039|#9E3039',POL:'h|#FFFFFF|#DC143C',UKR:'h|#0057B7|#FFD700',RUS:'h|#FFFFFF|#0039A6|#D52B1E',ROU:'v|#002B7F|#FCD116|#CE1126',MDA:'v|#0046AE|#FFD200|#CC092F',ESP:'h|#AA151B|#F1BF00|#F1BF00|#AA151B',PRT:'v|#006600|#006600|#FF0000|#FF0000|#FF0000',GRC:'h|#0D5EAF|#FFFFFF|#0D5EAF|#FFFFFF|#0D5EAF|#FFFFFF|#0D5EAF|#FFFFFF|#0D5EAF',CHE:'p|#DA291C|#FFFFFF',GBR:'gb',CZE:'cz',SVK:'h|#FFFFFF|#0B4EA2|#EE1C25',SVN:'h|#FFFFFF|#005DA4|#ED1C24',HRV:'h|#FF0000|#FFFFFF|#171796',SRB:'h|#C6363C|#0C4076|#FFFFFF',BIH:'s|#002395',MNE:'s|#C40308',MKD:'c|#D20000|#FFE600',ALB:'s|#E41E20',BLR:'h|#C8313E|#C8313E|#4AA657',KOS:'s|#244AA5',CYP:'s|#FFFFFF',
- TUR:'c|#E30A17|#FFFFFF|-0.08',USA:'us',CAN:'v|#D52B1E|#FFFFFF|#FFFFFF|#D52B1E',MEX:'v|#006847|#FFFFFF|#CE1126',GTM:'v|#4997D0|#FFFFFF|#4997D0',HND:'h|#0073CF|#FFFFFF|#0073CF',SLV:'h|#0F47AF|#FFFFFF|#0F47AF',NIC:'h|#0067C6|#FFFFFF|#0067C6',CRI:'h|#002B7F|#FFFFFF|#CE1126|#CE1126|#FFFFFF|#002B7F',PAN:'s|#FFFFFF',CUB:'h|#002A8F|#FFFFFF|#002A8F|#FFFFFF|#002A8F',DOM:'p|#002D62|#FFFFFF',HTI:'h|#00209F|#D21034',JAM:'s|#009B3A',
- BRA:'br',ARG:'h|#74ACDF|#FFFFFF|#74ACDF',CHL:'cl',COL:'h|#FCD116|#FCD116|#003893|#CE1126',PER:'v|#D91023|#FFFFFF|#D91023',VEN:'h|#FFCC00|#00247D|#CF142B',ECU:'h|#FFDD00|#FFDD00|#034EA2|#ED1C24',BOL:'h|#D52B1E|#F9E300|#007934',PRY:'h|#D52B1E|#FFFFFF|#0038A8',URY:'h|#FFFFFF|#0038A8|#FFFFFF|#0038A8|#FFFFFF',GUY:'s|#009E49',SUR:'h|#377E3F|#FFFFFF|#B40A2D|#B40A2D|#FFFFFF|#377E3F',
- JPN:'c|#FFFFFF|#BC002D',CHN:'d|#DE2910|#FFDE00',KOR:'c|#FFFFFF|#CD2E3A',PRK:'h|#024FA2|#ED1C27|#ED1C27|#024FA2',TWN:'s|#FE0000',MNG:'v|#C4272F|#015197|#C4272F',IND:'h|#FF9933|#FFFFFF|#138808',PAK:'v|#FFFFFF|#01411C|#01411C|#01411C',BGD:'c|#006A4E|#F42A41|-0.05',NPL:'s|#DC143C',LKA:'s|#FFBE29',MMR:'h|#FECB00|#34B233|#EA2839',THA:'h|#A51931|#F4F5F8|#2D2A4A|#2D2A4A|#F4F5F8|#A51931',LAO:'h|#CE1126|#002868|#002868|#CE1126',KHM:'h|#032EA1|#E00025|#E00025|#032EA1',VNM:'c|#DA251D|#FFFF00',MYS:'h|#CC0001|#FFFFFF|#CC0001|#FFFFFF|#CC0001|#FFFFFF|#CC0001',IDN:'h|#CE1126|#FFFFFF',PHL:'h|#0038A8|#CE1126',PNG:'s|#000000',AUS:'s|#012169',NZL:'s|#012169',
- KAZ:'s|#00AFCA',UZB:'h|#0099B5|#FFFFFF|#1EB53A',TKM:'s|#00843D',KGZ:'c|#E8112D|#FFEF00',TJK:'h|#CC0000|#FFFFFF|#006600',AFG:'v|#000000|#D32011|#007A36',IRN:'h|#239F40|#FFFFFF|#DA0000',IRQ:'h|#CE1126|#FFFFFF|#000000',SYR:'h|#CE1126|#FFFFFF|#000000',YEM:'h|#CE1126|#FFFFFF|#000000',SAU:'s|#006C35',ARE:'h|#00732F|#FFFFFF|#000000',OMN:'s|#DB161B',QAT:'s|#8A1538',KWT:'h|#007A3D|#FFFFFF|#CE1126',JOR:'h|#000000|#FFFFFF|#007A3D',ISR:'h|#FFFFFF|#0038B8|#FFFFFF|#FFFFFF|#FFFFFF|#0038B8|#FFFFFF',LBN:'h|#ED1C24|#FFFFFF|#FFFFFF|#ED1C24',GEO:'p|#FFFFFF|#FF0000',ARM:'h|#D90012|#0033A0|#F2A800',AZE:'h|#0092BC|#E4002B|#00AF66',
- EGY:'h|#CE1126|#FFFFFF|#000000',LBY:'h|#E70013|#000000|#000000|#239E46',TUN:'c|#E70013|#FFFFFF',DZA:'v|#006233|#FFFFFF',MAR:'s|#C1272D',SDN:'h|#D21034|#FFFFFF|#000000',ETH:'h|#078930|#FCDD09|#DA121A',KEN:'h|#000000|#BB0000|#006600',UGA:'h|#000000|#FCDC04|#D90000|#000000|#FCDC04|#D90000',TZA:'s|#1EB53A',NGA:'v|#008751|#FFFFFF|#008751',GHA:'h|#CE1126|#FCD116|#006B3F',CIV:'v|#F77F00|#FFFFFF|#009E60',MLI:'v|#14B53A|#FCD116|#CE1126',TCD:'v|#002664|#FECB00|#C60C30',GIN:'v|#CE1126|#FCD116|#009460',SEN:'v|#00853F|#FDEF42|#E31B23',CMR:'v|#007A5E|#CE1126|#FCD116',NER:'h|#E05206|#FFFFFF|#0DB02B',GAB:'h|#009E60|#FCD116|#3A75C4',SLE:'h|#1EB53A|#FFFFFF|#0072C6',BEN:'v|#008751|#FCD116',BFA:'h|#EF2B2D|#009E49',TGO:'h|#006A4E|#FFCE00|#006A4E|#FFCE00|#006A4E',ZAF:'h|#E03C31|#FFFFFF|#007749|#FFFFFF|#001489',NAM:'s|#003580',BWA:'h|#75AADB|#75AADB|#000000|#75AADB|#75AADB',ZWE:'h|#319B42|#FFD200|#DE2010|#000000|#DE2010|#FFD200|#319B42',ZMB:'s|#198A00',MOZ:'h|#009A44|#FFFFFF|#000000|#FFFFFF|#FCE100',AGO:'h|#CC092F|#000000',COD:'s|#007FFF',COG:'s|#009543',MDG:'h|#FC3D32|#007E3A',SOM:'c|#4189DD|#FFFFFF',RWA:'h|#00A1DE|#00A1DE|#FAD201|#20603D',
- GRL:'h|#FFFFFF|#C8102E'};
-function flagSVG(desc,x,y,w,h){const p=desc.split('|'),t=p[0],c=p.slice(1);const R=(a,b,cw,ch,col)=>`<rect x="${(x+a*w).toFixed(3)}" y="${(y+b*h).toFixed(3)}" width="${(cw*w).toFixed(3)}" height="${(ch*h).toFixed(3)}" fill="${col}"/>`;
- if(t==='h')return c.map((col,i)=>R(0,i/c.length,1,1/c.length+0.002,col)).join('');
- if(t==='v')return c.map((col,i)=>R(i/c.length,0,1/c.length+0.002,1,col)).join('');
- if(t==='s')return R(0,0,1,1,c[0]);
- if(t==='x'){let o=R(0,0,1,1,c[0])+R(0.30,0,0.13,1,c[1])+R(0,0.42,1,0.16,c[1]);if(c[2])o+=R(0.335,0,0.06,1,c[2])+R(0,0.465,1,0.07,c[2]);return o}
- if(t==='p')return R(0,0,1,1,c[0])+R(0.42,0.18,0.16,0.64,c[1])+R(0.22,0.42,0.56,0.16,c[1]);
- if(t==='c'){const dx=+(c[2]||0);return R(0,0,1,1,c[0])+`<ellipse cx="${(x+(0.5+dx)*w).toFixed(3)}" cy="${(y+0.5*h).toFixed(3)}" rx="${(0.18*Math.min(w,h)*(w>h?1:w/h)).toFixed(3)}" ry="${(0.18*Math.min(w,h)*(h>w?1:h/w)).toFixed(3)}" fill="${c[1]}"/>`.replace(/rx="[^"]*" ry="[^"]*"/,`rx="${(0.17*w).toFixed(3)}" ry="${(0.25*h).toFixed(3)}"`)}
- if(t==='d')return R(0,0,1,1,c[0])+`<ellipse cx="${(x+0.17*w).toFixed(3)}" cy="${(y+0.25*h).toFixed(3)}" rx="${(0.07*w).toFixed(3)}" ry="${(0.1*h).toFixed(3)}" fill="${c[1]}"/>`;
- if(t==='us'){let o='';for(let i=0;i<13;i++)o+=R(0,i/13,1,1/13+0.002,i%2?'#FFFFFF':'#B22234');return o+R(0,0,0.4,7/13,'#3C3B6E')}
- if(t==='gb'){const sw=Math.max(w,h);return R(0,0,1,1,'#012169')+`<path d="M${x} ${y}L${x+w} ${y+h}M${x+w} ${y}L${x} ${y+h}" stroke="#FFFFFF" stroke-width="${(0.12*sw).toFixed(3)}"/><path d="M${x} ${y}L${x+w} ${y+h}M${x+w} ${y}L${x} ${y+h}" stroke="#C8102E" stroke-width="${(0.04*sw).toFixed(3)}"/>`+R(0.4,0,0.2,1,'#FFFFFF')+R(0,0.38,1,0.24,'#FFFFFF')+R(0.44,0,0.12,1,'#C8102E')+R(0,0.43,1,0.14,'#C8102E')}
- if(t==='cz')return R(0,0,1,0.5,'#FFFFFF')+R(0,0.5,1,0.5,'#D7141A')+`<path d="M${x} ${y}L${x+0.5*w} ${y+0.5*h}L${x} ${y+h}Z" fill="#11457E"/>`;
- if(t==='cl')return R(0,0,1,0.5,'#FFFFFF')+R(0,0.5,1,0.5,'#D52B1E')+R(0,0,0.33,0.5,'#0039A6');
- if(t==='br')return R(0,0,1,1,'#009C3B')+`<path d="M${x+0.08*w} ${y+0.5*h}L${x+0.5*w} ${y+0.1*h}L${x+0.92*w} ${y+0.5*h}L${x+0.5*w} ${y+0.9*h}Z" fill="#FFDF00"/><ellipse cx="${x+0.5*w}" cy="${y+0.5*h}" rx="${0.18*w}" ry="${0.26*h}" fill="#002776"/>`;
- return R(0,0,1,1,'#cccccc')}
-// ---------- Pixel-mosaik ----------
-function pixelCells(det,colorOf){const cell=Math.max(6,Math.round(Math.min(W,H)/80)),gap=Math.max(1,cell*0.14);const key='pix|'+det+'|'+cell+'|'+(S.focusHide?S.focus:'');
- if(!cache[key]){const cv=document.createElement('canvas');cv.width=2;cv.height=2;const ctx=cv.getContext('2d');
-  const units=GEO.units.filter(k=>!(S.focusHide&&!inFocus(k))).map(k=>{const p=new Path2D(kp(k,det));const cs=[P(k.b[0],k.b[1],isBH(k)),P(k.b[2],k.b[3],isBH(k)),P(k.b[0],k.b[3],isBH(k)),P(k.b[2],k.b[1],isBH(k))];return{k,p,b:[Math.min(...cs.map(c=>c[0]))-cell,Math.min(...cs.map(c=>c[1]))-cell,Math.max(...cs.map(c=>c[0]))+cell,Math.max(...cs.map(c=>c[1]))+cell]}});
-  const cells=[];for(let y=cell/2;y<H-FOOT;y+=cell)for(let x=cell/2;x<W;x+=cell){for(const u of units){if(x<u.b[0]||x>u.b[2]||y<u.b[1]||y>u.b[3])continue;if(ctx.isPointInPath(u.p,x,y,'evenodd')){cells.push([x,y,u.k]);break}}}
-  cache[key]=cells}
- const byCol={};for(const[x,y,k]of cache[key]){const c=colorOf(k);(byCol[c]=byCol[c]||[]).push(`M${(x-cell/2+gap/2).toFixed(1)} ${(y-cell/2+gap/2).toFixed(1)}h${(cell-gap).toFixed(1)}v${(cell-gap).toFixed(1)}h${(gap-cell).toFixed(1)}z`)}
- return Object.entries(byCol).map(([c,d])=>`<path d="${d.join('')}" fill="${c}"/>`).join('')}
-// ---------- Nabolande (kontekst i landevisning) ----------
-function utm32(lon,lat){const a=6378137,f=1/298.257223563,k0=0.9996,e2=f*(2-f),ep2=e2/(1-e2),l0=9*RAD,ph=lat*RAD,la=lon*RAD;const sp=Math.sin(ph),cp=Math.cos(ph),tp=Math.tan(ph);const N=a/Math.sqrt(1-e2*sp*sp),T=tp*tp,C=ep2*cp*cp,A=cp*(la-l0);
- const Mm=a*((1-e2/4-3*e2*e2/64-5*e2**3/256)*ph-(3*e2/8+3*e2*e2/32+45*e2**3/1024)*Math.sin(2*ph)+(15*e2*e2/256+45*e2**3/1024)*Math.sin(4*ph)-(35*e2**3/3072)*Math.sin(6*ph));
- return[k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T*T+72*C-58*ep2)*A**5/120)+500000,k0*(Mm+N*tp*(A*A/2+(5-T+9*C+4*C*C)*A**4/24+(61-58*T+T*T+600*C-330*ep2)*A**6/720))]}
-function worldPt(x,y){if(GEO.geo)return P(x,y);const[E,N]=utm32(x-180,90-y);return[((E-441000)/300)*sc+ox,((6403000-N)/300)*sc+oy]}
-const NBR={};function nbRings(u){if(NBR[u.c])return NBR[u.c];const a=DATA.adm1[u.c];return NBR[u.c]=a&&a.l?decRings(a.l):u.s}
-function neighboursPath(){const key='nb|'+S.country;if(cache[key]!=null)return cache[key];const b=S.map==='dk'?[188,32.2,195.2,35.5]:GEO.main;const m=Math.max(10,(b[2]-b[0])*1.2,(b[3]-b[1])*1.2);const win=[b[0]-m,b[1]-m,b[2]+m,b[3]+m];
- let d='';for(const u of DATA.world.units){if(u.c===(S.country||'DNK'))continue;if(u.b[2]<win[0]||u.b[0]>win[2]||u.b[3]<win[1]||u.b[1]>win[3])continue;for(const r of nbRings(u)){const rb=bboxR([r]);if(rb[2]<win[0]||rb[0]>win[2]||rb[3]<win[1]||rb[1]>win[3])continue;for(let i=0;i<r.length;i+=2){const cx=Math.min(win[2],Math.max(win[0],r[i])),cy=Math.min(win[3],Math.max(win[1],r[i+1]));const[x,y]=worldPt(cx,cy);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}d+='Z'}}
- return cache[key]=d}
-// ---------- Automatisk tekst (titel = fokus, undertitel = markering) ----------
-function listNames(arr){if(arr.length<=1)return arr.join('');return arr.slice(0,-1).join(', ')+' '+t('and')+' '+arr[arr.length-1]}
-function autoText(){const place=S.focus?(GEO.groups[S.focus]||nm(GEO.units.find(k=>k.c===S.focus)||{n:''})):(S.country?countryName(S.country):t('world'));
- const gs=S.groups.filter(g=>g.sel.size);const tot=gs.reduce((n,g)=>n+g.sel.size,0);let sub='';
- if(tot&&tot<=4){sub=listNames(gs.flatMap(g=>[...g.sel]).map(c=>GEO.units.find(k=>k.c===c)).filter(Boolean).map(nm))}
- else if(gs.length===1){const nms=[...gs[0].sel].map(c=>GEO.units.find(k=>k.c===c)).filter(Boolean).map(nm);sub=tot+' '+t(MAPS[S.map].unitKey)+': '+nms.slice(0,3).join(', ')+' +'+(tot-3)}
- else if(gs.length>1)sub=gs.map(g=>g.name+': '+g.sel.size).join(' · ');
- return{title:place,sub}}
-// ---------- Render ----------
-function render(){
- setLayout(S.layout);
- const D=DS[S.ds],st=S.style,det=document.getElementById('detail').checked,all=document.getElementById('labels').checked;
- const ds=Object.assign({head:D.fonts.heading,body:D.fonts.body},D.colors);
- const sp=SP[st]||{};const dark=sp.dark!=null?sp.dark:(ds.dark||st==='neon'||st==='blueprint');
- let bg=ds.bg,land=ds.land,stroke=ds.stroke,ink=ds.ink,landAlt=ds.landAlt;
- if(st==='neon'){bg='#061a2b';land='#0d2a40';stroke='#19c6ff';ink='#e6f7ff'}
- if(st==='blueprint'){bg='#163b5c';land='none';stroke='#9fd3ff';ink='#dcefff'}
- if(st==='outline'){land=ds.dark?bg:'#ffffff';stroke=ds.dark?ink:ds.land;if(ds.dark)land='transparent'}
- if(st==='glass'){bg=ds.dark?bg:'#dfe6ec';land=ds.dark?'#2d4454':'#f3f6f8';stroke=ds.dark?'#5a7a90':'#b9c6d0';landAlt=land}
- if(st==='silhouette'){stroke=land}
- if(st==='atlas'){bg=ds.dark?bg:'#ffffff';land=ds.dark?land:'#b9d3e6';landAlt=land;stroke=ds.dark?stroke:'#ffffff'}
- if(st==='patchwork'){stroke='#ffffff'}
- if(st==='paper'){stroke=mix(land,bg,0.35)}
- if(sp.bg){bg=sp.bg;land=sp.land;stroke=sp.stroke;ink=sp.ink;landAlt=sp.landAlt||mix(land,bg,0.25)}
- if(sp.pixel){stroke='none'}
- const groups=S.groups;const selAll=new Set(groups.flatMap(g=>[...g.sel]));const AT=attrDef();const ATC=AT?attrCats(AT):[];
- const unsel=GEO.units.filter(k=>!selAll.has(k.c));
- const onCol=c=>light(c)?'#1b1b1b':'#ffffff';
- let defs=`<defs>
-  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <filter id="emboss" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="${dark?0.7:0.4}"/><feDropShadow dx="-1" dy="-1" stdDeviation="0.6" flood-color="#fff" flood-opacity="0.5"/></filter>
-  <filter id="paper" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.22"/></filter>
-  <filter id="neonf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <filter id="longshadow" x="-50%" y="-50%" width="250%" height="250%">${[...Array(14)].map((_,i)=>`<feOffset in="SourceAlpha" dx="${(i+1)*3}" dy="${(i+1)*3}" result="o${i}"/>`).join('')}<feMerge>${[...Array(14)].map((_,i)=>`<feMergeNode in="o${i}"/>`).join('')}</feMerge><feColorMatrix type="matrix" values="0 0 0 0 0.1 0 0 0 0 0.2 0 0 0 0 0.3 0 0 0 0.35 0"/><feGaussianBlur stdDeviation="2"/></filter>
-  <pattern id="dotsBase" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="${bg}"/><circle cx="3.5" cy="3.5" r="2.3" fill="${land==='none'?stroke:land}"/></pattern>
-  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#9fd3ff" stroke-opacity=".25" stroke-width=".7"/><path d="M10 0V50M20 0V50M30 0V50M40 0V50M0 10H50M0 20H50M0 30H50M0 40H50" stroke="#9fd3ff" stroke-opacity=".1" stroke-width=".4"/></pattern>
-  <linearGradient id="glassg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
-  <linearGradient id="extrSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mix(land,'#000',0.35)}"/><stop offset="1" stop-color="${mix(land,'#000',0.6)}"/></linearGradient>
-  <filter id="slatef" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.015" numOctaves="2" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="screen"/></filter>
-  <filter id="hillshade" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.3  0 0 0 0 0.35  0 0 0 0 0.2  0 0 0 0.45 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="multiply"/></filter>
-  <filter id="hand" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
-  <pattern id="dStripe" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#fff"/><line x1="0" y1="0" x2="0" y2="8" stroke="#111" stroke-width="2.2"/></pattern>
-  <pattern id="dDots" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><circle cx="4" cy="4" r="1.8" fill="#111"/></pattern>
-  <pattern id="dCross" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><path d="M0 0L8 8M8 0L0 8" stroke="#111" stroke-width="1"/></pattern>
-  <pattern id="dWave" width="14" height="8" patternUnits="userSpaceOnUse"><rect width="14" height="8" fill="#fff"/><path d="M0 4Q3.5 0 7 4T14 4" fill="none" stroke="#111" stroke-width="1.2"/></pattern>
-  <pattern id="dScale" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff"/><path d="M0 6a6 6 0 0 0 12 0M-6 12a6 6 0 0 0 12 0M6 12a6 6 0 0 0 12 0" fill="none" stroke="#111" stroke-width="1"/></pattern>
-  <pattern id="dBrick" width="14" height="8" patternUnits="userSpaceOnUse"><rect width="14" height="8" fill="#fff"/><path d="M0 0H14M0 4H14M7 0V4M0 4V8M14 4V8" fill="none" stroke="#111" stroke-width="1"/></pattern>
-  <pattern id="dZig" width="10" height="8" patternUnits="userSpaceOnUse"><rect width="10" height="8" fill="#fff"/><path d="M0 6L2.5 2L5 6L7.5 2L10 6" fill="none" stroke="#111" stroke-width="1.1"/></pattern>
-  <pattern id="dCheck" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><rect width="4" height="4" fill="#111"/><rect x="4" y="4" width="4" height="4" fill="#111"/></pattern>
-  <pattern id="waves" width="40" height="24" patternUnits="userSpaceOnUse"><path d="M0 12Q5 6 10 12T20 12M22 20Q27 14 32 20T42 20" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/></pattern>
-  <radialGradient id="midbg" cx=".45" cy=".45" r=".75"><stop offset="0" stop-color="${sp.bgGradient?sp.bgGradient[0]:bg}"/><stop offset="1" stop-color="${sp.bgGradient?sp.bgGradient[1]:bg}"/></radialGradient>
-  <filter id="landglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter>
-  <filter id="stonef" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.3  0 0 0 0 0.3  0 0 0 0 0.28  0 0 0 0.35 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="multiply"/></filter>
-  <filter id="concrete" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="4" result="n"/><feColorMatrix in="n" type="saturate" values="0" result="g"/><feComponentTransfer in="g"><feFuncA type="linear" slope="0" intercept="0.22"/></feComponentTransfer></filter>
-  <filter id="sticker" x="-10%" y="-10%" width="120%" height="125%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000" flood-opacity="0.25"/></filter>
-  <filter id="pxshadow" x="-5%" y="-5%" width="115%" height="115%"><feDropShadow dx="2" dy="3" stdDeviation="1.5" flood-color="#000" flood-opacity="0.3"/></filter>
-  ${sp.flag&&S.map==='world'?GEO.units.filter(k=>FLAGS[k.c]).map(k=>`<pattern id="fl_${k.c}" patternContentUnits="objectBoundingBox" width="1" height="1">${flagSVG(FLAGS[k.c],0,0,1,1)}</pattern>`).join(''):''}
-  <radialGradient id="vignette" cx=".5" cy=".5" r=".7"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>`;
- const baseLand=land==='none'?'#1d4a73':land;
- groups.forEach((g,i)=>{const c=g.color,base=g.hl.has('fill')?c:(g.hl.has('tint')?mix(baseLand,c,0.5):baseLand),lineCol=g.hl.has('fill')?onCol(c):c;
-  defs+=`<pattern id="hatch${i}" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="${base}"/><line x1="0" y1="0" x2="0" y2="9" stroke="${lineCol}" stroke-width="3" stroke-opacity=".85"/></pattern>
-  <pattern id="dots${i}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="4" cy="4" r="2.2" fill="${lineCol}" fill-opacity=".9"/></pattern>`});
- defs+='</defs>';
- let out=`<rect width="${W}" height="${H}" fill="${bg}"/>`;
- if(st==='blueprint')out+=`<rect width="${W}" height="${H}" fill="url(#grid)"/><rect x="20" y="20" width="${W-40}" height="${H-40}" fill="none" stroke="#9fd3ff" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="#9fd3ff" fill-opacity=".7">${[...Array(9)].map((_,i)=>`<text x="${PAD.l+i*(W-PAD.l-PAD.r)/8}" y="${H-FOOT-26}">${(8+i*0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_,i)=>`<text x="26" y="${150+i*(H-200)/5}" transform="rotate(-90 26 ${150+i*(H-200)/5})">${(57.8-i*0.5).toFixed(1)}°N</text>`).join('')}</g>`;
- if(st==='neon')out+=`<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
- if(sp.bgGradient)out+=`<rect width="${W}" height="${H}" fill="url(#midbg)"/>`;
- if(sp.stars){let r=12345;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;out+='<g pointer-events="none">';for(let i=0;i<160;i++)out+=`<circle cx="${(rnd()*W).toFixed(0)}" cy="${(rnd()*(H-FOOT)).toFixed(0)}" r="${(0.4+rnd()*1.2).toFixed(1)}" fill="#fff" opacity="${(0.2+rnd()*0.6).toFixed(2)}"/>`;out+='</g>'}
- if(sp.concrete)out+=`<rect width="${W}" height="${H}" fill="#fff" filter="url(#concrete)"/>`;
- if(sp.waves)out+=`<rect width="${W}" height="${H}" fill="url(#waves)"/>`;
- if(sp.frame)out+=`<rect x="18" y="18" width="${W-36}" height="${H-36}" fill="none" stroke="${ink}" stroke-opacity=".6" stroke-width="1.5"/>`;
- if(sp.sea){const sea=S.focus?[]:(GEO.sea||[]).map(x=>[x[0],x[1],x[2].toUpperCase()]);out+=`<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity=".7" ${sp.seaItalic?'font-style="italic"':''}>`;for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;out+='</g>'}
- if(I){const R=bhRect();
- out+=`<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="none" stroke="${st==='neon'?stroke:ink}" stroke-opacity=".45" stroke-width="1" ${st==='blueprint'?'stroke-dasharray="4 3"':''}/>`}
- const allPath=landPath(det)+(I?kp(GEO.units.find(isBH),det):'');
- if(S.map!=='world'&&document.getElementById('showNeighbours').checked&&!S.focusHide){const nb=neighboursPath();if(nb)out+=`<path d="${nb}" fill="${mix(bg,dark?'#ffffff':'#000000',dark?0.1:0.09)}" stroke="${bg}" stroke-width="0.8" pointer-events="none"/>`}
- if(sp.flag&&S.map!=='world'){const iso=S.country||'DNK',fl=FLAGS[iso];const x0=M[0]*sc+ox,y0=M[1]*sc+oy,x1=M[2]*sc+ox,y1=M[3]*sc+oy;
-  out+=`<path d="${allPath}" fill="#fff" stroke="#fff" stroke-width="16" stroke-linejoin="round" filter="url(#sticker)" pointer-events="none"/><clipPath id="landclipF"><path d="${allPath}"/></clipPath><g clip-path="url(#landclipF)" pointer-events="none">${fl?flagSVG(fl,x0,y0,x1-x0,y1-y0):`<rect x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" fill="${ds.primary}"/>`}</g>`}
- if(sp.flag&&S.map==='world')out+=`<path d="${allPath}" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round" filter="url(#sticker)" pointer-events="none"/>`;
- if(sp.stone)out+='';
- if(sp.landGlow)out+=`<path d="${allPath}" fill="none" stroke="${sp.landGlow}" stroke-width="14" filter="url(#landglow)" opacity=".5"/>`;
- if(st==='extrude'||sp.extrude){const ec=sp.extrudeColor||mix(land,'#000',0.45);for(let i=14;i>0;i--)out+=`<path d="${allPath}" transform="translate(${-i*0.6},${i*1.1})" fill="${i===1?'url(#extrSide)':ec}" stroke="${mix(ec,'#fff',0.12)}" stroke-width=".6"/>`}
- if(st==='glass')out+=`<path d="${allPath}" fill="#000" filter="url(#longshadow)" opacity=".9"/>`;
- if(st==='paper')out+=`<path d="${allPath}" fill="${mix(land,bg,0.4)}" transform="translate(5,7)" opacity=".5"/>`;
- if(st==='neon')out+=`<path d="${allPath}" fill="none" stroke="${stroke}" stroke-width="5" filter="url(#neonf)" opacity=".7"/>`;
- const dim=groups.some(g=>g.hl.has('dim')&&g.sel.size);
- const baseFill=k=>{
-  if(sp.flag)return S.map==='world'?(FLAGS[k.c]?`url(#fl_${k.c})`:mix(land,'#888888',0.3)):land;
-  if(st==='halftone')return 'url(#dotsBase)';
-  if(st==='blueprint')return '#1d4a73';
-  if(AT&&!sp.patterns&&!sp.text){const v=AT.f(k),i=Math.max(0,ATC.indexOf(v));return (AT.ord||AT.ordKeys)?mix(mix(land,'#ffffff',0.72),land,ATC.length>1?i/(ATC.length-1):1):PATCH[i%PATCH.length]}
-  if(st==='shades'){const i=(parseInt(k.c)*7)%5;return [land,landAlt,mix(land,bg,0.25),mix(land,bg,0.4),mix(land,'#000',0.12)][i]}
-  if(st==='regions'){const n=Math.max(2,Object.keys(GEO.groups).length);return mix(land,bg,0.75*REGI[k.r]/(n-1))}
-  if(st==='patchwork'){return PATCH[(parseInt(k.c)*13+REGI[k.r])%PATCH.length]}
-  if(sp.patterns){return 'url('+DOODLE[(parseInt(k.c)*7+REGI[k.r])%DOODLE.length]+')'}
-  if(st==='topo'){return (parseInt(k.c)*7)%3?land:landAlt}
-  return land;
- };
- const swBase=sp.strokeW!=null?sp.strokeW:st==='outline'?1.2:st==='blueprint'?0.8:st==='neon'?0.8:st==='silhouette'?0:0.9;
- const strokeBase=st==='silhouette'?'none':stroke;
- out+=`<g id="unsel"${st==='paper'?' filter="url(#paper)"':sp.filter?' filter="url(#'+sp.filter+')"':''}>`;
- for(const k of unsel){const fo=!inFocus(k);if(fo&&S.focusHide)continue;out+=`<path class="k" data-c="${k.c}" d="${kp(k,det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim||fo?'opacity=".3"':''} ${st==='outline'||sp.pixel||(sp.flag&&S.map!=='world')?'fill-opacity="0"':sp.network?'fill-opacity=".55"':''} ${sp.flag&&S.map!=='world'?'stroke-opacity=".45"':''}/>`}
- out+='</g>';
- if(sp.network){out+=`<path d="${allPath}" fill="none" stroke="#7cc4ff" stroke-width="5" filter="url(#landglow)" opacity=".55" pointer-events="none"/><path d="${allPath}" fill="none" stroke="#9fd6ff" stroke-width="1.2" pointer-events="none"/>`;
-  const nodes=GEO.units.filter(k=>!(S.focusHide&&!inFocus(k))&&!isBH(k)).map(k=>{const[x,y]=kc(k);return{k,x,y}});const seen=new Set();let ls='';
-  for(const a of nodes){const nn=nodes.filter(b=>b!==a).map(b=>[b,(a.x-b.x)**2+(a.y-b.y)**2]).sort((p,q)=>p[1]-q[1]).slice(0,3);for(const[b]of nn){const key=a.k.c<b.k.c?a.k.c+'|'+b.k.c:b.k.c+'|'+a.k.c;if(seen.has(key))continue;seen.add(key);ls+=`M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${b.x.toFixed(1)} ${b.y.toFixed(1)}`}}
-  out+=`<path d="${ls}" stroke="#8fd0ff" stroke-width=".7" opacity=".5" fill="none" pointer-events="none"/><g filter="url(#neonf)" pointer-events="none">`+nodes.map(n=>{const gi=groupOf(n.k.c);return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${gi>=0?4.5:2.2}" fill="${gi>=0?S.groups[gi].color:'#cfeeff'}"/>`}).join('')+'</g>'}
- if(sp.pixel){out+=`<g filter="url(#pxshadow)" pointer-events="none">`+pixelCells(det,k=>{const gi=groupOf(k.c);if(gi>=0)return S.groups[gi].color;const f=baseFill(k);return f.startsWith('url')?land:f})+'</g>'}
- if(sp.extrude&&st==='stone')out+=`<path d="${allPath}" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".55" transform="translate(-1,-1)" pointer-events="none"/>`;
- if(st==='glass'){out+=`<path d="${allPath}" fill="url(#glassg)" pointer-events="none" opacity=".55"/><path d="${allPath}" fill="none" stroke="#fff" stroke-width="1.2" pointer-events="none" opacity=".8"/>`}
- if(st==='silhouette')out+=`<path d="${allPath}" fill="none" stroke="${mix(land,'#000',0.2)}" stroke-width="1" pointer-events="none"/>`;
- if(sp.regionLines){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`}
- if(sp.dotted){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`}
- if(sp.text){out+='<g pointer-events="none">';GEO.units.forEach((k,i)=>{if(selAll.has(k.c))return;const cs=[P(k.b[0],k.b[1],isBH(k)),P(k.b[2],k.b[3],isBH(k)),P(k.b[0],k.b[3],isBH(k)),P(k.b[2],k.b[1],isBH(k))];const x0=Math.min(...cs.map(c=>c[0])),x1=Math.max(...cs.map(c=>c[0])),y0=Math.min(...cs.map(c=>c[1])),y1=Math.max(...cs.map(c=>c[1]));const bw=x1-x0,bh=y1-y0;const n=nm(k).toUpperCase();
-   out+=`<clipPath id="ck${k.c}"><path d="${kp(k,det)}"/></clipPath><g clip-path="url(#ck${k.c})">`;
-   if(sp.text==='typo'){const fs=Math.max(6,Math.min(bh*0.95,bw*1.6/n.length));out+=`<text x="${(x0+bw/2).toFixed(1)}" y="${(y0+bh/2+fs*0.36).toFixed(1)}" text-anchor="middle" font-family="'${ds.head}'" font-weight="700" font-size="${fs.toFixed(1)}" textLength="${(bw*0.96).toFixed(1)}" lengthAdjust="spacingAndGlyphs" fill="${sp.textColor}">${esc(n)}</text>`}
-   else{const fs=Math.max(5,Math.min(bw*1.5/n.length,bh*0.6,18));const rows=Math.max(1,Math.ceil(bh/(fs*0.95)));for(let r=0;r<rows;r++){const col=sp.wordColors[(i+r)%sp.wordColors.length];out+=`<text x="${(x0+bw/2).toFixed(1)}" y="${(y0+fs*0.85+r*fs*0.95).toFixed(1)}" text-anchor="middle" font-family="'${ds.head}'" font-weight="700" font-size="${fs.toFixed(1)}" textLength="${(bw*0.98).toFixed(1)}" lengthAdjust="spacingAndGlyphs" fill="${col}">${esc(n)}</text>`}}
-   out+='</g>'});out+='</g>'}
- if(sp.cityDots){out+='<g pointer-events="none">';for(const k of unsel){if(k.a<TH.h&&!isBH(k))continue;const[x,y]=kc(k);out+=`<circle cx="${x.toFixed(1)}" cy="${(y+8).toFixed(1)}" r="3.2" fill="#fff" stroke="${land}" stroke-width="1"/>`}out+='</g>'}
- if(st==='atlas'||st==='regions'){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ds.dark?ink:'#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
-  out+=`<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity=".65" fill="${ds.dark?ink:'#355a78'}">`;
-  for(const r in REGC){if(S.focus)break;const[x,y]=P(REGC[r][0],REGC[r][1]);out+=`<text x="${x.toFixed(0)}" y="${(y+3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`}
-  if(st==='atlas'){const sea=S.focus?[]:(GEO.sea||[]).map(x=>[x[0],x[1],x[2].toUpperCase()]);for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`}
-  out+='</g>'}
- // markerede grupper (tegnes i rækkefølge; senere grupper øverst)
- groups.forEach((g,gi)=>{const col=g.color,hl=g.hl;out+=`<g id="g${gi}">`;
-  for(const c of g.sel){const k=GEO.units.find(k=>k.c===c);if(!k)continue;
-   let fill=hl.has('fill')?col:(hl.has('tint')?mix(baseFill(k)==='url(#dotsBase)'?baseLand:baseFill(k).startsWith('url')?baseLand:baseFill(k),col,0.5):baseFill(k));
-   if(hl.has('hatch'))fill=`url(#hatch${gi})`;else if(hl.has('dots'))fill=`url(#dots${gi})`;
-   let strk=strokeBase,sw=swBase;
-   if(hl.has('outline')){strk=(hl.has('fill')&&!hl.has('hatch')&&!hl.has('dots'))?onCol(col):col;sw=3.2}
-   const tr=hl.has('emboss')?'transform="translate(0,-6)"':'';const f=hl.has('emboss')?'filter="url(#emboss)"':'';
-   const fillAttr=sp.pixel?'fill-opacity="0"':st==='outline'&&!hl.has('fill')&&!hl.has('hatch')&&!hl.has('dots')&&!hl.has('tint')?'fill-opacity="0"':'';
-   out+=`<g ${tr}>${hl.has('glow')?`<path d="${kp(k,det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity=".85" pointer-events="none"/>`:''}<path class="k" data-c="${k.c}" d="${kp(k,det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`}
-  out+='</g>'});
- // byer i fokus (kun datasæt med cities)
- const CL=S.map==='adm1'?GEO.cityList:(S.focus&&GEO.cities?(focusUnits()||[]).flatMap(u=>(GEO.cities[u.c]||[]).filter(c=>!GEO.groups[S.focus]||c.cap)):[]);
- if(CL.length&&document.getElementById('showCities').checked){out+='<g pointer-events="none">';for(const u of [0]){for(const c of CL){const[x,y]=P(c.x,c.y);const big=c.cap||c.pop>2e6;out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big?4.5:3}" fill="${c.cap?ds.accent:'#ffffff'}" stroke="${ink}" stroke-width="1.2"/><text x="${(x+7).toFixed(1)}" y="${(y+4).toFixed(1)}" font-family="'${ds.body}'" font-size="${big?12:10}" font-weight="${c.cap?700:500}" fill="${ink}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(c.n)}</text>`}}out+='</g>'}
- // navne, pins, labels, callouts
- const lf=ds.body;out+='<g pointer-events="none">';
- if(all||sp.labels)for(const k of unsel){const[x,y]=kc(k);if(k.a<(sp.labels?TH.h:TH.l)&&!isBH(k))continue;const caps=sp.labels==='caps';out+=`<text x="${x.toFixed(0)}" y="${(y-(sp.cityDots?2:0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps?(k.a>TH.big?7.5:6.5):(k.a>TH.big?8:6.5)}" ${caps?'letter-spacing="1.2"':'font-weight="700"'} text-anchor="middle" fill="${sp.labelColor||(st==='outline'||st==='halftone'?ink:(light(land)?'#222':'#fff'))}" opacity=".9">${esc(caps?nm(k).toUpperCase():nm(k))}</text>`}
- const margin={l:[],r:[]};
- groups.forEach(g=>{const col=g.color,hl=g.hl;for(const c of g.sel){const k=GEO.units.find(k=>k.c===c);if(!k)continue;const[x,y]=kc(k);
-  if(hl.has('pin'))out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${col}" stroke-width="2.5" class="pulse"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" stroke="${onCol(col)}" stroke-width="1.6"/>`;
-  if(hl.has('label')&&!hl.has('callout')){const w=nm(k).length*6.6+16;out+=`<g transform="translate(${x.toFixed(1)},${(y-(hl.has('pin')?16:0)).toFixed(1)})"><rect x="${-w/2}" y="-20" width="${w}" height="18" rx="4" fill="${dark?col:ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark?onCol(col):onCol(ds.primary)}">${esc(nm(k))}</text></g>`}
-  if(hl.has('callout'))(x<W/2?margin.l:margin.r).push({k,x,y,col})}});
- for(const side of ['l','r']){const arr=margin[side].sort((a,b)=>a.y-b.y);const n=arr.length;if(!n)continue;const avail=H-FOOT-260;const step=Math.min(70,avail/n);const y0=(H-FOOT-step*(n-1))/2+40;
-  arr.forEach((o,i)=>{const lab=y0+i*step;const lx=side==='l'?PAD.l-18:W-PAD.r+18;const tx=side==='l'?24:W-24;
-   const ln=`M${o.x.toFixed(1)} ${o.y.toFixed(1)}L${lx} ${lab.toFixed(1)}`;const lc=o.col.toLowerCase()===land.toLowerCase()?onCol(land):o.col;
-   out+=`<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/><text x="${tx}" y="${(lab-4).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}">${esc(nm(o.k))}</text><text x="${tx}" y="${(lab+10).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".7">${GEO.groups[o.k.r].toUpperCase()}</text>`})}
- // signaturforklaring
- if(document.getElementById('legend').checked){const items=[];const gs=groups.filter(g=>g.sel.size);
-  if(gs.length>1||(gs.length===1&&gs[0].name))gs.forEach(g=>{const sw=g.hl.has('hatch')?`url(#hatch${groups.indexOf(g)})`:g.hl.has('dots')?`url(#dots${groups.indexOf(g)})`:(g.hl.has('fill')?g.color:g.hl.has('tint')?mix(baseLand,g.color,0.5):baseLand);items.push({sw,stroke:g.hl.has('outline')&&!g.hl.has('fill')?g.color:ink,sw2:g.hl.has('outline')?2:0.6,label:g.name+' ('+g.sel.size+')'})});
-  if(AT&&!sp.patterns&&!sp.text)ATC.forEach((v,i)=>items.push({sw:AT.ord?mix(mix(land,'#ffffff',0.72),land,ATC.length>1?i/(ATC.length-1):1):PATCH[i%PATCH.length],stroke:ink,sw2:0.4,label:v}));
-  if(items.length){let y=H-FOOT-14-items.length*18;const lw=Math.max(...items.map(o=>o.label.length))*6.2+50;const x=margin.l.length?(margin.r.length?(W-lw)/2:W-PAD.r+20-lw):PAD.l-20;
-  out+=`<rect x="${x-8}" y="${y-8}" width="${lw}" height="${items.length*18+12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
-  items.forEach(o=>{out+=`<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x+20}" y="${y+11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;y+=18})}}
- out+='</g>';
- // tekst & logo
- if(document.getElementById('autoText').checked){const a=autoText();document.getElementById('title').value=a.title;document.getElementById('sub').value=a.sub}
- const title=document.getElementById('title').value,sub=document.getElementById('sub').value;
- const hcol=sp.bg?(sp.heading||ink):(dark?ds.headingOnDark:ds.heading);const ts=Math.round(W*0.038);
- out+='<g pointer-events="none">';
- if(document.getElementById('showText').checked){const ta=sp.titleAlign||'left';const tx=ta==='center'?W/2:ta==='right'?W-PAD.l+12:PAD.l-12;const anc=ta==='center'?'middle':ta==='right'?'end':'start';const t=sp.titleCaps?title.toUpperCase():title;const ls=sp.titleCaps?8:-1;
-  out+=`<text x="${tx}" y="${Math.round(ts*2)}" text-anchor="${anc}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}">${esc(t)}</text><text x="${tx+(ta==='left'?2:0)}" y="${Math.round(ts*2+24)}" text-anchor="${anc}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps?3:0}" fill="${ink}" opacity=".9">${esc(sp.titleCaps?sub.toUpperCase():sub)}</text>`}
- if(document.getElementById('showLogo').checked){const L=D.company.logo;
-  if(L.src){const lw=Math.min(L.width||220,W*0.26),lh=lw/(L.aspect||4);
-   const uniformDark=dark&&(bg.toLowerCase()===(L.boxColor||'').toLowerCase()||st==='neon'||st==='blueprint'||ds.dark);
-   const box=L.box==='always'||(L.box==='auto'&&!uniformDark);
-   if(!box)out+=`<image href="${L.src}" x="${W-PAD.l+12-lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`;
-   else out+=`<rect x="${W-PAD.l+12-lw-22}" y="38" width="${lw+44}" height="${(lh+30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W-PAD.l+12-lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`;
-  } else {const t=L.text||D.company.name;if(t)out+=`<text x="${W-PAD.l+12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(t)}</text><text x="${W-PAD.l+12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(L.sub||'')}</text>`}
- }
- out+='</g>';
- // footer med partnere
- window._links=[];
- if(FOOT){const fy=H-FOOT;const label=document.getElementById('footerLabel').value;const dv=D.footer.divider;const dcol=dv.color||ds.primary;const dw=dv.width<=1?(W-2*(PAD.l-12))*dv.width:dv.width;const dx=dv.align==='center'?(W-dw)/2:dv.align==='right'?W-PAD.l+12-dw:PAD.l-12;
-  out+='<g pointer-events="none">';
-  if(dv.style==='bar')out+=`<rect x="${dx.toFixed(1)}" y="${(fy-dv.height/2).toFixed(1)}" width="${dw.toFixed(1)}" height="${dv.height}" rx="${dv.height/2}" fill="${dcol}" fill-opacity="${dv.opacity}"/>`;
-  else if(dv.style==='line')out+=`<line x1="${dx.toFixed(1)}" y1="${fy}" x2="${(dx+dw).toFixed(1)}" y2="${fy}" stroke="${dcol}" stroke-opacity="${dv.opacity}" stroke-width="1"/>`;
-  let x=PAD.l-12;const lh=FOOT*0.5,gap=Math.round(W*0.03);const ty=fy+FOOT/2;
-  if(label){out+=`<text x="${x}" y="${(ty+4).toFixed(1)}" font-family="'${lf}'" font-size="11" letter-spacing="1" fill="${ink}" opacity=".75">${esc(label.toUpperCase())}</text>`;x+=label.length*7.2+gap}
-  for(const p of S.partners){if(p.logo&&p.logo.src){const a=p.logo.aspect||2,lw=Math.min(lh*a,W*0.2);const bx=x,by=ty-lh/2;
-    out+=`<rect x="${bx-6}" y="${by-6}" width="${lw+12}" height="${lh+12}" rx="4" fill="#ffffff" fill-opacity="${dark?0.92:0}"/><image href="${p.logo.src}" x="${bx}" y="${by.toFixed(1)}" width="${lw.toFixed(1)}" height="${lh.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
-    if(p.link)window._links.push({x:bx,y:by,w:lw,h:lh,url:p.link});x+=lw+gap}
-   else if(p.name){out+=`<text x="${x}" y="${(ty+4).toFixed(1)}" font-family="'${ds.head}'" font-weight="700" font-size="13" fill="${ink}">${esc(p.name)}</text>`;if(p.link)window._links.push({x,y:ty-10,w:p.name.length*8,h:20,url:p.link});x+=p.name.length*8+gap}}
-  out+='</g>'}
- document.getElementById('svg').innerHTML=defs+out;
- const wrap=document.getElementById('wrap');wrap.style.background=bg;wrap.style.setProperty('--hl',(groups[S.active]||groups[0]||{color:ds.accent}).color);
- document.getElementById('count').textContent=t('count').replace('{n}',selAll.size).replace('{g}',groups.length);
-}
-
-// ---------- UI ----------
-function ui(){
- if(!DS[S.ds])S.ds=DSORDER[0];applyTheme();const D=DS[S.ds];
- const sel=document.getElementById('ds');const grp={builtin:t('grp_builtin'),private:t('grp_private'),file:t('grp_file'),user:t('grp_user')};
- sel.innerHTML=Object.keys(grp).map(g=>{const items=DSORDER.filter(i=>g==='private'?DS[i].private:(DS[i].source===g&&!DS[i].private));return items.length?`<optgroup label="${grp[g]}">`+items.map(k=>`<option value="${k}">${esc(DS[k].name)}</option>`).join('')+'</optgroup>':''}).join('');sel.value=S.ds;
- document.getElementById('dsSw').innerHTML=D.swatches.map(c=>`<span class="sw" style="background:${c}" title="${c}"></span>`).join('')+(D.company.link?` <a href="${esc(D.company.link)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--tyr)">${esc(D.company.name)} ↗</a>`:'');
- document.getElementById('dsName').textContent=D.note||(D.source==='user'?'importeret':'');
- document.getElementById('dsDel').style.display=D.source==='user'?'':'none';
- document.getElementById('attrSel').innerHTML=`<option value="none">${esc(t('colour_by'))}: ${esc(t('none'))}</option>`+(ATTRS[S.map]||[]).map(a=>`<option value="${a.id}">${esc(t('colour_by'))}: ${esc(t(a.n))}</option>`).join('');document.getElementById('attrSel').value=S.attr;
- document.getElementById('mapInfo').textContent=(S.country?countryName(S.country)+' · ':'')+GEO.units.length+' '+t(MAPS[S.map].unitKey);
- document.getElementById('attrBtn').style.display=S.attr==='none'?'none':'';
- const ps=document.getElementById('projSel');ps.innerHTML=GEO.geo?Object.entries(PROJS).filter(([k,p])=>!p.local||S.country||S.focus).map(([k,p])=>`<option value="${k}">${esc(t('projection'))}: ${p.local?esc(t('proj_local')):p.n}</option>`).join(''):`<option>${esc(t('projection'))}: UTM 32N</option>`;ps.disabled=!GEO.geo;if(GEO.geo)ps.value=S.proj;
- const fsel=document.getElementById('focusSel2');const cmp=(a,b)=>a[1].localeCompare(b[1],S.lang);
- const ctry=[...new Set([...Object.keys(DATA.adm1),'DNK'])].map(c=>[c,countryName(c)]).sort(cmp);
- const og=(label,arr)=>arr.length?`<optgroup label="${esc(label)}">`+arr.map(([v,n])=>`<option value="${esc(v)}">${esc(n)}</option>`).join('')+'</optgroup>':'';
- let h='';
- if(S.map==='world'){h+=`<option value="">${esc(t('focus'))}: ${esc(t('world'))}</option>`+og(t('continents'),Object.entries(GEO.groups))+og(t('countries_drill'),ctry.map(([c,n])=>['c:'+c,n]))}
- else{h+=`<option value="world">← ${esc(t('world'))}</option><option value="">${esc(t('focus'))}: ${esc(countryName(S.country))} – ${esc(t('whole_country'))}</option>`;
-  const gs=Object.entries(GEO.groups).filter(([r])=>r!=='_');if(gs.length>1)h+=og(t('regions'),gs.sort(cmp));
-  h+=og(t('zoom_unit'),GEO.units.map(k=>[k.c,nm(k)]).sort(cmp));h+=og(t('other_countries'),ctry.filter(([c])=>c!==S.country).map(([c,n])=>['c:'+c,n]))}
- fsel.innerHTML=h;fsel.value=S.focus;
- document.getElementById('regionPresets').innerHTML=Object.entries(GEO.groups).map(([r,n])=>`<button class="chip" onclick="presetRegionActive('${r}')">${esc(n)} ${esc(t('to_active'))}</button>`).join('');
- document.getElementById('langSel').innerHTML=Object.keys(T).map(l=>`<option value="${l}">${LANGN[l]}</option>`).join('');document.getElementById('langSel').value=S.lang;
- document.getElementById('layouts').innerHTML=LAYOUTS.map(l=>`<button class="tile ${S.layout===l.id?'on':''}" onclick="S.layout='${l.id}';ui();render()"><b>${t('lay_'+l.id)}</b><i>${l.d}</i></button>`).join('');
- document.getElementById('layoutInfo').textContent=W+'×'+H;
- document.getElementById('styles').innerHTML=STYLES.map((s,i)=>`<button class="tile ${S.style===s.id?'on':''}" onclick="S.style='${s.id}';ui();render()"><b>${i+1}. ${esc(t('st_'+s.id))}</b><i>${esc(t('st_'+s.id+'_d'))}</i></button>`).join('');
- document.getElementById('styleNo').textContent='#'+(STYLES.findIndex(s=>s.id===S.style)+1)+' / '+STYLES.length;
- const cols=D.highlight;
- document.getElementById('groups').innerHTML=S.groups.map((g,i)=>`<div class="grp ${S.active===i?'active':''}" onclick="if(S.active!==${i}){S.active=${i};ui();render()}">
-  <div class="hd"><input type="radio" name="act" ${S.active===i?'checked':''} title="Aktiv gruppe (klik på kortet)"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="Gruppenavn"><span class="cnt">${g.sel.size}</span>${S.groups.length>1?`<button class="x" title="Fjern gruppe" onclick="event.stopPropagation();removeGroup(${i})">×</button>`:''}</div>
-  <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}',MAPS[S.map].ex))}">${esc(g.text!=null?g.text:[...g.sel].map(c=>nm(GEO.units.find(k=>k.c===c))).join(', '))}</textarea>
-  <div class="warn" id="warn${i}" style="${g.bad.length?'display:block':''}">${g.bad.length?'Ikke genkendt: '+esc(g.bad.join(', ')):''}</div>
-  <div class="row" style="margin-top:6px">${cols.map(c=>`<button class="sw sm ${g.color===c?'on':''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
-  <div class="row" style="margin-top:6px">${HLS.map(h=>`<button class="chip sm ${g.hl.has(h.id)?'on':''}" title="${esc(t('hl_'+h.id+'_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_'+h.id))}</button>`).join('')}</div>
- </div>`).join('');
- S.groups.forEach(g=>{if(!g.color)g.color=cols[Math.min(S.groups.indexOf(g),cols.length-1)]});
- document.getElementById('partners').innerHTML=S.partners.map((p,i)=>`<div class="partner">${p.logo&&p.logo.src?`<img src="${p.logo.src}" alt="">`:'<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(tekst)</span>'}<span>${esc(p.name)}${p.link?` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--tyr)">link</a>`:''}</span><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`).join('')||'<p class="note" style="margin:0">'+esc(t('no_partners'))+'</p>';
- document.getElementById('partnerCount').textContent=S.partners.length+' '+t('partners');
-}
-function setDS(v){S.ds=v;const D=DS[v];const d=D.defaults;if(d&&!document.getElementById('autoText').checked){if(d.title!=null)document.getElementById('title').value=d.title;if(d.sub!=null)document.getElementById('sub').value=d.sub}
- S.partners=D.partners.map(p=>({name:p.name,link:p.link,logo:Object.assign({},p.logo)}));document.getElementById('footerLabel').value=D.footer.label||'';
- ui();render()}
-function toggleHL(i,id){const g=S.groups[i];if(g.hl.has(id)){if(g.hl.size>1)g.hl.delete(id);else return toast(t('ts_min_one'))}else{g.hl.add(id);const ex=['fill','hatch','dots','tint'];if(ex.includes(id))ex.filter(x=>x!==id).forEach(x=>g.hl.delete(x))}ui();render()}
-function addGroup(){const D=DS[S.ds];const i=S.groups.length;const defaults=[['fill','glow'],['hatch'],['dots'],['tint','outline'],['outline']];S.groups.push(newGroup(t('group')+' '+(i+1),defaults[i%defaults.length],D.highlight[Math.min(i,D.highlight.length-1)]));S.active=i;ui();render()}
-function removeGroup(i){S.groups.splice(i,1);S.active=Math.max(0,Math.min(S.active,S.groups.length-1));ui();render()}
-function fromText(i){const g=S.groups[i];const raw=document.getElementById('list'+i).value;g.text=raw;const toks=raw.split(/[\n,;]+/).map(t=>t.trim()).filter(Boolean);g.sel=new Set();g.bad=[];
- for(const t of toks){const c=lookup(t);if(c){S.groups.forEach((o,j)=>{if(j!==i)o.sel.delete(c)});g.sel.add(c)}else g.bad.push(t)}
- const w=document.getElementById('warn'+i);w.style.display=g.bad.length?'block':'none';w.textContent=g.bad.length?'Ikke genkendt: '+g.bad.join(', '):'';
- S.groups.forEach((o,j)=>{if(j!==i){o.text=null;const el=document.getElementById('list'+j);if(el)el.value=[...o.sel].map(c=>nm(GEO.units.find(k=>k.c===c))).join(', ')}});
- document.querySelector(`#groups .grp:nth-child(${i+1}) .cnt`).textContent=g.sel.size;render()}
-function syncText(){S.groups.forEach(g=>{g.text=null;g.bad=[]})}
-function setMap(id){const prevW=S.map==='world';if(prevW)S.worldProj=S.proj;setData(id);S.attr='none';S.focusHide=false;document.getElementById('focusHide').checked=false;
- S.proj=S.map==='world'?(S.worldProj&&!PROJS[S.worldProj].local?S.worldProj:'robinson'):(GEO.geo?'local':S.proj);
- const D=DS[S.ds];const tmpl=S.groups.length?S.groups:[{name:t('g_fill'),hl:new Set(['fill','glow']),color:D.highlight[0]},{name:t('g_hatch'),hl:new Set(['hatch']),color:D.highlight[1]||D.highlight[0]}];
- S.groups=tmpl.map(g=>newGroup(g.name,[...g.hl],g.color));if(!S.groups.length)S.groups=[newGroup(t('g_fill'),['fill'],D.highlight[0])];
- MAPS[S.map].defaults.forEach(c=>S.groups[0].sel.add(c));S.active=0;ui();render()}
-function setFocus(v){if(v==='world')return setMap('world');if(v.startsWith('c:'))return setMap(v.slice(2));S.focus=v;LC=null;ui();render()}
-function presetRegionActive(r){const g=S.groups[S.active];const list=GEO.units.filter(k=>k.r===r).map(k=>k.c);list.forEach(c=>{S.groups.forEach(o=>o.sel.delete(c));g.sel.add(c)});syncText();ui();render()}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800)}
-const svg=document.getElementById('svg'),tip=document.getElementById('tip');
-svg.addEventListener('click',e=>{const p=e.target.closest('.k');if(!p)return;const c=p.dataset.c;const g=S.groups[S.active];if(g.sel.has(c))g.sel.delete(c);else{S.groups.forEach(o=>o.sel.delete(c));g.sel.add(c)}syncText();ui();render()});
-svg.addEventListener('mousemove',e=>{const p=e.target.closest('.k');if(!p){tip.style.display='none';return}const k=GEO.units.find(k=>k.c===p.dataset.c);const gi=groupOf(k.c);tip.innerHTML=`<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi>=0?t('tip_in')+' "'+esc(S.groups[gi].name)+'"':t('tip_click')+' "'+esc(S.groups[S.active].name)+'"'}`;tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY-10+'px'});
-// Hover-kontur tegnes som et separat, ikke-klikbart lag øverst. Den hoverede sti må IKKE flyttes i DOM'en:
-// det får mousedown/mouseup til at ramme forælderen, så click aldrig udløses.
-function hoverLine(p){let h=document.getElementById('hoverline');if(!p){if(h)h.remove();return}
- if(!h){h=document.createElementNS('http://www.w3.org/2000/svg','path');h.id='hoverline'}
- h.setAttribute('d',p.getAttribute('d'));const t=p.parentNode.getAttribute('transform');if(t)h.setAttribute('transform',t);else h.removeAttribute('transform');svg.appendChild(h)}
-svg.addEventListener('mouseleave',()=>{tip.style.display='none';hoverLine(null)});
-svg.addEventListener('mouseover',e=>{hoverLine(e.target.closest('.k'))});
-
-// ---------- Eksport ----------
-async function renderCanvas(scale){const el=document.getElementById('svg').cloneNode(true);el.querySelectorAll('.pulse').forEach(c=>c.removeAttribute('class'));el.insertAdjacentHTML('afterbegin',`<style>${allFontCSS()}</style>`);el.setAttribute('width',W);el.setAttribute('height',H);
- const src=new XMLSerializer().serializeToString(el);const c=document.createElement('canvas');c.width=W*scale;c.height=H*scale;const img=new Image();const url=URL.createObjectURL(new Blob([src],{type:'image/svg+xml;charset=utf-8'}));
- await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);return c}
-async function exportMap(fmt){
- toast(t('ts_generating')+' '+fmt.toUpperCase()+' …');
- const c=await renderCanvas(3);const slug=v=>String(v).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const name=['mobomap',slug(S.country?countryName(S.country):'world'),S.focus?slug(GEO.groups[S.focus]||S.focus):'',S.style,S.layout].filter(Boolean).join('-');
- if(fmt==='png')dl(c.toDataURL('image/png'),name+'.png');
- else if(fmt==='jpg')dl(c.toDataURL('image/jpeg',0.93),name+'.jpg');
- else{const{jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:W>=H?'landscape':'portrait',unit:'mm',format:'a4'});const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();const r=Math.min(pw/W,ph/H);const x0=(pw-W*r)/2,y0=(ph-H*r)/2;
-  pdf.addImage(c.toDataURL('image/jpeg',0.95),'JPEG',x0,y0,W*r,H*r);
-  for(const l of (window._links||[]))pdf.link(x0+l.x*r,y0+l.y*r,l.w*r,l.h*r,{url:l.url});
-  const D=DS[S.ds];if(D.company.link)pdf.link(x0+(W-PAD.l-240)*r,y0+30*r,260*r,70*r,{url:D.company.link});
-  pdf.save(name+'.pdf')}
- toast(fmt.toUpperCase()+' '+t('ts_downloaded'));
-}
-window._testExport=async()=>(await renderCanvas(1)).toDataURL('image/png');
-function dl(u,n){const a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove()}
-window.exportSVG=()=>new XMLSerializer().serializeToString(document.getElementById('svg'));
-// ---------- Projekt: gem/åbn ----------
-const CK=['labels','detail','legend','showText','showLogo','showFooter','showCities','showNeighbours'];
-function projectState(){const D=DS[S.ds];return {format:'mobomap-project',version:1,saved:new Date().toISOString(),
- map:S.map,country:S.country,attr:S.attr,proj:S.proj,focus:S.focus,focusHide:!!S.focusHide,lang:S.lang,designSystem:S.ds,designSystemData:D.source==='builtin'?null:currentDSExport(),
- layout:S.layout,style:S.style,active:S.active,
- groups:S.groups.map(g=>({name:g.name,color:g.color,hl:[...g.hl],kommuner:[...g.sel]})),
- title:document.getElementById('title').value,sub:document.getElementById('sub').value,footerLabel:document.getElementById('footerLabel').value,
- partners:S.partners,checks:Object.fromEntries(CK.map(k=>[k,document.getElementById(k).checked]))}}
-function saveProject(){const p=projectState();const name=(document.getElementById('title').value||'mobomap').toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-|-$/g,'');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(p,null,2)),(name||'projekt')+'.mobomap.json');toast(t('ts_proj_saved'))}
-function loadProject(p){if(!p||p.format!=='mobomap-project')throw new Error(t('ts_not_project'));
- if(p.designSystemData){const r=addDS(p.designSystemData,'user');if(r){saveUserDS()}}
- if(!DS[p.designSystem])toast(t('ts_ds_missing').replace('{id}',p.designSystem)+' '+DS[DSORDER[0]].name);
- S.ds=DS[p.designSystem]?p.designSystem:DSORDER[0];const D=DS[S.ds];
- setData(p.country!=null?(p.country||'world'):(p.map==='dk'?'DNK':'world'));S.attr=p.attr||'none';S.proj=PROJS[p.proj]?p.proj:(GEO.geo?(S.country?'local':'robinson'):'robinson');S.focus=p.focus||'';S.focusHide=!!p.focusHide;document.getElementById('focusHide').checked=S.focusHide;if(p.lang)setLang(p.lang,true);
- S.layout=LAYOUTS.some(l=>l.id===p.layout)?p.layout:'land';S.style=STYLES.some(s=>s.id===p.style)?p.style:'flat';
- S.groups=(p.groups||[]).map(g=>{const n=newGroup(g.name||'Gruppe',g.hl||['fill'],g.color||D.highlight[0]);(g.kommuner||[]).forEach(c=>{if(byName[c])n.sel.add(c)});return n});if(!S.groups.length)S.groups=[newGroup('Gruppe 1',['fill'],D.highlight[0])];
- S.active=Math.min(p.active||0,S.groups.length-1);
- S.partners=(p.partners||D.partners).map(q=>({name:q.name||'',link:q.link||'',logo:Object.assign({},q.logo||{})}));
- document.getElementById('title').value=p.title??'';document.getElementById('sub').value=p.sub??'';document.getElementById('footerLabel').value=p.footerLabel??'';
- for(const k of CK)if(p.checks&&k in p.checks)document.getElementById(k).checked=!!p.checks[k];
- ui();render();toast(t('ts_proj_opened'))}
-function openProjectFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{loadProject(JSON.parse(rd.result))}catch(e){toast(t('ts_openfail')+': '+e.message)}};rd.readAsText(file)}
-document.addEventListener('dragover',e=>{e.preventDefault()});
-document.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(!f)return;if(/\.mobomap\.json$/i.test(f.name))openProjectFile(f);else if(/\.(json|js)$/i.test(f.name))importDSFile(f)});
-// ---------- Start ----------
-loadDS();S.ds=DSORDER.find(i=>!DS[i].private)||DSORDER[0];
-setLang(localStorage.getItem('mobomap.lang')||'en',true);
-setData('DNK');
-S.groups=[newGroup(t('g_fill'),['fill','glow'],DS[S.ds].highlight[0]),newGroup(t('g_hatch'),['hatch'],DS[S.ds].highlight[1]||DS[S.ds].highlight[0])];
-MAPS.dk.defaults.forEach(c=>S.groups[0].sel.add(c));
-setDS(S.ds);
-</script>
-</body>
+    </header>
+    <main>
+      <aside>
+        <section>
+          <h2><span data-i18n="sec_ds">1. Design system / company profile</span> <span id="dsName"></span></h2>
+          <select id="ds" onchange="setDS(this.value)"></select>
+          <div class="row" id="dsSw" style="margin-top: 8px"></div>
+          <div class="row" style="margin-top: 8px">
+            <button class="chip" onclick="document.getElementById('dsFile').click()">
+              <span data-i18n="import">Import (.json/.js)</span>
+            </button>
+            <button class="chip" onclick="openEditor()"><span data-i18n="edit_new">Edit / new</span></button>
+            <button class="chip" onclick="exportDS()"><span data-i18n="export_json">Export JSON</span></button>
+            <button class="chip" onclick="exportSidecar()" title="Alle egne designsystemer som designsystems.js">
+              designsystems.js
+            </button>
+            <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete">Delete</span></button>
+            <input
+              type="file"
+              id="dsFile"
+              accept=".json,.js,application/json"
+              style="display: none"
+              onchange="
+                importDSFile(this.files[0]);
+                this.value = '';
+              "
+            />
+          </div>
+          <details id="editor" style="margin-top: 8px">
+            <summary style="font-size: 11px; cursor: pointer; color: var(--mute)" data-i18n="editor_sum">
+              JSON editor (profile: name, logo, link, colours, fonts, partners)
+            </summary>
+            <textarea
+              id="dsJson"
+              rows="12"
+              style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin-top: 6px"
+            ></textarea>
+            <div class="row" style="margin-top: 6px">
+              <button class="chip" onclick="document.getElementById('logoFile').click()">
+                <span data-i18n="pick_logo">Choose logo (PNG/SVG)</span>
+              </button>
+              <input
+                type="file"
+                id="logoFile"
+                accept="image/*"
+                style="display: none"
+                onchange="
+                  pickLogo(this.files[0]);
+                  this.value = '';
+                "
+              />
+              <button class="chip on" onclick="applyEditor()"><span data-i18n="save">Save</span></button>
+            </div>
+            <p class="note" data-i18n="editor_note">
+              Stored in the browser (localStorage). Share via "Export JSON", or place designsystems.js next to
+              index.html – it loads automatically. You can also drop a .json file onto the page.
+            </p>
+          </details>
+        </section>
+        <section>
+          <h2><span data-i18n="sec_map">2. Map</span> <span id="mapInfo"></span></h2>
+          <div class="row" style="margin-bottom: 6px">
+            <select id="focusSel2" onchange="setFocus(this.value)" style="flex: 1; font-weight: 600"></select>
+          </div>
+          <div class="row">
+            <select
+              id="attrSel"
+              onchange="
+                S.attr = this.value;
+                ui();
+                render();
+              "
+              style="flex: 1"
+            ></select>
+            <button class="chip" onclick="attrToGroups()" title="" id="attrBtn">
+              <span data-i18n="attr_to_groups">→ groups</span>
+            </button>
+          </div>
+          <div class="row" style="margin-top: 6px">
+            <select
+              id="projSel"
+              onchange="
+                S.proj = this.value;
+                ui();
+                render();
+              "
+              style="flex: 1"
+            ></select>
+            <label class="ck" style="margin: 0"
+              ><input
+                type="checkbox"
+                id="focusHide"
+                onchange="
+                  S.focusHide = this.checked;
+                  render();
+                "
+              />
+              <span data-i18n="focus_hide">Hide the rest</span></label
+            >
+          </div>
+          <p class="note" data-i18n="map_note">
+            Choose world, a continent or a country in Focus – a country opens its regions (Denmark: 98 municipalities).
+            Optionally colour all units by an attribute.
+          </p>
+        </section>
+        <section>
+          <h2><span data-i18n="sec_layout">3. Layout</span> <span id="layoutInfo"></span></h2>
+          <div class="grid4" id="layouts"></div>
+        </section>
+        <section>
+          <h2><span data-i18n="sec_groups">4. Highlight groups</span> <span class="sel" id="count"></span></h2>
+          <div id="groups"></div>
+          <div class="row">
+            <button class="chip" onclick="addGroup()"><span data-i18n="new_group">+ New group</span></button>
+            <button
+              class="chip"
+              onclick="
+                S.groups = [newGroup(t('group') + ' 1', ['fill'], DS[S.ds].highlight[0])];
+                S.active = 0;
+                ui();
+                render();
+              "
+            >
+              <span data-i18n="clear_groups">Clear groups</span>
+            </button>
+            <span id="regionPresets" class="row"></span>
+          </div>
+          <p class="note" data-i18n="groups_note">
+            Clicking the map puts the unit in the active group (click again to remove). Each group has its own colour
+            and highlight modes. Separate names with commas or line breaks.
+          </p>
+          <label class="ck"
+            ><input type="checkbox" id="labels" onchange="render()" />
+            <span data-i18n="show_all_names">Show names on all units</span></label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="showNeighbours" checked onchange="render()" />
+            <span data-i18n="show_neighbours">Show neighbouring countries</span></label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="showCities" checked onchange="render()" />
+            <span data-i18n="show_cities">Show major cities</span></label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="detail" checked onchange="render()" />
+            <span data-i18n="detail_coast">Detailed coastline</span></label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="legend" checked onchange="render()" />
+            <span data-i18n="show_legend">Show legend (group names)</span></label
+          >
+        </section>
+        <section>
+          <h2><span data-i18n="sec_style">5. Map style</span> <span id="styleNo"></span></h2>
+          <div class="grid" id="styles"></div>
+        </section>
+        <section>
+          <h2 data-i18n="sec_text">6. Text on the map</h2>
+          <label class="ck" style="margin: 0 0 8px"
+            ><input type="checkbox" id="showText" checked onchange="render()" />
+            <span data-i18n="show_title">Show title and subtitle</span></label
+          >
+          <label class="ck" style="margin: 0 0 8px"
+            ><input type="checkbox" id="autoText" checked onchange="render()" />
+            <span data-i18n="auto_text">Auto: follow focus and selection</span></label
+          >
+          <input
+            type="text"
+            id="title"
+            value=""
+            oninput="
+              document.getElementById('autoText').checked = false;
+              render();
+            "
+            data-i18n-ph="ph_title"
+            placeholder="Title"
+          />
+          <input
+            type="text"
+            id="sub"
+            value=""
+            oninput="
+              document.getElementById('autoText').checked = false;
+              render();
+            "
+            data-i18n-ph="ph_sub"
+            placeholder="Subtitle"
+            style="margin-top: 6px"
+          />
+          <label class="ck"
+            ><input type="checkbox" id="showLogo" checked onchange="render()" />
+            <span data-i18n="show_logo">Show company logo (right side)</span></label
+          >
+        </section>
+        <section>
+          <h2><span data-i18n="sec_footer">7. Footer / partners</span> <span id="partnerCount"></span></h2>
+          <label class="ck" style="margin: 0 0 6px"
+            ><input type="checkbox" id="showFooter" checked onchange="render()" />
+            <span data-i18n="show_footer">Show footer with partner logos</span></label
+          >
+          <input
+            type="text"
+            id="footerLabel"
+            value=""
+            oninput="
+              this.dataset.auto = '0';
+              render();
+            "
+            data-i18n-ph="ph_footer"
+            placeholder="Footer text, e.g. 'In partnership with'"
+          />
+          <div id="partners" style="margin-top: 6px"></div>
+          <details style="margin-top: 6px">
+            <summary style="font-size: 11px; cursor: pointer; color: var(--mute)">
+              <span data-i18n="add_partner">Add partner</span>
+            </summary>
+            <input type="text" id="pName" data-i18n-ph="ph_name" placeholder="Name" style="margin-top: 6px" />
+            <input
+              type="url"
+              id="pLink"
+              data-i18n-ph="ph_link"
+              placeholder="Link (https://…)"
+              style="margin-top: 6px"
+            />
+            <div class="row" style="margin-top: 6px">
+              <button class="chip" onclick="document.getElementById('pFile').click()">
+                <span data-i18n="pick_logo_p">Choose logo</span>
+              </button>
+              <input
+                type="file"
+                id="pFile"
+                accept="image/*"
+                style="display: none"
+                onchange="
+                  pickPartnerLogo(this.files[0]);
+                  this.value = '';
+                "
+              />
+              <span id="pFileName" class="note" style="margin: 0"></span>
+              <button class="chip on" onclick="addPartner()"><span data-i18n="add">Add</span></button>
+            </div>
+            <p class="note" data-i18n="partner_note">
+              Partners follow the profile for the session; "Export JSON" in section 1 stores them in the profile. Links
+              are clickable in the PDF export.
+            </p>
+          </details>
+        </section>
+      </aside>
+      <div class="stage">
+        <div id="wrap"><svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      </div>
+    </main>
+    <div id="tip"></div>
+    <div id="toast"></div>
+    <script>
+      /*__JS__*/
+    </script>
+  </body>
 </html>

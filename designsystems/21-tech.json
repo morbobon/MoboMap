@@ -1,6 +1,17 @@
 {
   "id": "tech",
-  "name": "Tech / mørk",
+  "name": {
+    "en": "Tech / dark",
+    "da": "Tech / mørk",
+    "de": "Tech / dunkel",
+    "fr": "Tech / sombre",
+    "es": "Tech / oscuro",
+    "sv": "Tech / mörk",
+    "no": "Tech / mørk",
+    "fi": "Tech / tumma",
+    "nl": "Tech / donker",
+    "it": "Tech / scuro"
+  },
   "fonts": {
     "heading": "Space Grotesk",
     "body": "Space Grotesk"
@@ -29,7 +40,7 @@
     "#FF4D8D"
   ],
   "company": {
-    "name": "Tech / mørk",
+    "name": "",
     "link": "",
     "logo": {
       "text": "",

@@ -1,7 +1,29 @@
 {
   "id": "template",
-  "name": "Skabelon – grafit & koral",
-  "note": "kopiér og tilpas",
+  "name": {
+    "en": "Template – graphite & coral",
+    "da": "Skabelon – grafit & koral",
+    "de": "Vorlage – Graphit & Koralle",
+    "fr": "Modèle – graphite & corail",
+    "es": "Plantilla – grafito y coral",
+    "sv": "Mall – grafit & korall",
+    "no": "Mal – grafitt & korall",
+    "fi": "Malli – grafiitti & koralli",
+    "nl": "Sjabloon – grafiet & koraal",
+    "it": "Modello – grafite e corallo"
+  },
+  "note": {
+    "en": "copy and adapt",
+    "da": "kopiér og tilpas",
+    "de": "kopieren und anpassen",
+    "fr": "copier et adapter",
+    "es": "copiar y adaptar",
+    "sv": "kopiera och anpassa",
+    "no": "kopier og tilpass",
+    "fi": "kopioi ja muokkaa",
+    "nl": "kopiëren en aanpassen",
+    "it": "copia e adatta"
+  },
   "fonts": {
     "heading": "Roboto Slab",
     "body": "Work Sans"
@@ -32,11 +54,44 @@
     "#FFD166"
   ],
   "company": {
-    "name": "Dit firma",
+    "name": {
+      "en": "Your company",
+      "da": "Dit firma",
+      "de": "Ihre Firma",
+      "fr": "Votre entreprise",
+      "es": "Tu empresa",
+      "sv": "Ditt företag",
+      "no": "Ditt firma",
+      "fi": "Yrityksesi",
+      "nl": "Uw bedrijf",
+      "it": "La tua azienda"
+    },
     "link": "",
     "logo": {
-      "text": "DIT LOGO",
-      "sub": "VÆLG LOGO I EDITOREN"
+      "text": {
+        "en": "YOUR LOGO",
+        "da": "DIT LOGO",
+        "de": "IHR LOGO",
+        "fr": "VOTRE LOGO",
+        "es": "TU LOGO",
+        "sv": "DIN LOGOTYP",
+        "no": "DIN LOGO",
+        "fi": "LOGOSI",
+        "nl": "UW LOGO",
+        "it": "IL TUO LOGO"
+      },
+      "sub": {
+        "en": "CHOOSE A LOGO IN THE EDITOR",
+        "da": "VÆLG LOGO I EDITOREN",
+        "de": "LOGO IM EDITOR WÄHLEN",
+        "fr": "CHOISIR UN LOGO DANS L’ÉDITEUR",
+        "es": "ELIGE UN LOGO EN EL EDITOR",
+        "sv": "VÄLJ LOGOTYP I REDIGERAREN",
+        "no": "VELG LOGO I EDITOREN",
+        "fi": "VALITSE LOGO EDITORISSA",
+        "nl": "KIES EEN LOGO IN DE EDITOR",
+        "it": "SCEGLI UN LOGO NELL’EDITOR"
+      }
     }
   },
   "partners": [],
@@ -50,7 +105,18 @@
     }
   },
   "defaults": {
-    "title": "Vi er her",
-    "sub": "Danmark"
+    "title": {
+      "en": "We are here",
+      "da": "Vi er her",
+      "de": "Hier sind wir",
+      "fr": "Nous sommes ici",
+      "es": "Estamos aquí",
+      "sv": "Här finns vi",
+      "no": "Her er vi",
+      "fi": "Täällä olemme",
+      "nl": "Hier zijn we",
+      "it": "Siamo qui"
+    },
+    "sub": ""
   }
 }

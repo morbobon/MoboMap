@@ -1,6 +1,17 @@
 {
   "id": "green",
-  "name": "Grøn",
+  "name": {
+    "en": "Green",
+    "da": "Grøn",
+    "de": "Grün",
+    "fr": "Vert",
+    "es": "Verde",
+    "sv": "Grön",
+    "no": "Grønn",
+    "fi": "Vihreä",
+    "nl": "Groen",
+    "it": "Verde"
+  },
   "fonts": {
     "heading": "Roboto Slab",
     "body": "Work Sans"
@@ -27,7 +38,7 @@
     "#1f5e0f"
   ],
   "company": {
-    "name": "Grøn",
+    "name": "",
     "link": "",
     "logo": {
       "text": "",

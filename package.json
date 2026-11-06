@@ -6,10 +6,13 @@
   "scripts": {
     "geo": "node tools/prepare-geo.mjs && node tools/prepare-admin1.mjs",
     "build": "node tools/build.mjs",
-    "release": "node tools/release.mjs"
+    "release": "node tools/release.mjs",
+    "check": "node tools/check.mjs",
+    "format": "prettier --write \"src/js/*.js\" src/app.css src/app.html \"tools/*.mjs\""
   },
   "devDependencies": {
-    "mapshaper": "^0.6.0"
+    "mapshaper": "^0.6.0",
+    "prettier": "^3.9.10"
   },
   "license": "MIT",
   "repository": {

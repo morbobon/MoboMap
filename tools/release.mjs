@@ -1,7 +1,7 @@
-// Release-build: bygger index.html (alle profiler) og pakker to zips i release/:
-//   MoboMap-<version>-<dato>.zip         – med alle profiler i designsystems/ (inkl. private/)
-//   MoboMap-<version>-<dato>-public.zip  – uden designsystems/private/
-// Hver zip indeholder index.html, README.txt og designsystems.example.js.
+// Release build: builds index.html (all profiles) and packs two zips in release/:
+//   MoboMap-<version>-<date>.zip         – all profiles in designsystems/ (incl. private/)
+//   MoboMap-<version>-<date>-public.zip  – without designsystems/private/
+// Each zip contains index.html, README.txt and designsystems.example.js.
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -51,9 +51,16 @@ function pack(name, publicOnly) {
   fs.writeFileSync(path.join(dir, 'designsystems.example.js'), example);
   const zip = path.resolve('release', name + '.zip');
   fs.rmSync(zip, { force: true });
-  // PowerShell Compress-Archive findes på alle Windows-maskiner; zip(1) bruges hvis tilgængelig
-  try { execFileSync('zip', ['-qrj', zip, dir]); }
-  catch { execFileSync('powershell', ['-NoProfile', '-Command', `Compress-Archive -Path '${path.resolve(dir)}\\*' -DestinationPath '${zip}' -Force`], { stdio: 'inherit' }); }
+  // zip(1) if available, otherwise PowerShell Compress-Archive (present on every Windows machine)
+  try {
+    execFileSync('zip', ['-qrj', zip, dir]);
+  } catch {
+    execFileSync(
+      'powershell',
+      ['-NoProfile', '-Command', `Compress-Archive -Path '${path.resolve(dir)}\\*' -DestinationPath '${zip}' -Force`],
+      { stdio: 'inherit' },
+    );
+  }
   fs.rmSync(dir, { recursive: true, force: true });
   console.log(path.relative('.', zip), (fs.statSync(zip).size / 1024).toFixed(0) + ' KB');
 }
