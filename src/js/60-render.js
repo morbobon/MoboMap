@@ -135,6 +135,8 @@ function render() {
   if (sp.waves) out += `<rect width="${W}" height="${H}" fill="url(#waves)"/>`;
   if (sp.frame)
     out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink}" stroke-opacity=".6" stroke-width="1.5"/>`;
+  const relief = reliefOn(sp);
+  if (relief) out += reliefSea(sp, bg, dark);
   if (sp.sea) {
     const sea = S.focus ? [] : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
     out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity=".7" ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
@@ -198,9 +200,6 @@ function render() {
     if (sp.patterns) {
       return 'url(' + DOODLE[(parseInt(k.c) * 7 + REGI[k.r]) % DOODLE.length] + ')';
     }
-    if (st === 'topo') {
-      return (parseInt(k.c) * 7) % 3 ? land : landAlt;
-    }
     return land;
   };
   const swBase =
@@ -223,6 +222,16 @@ function render() {
     out += `<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim || fo ? 'opacity=".3"' : ''} ${st === 'outline' || sp.pixel || (sp.flag && S.map !== 'world') ? 'fill-opacity="0"' : sp.network ? 'fill-opacity=".55"' : ''} ${sp.flag && S.map !== 'world' ? 'stroke-opacity=".45"' : ''}/>`;
   }
   out += '</g>';
+  if (relief) {
+    const borders =
+      strokeBase === 'none'
+        ? ''
+        : unsel
+            .filter((k) => !(S.focusHide && !inFocus(k)))
+            .map((k) => kp(k, det))
+            .join('');
+    out += reliefLand(sp, allPath, borders, strokeBase, swBase, land);
+  }
   if (sp.network) {
     out += `<path d="${allPath}" fill="none" stroke="#7cc4ff" stroke-width="5" filter="url(#landglow)" opacity=".55" pointer-events="none"/><path d="${allPath}" fill="none" stroke="#9fd6ff" stroke-width="1.2" pointer-events="none"/>`;
     const nodes = GEO.units
@@ -491,6 +500,7 @@ function render() {
       const src = attrSource(AT);
       if (src) items.push({ src: true, label: src });
     }
+    if (relief) items.push(...reliefLegend(sp));
     if (items.length) {
       const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
       let y = H - FOOT - 14 - items.length * 18;

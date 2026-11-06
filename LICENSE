@@ -29,7 +29,8 @@ Third-party content bundled in builds:
 - Country boundaries and populated places: Natural Earth (naturalearthdata.com) – public domain.
 - Country statistics: Our World in Data (ourworldindata.org) – CC BY 4.0, with data from UCDP, V-Dem,
   World Bank, FAO, WHO, UN WPP, UNDP, ITU, Global Carbon Project, Ember and the Energy Institute.
+- Elevation: ETOPO1 Global Relief Model (NOAA NCEI), via NOAA CoastWatch ERDDAP – public domain.
 - Fonts: Arvo, Work Sans, Roboto Slab, Space Grotesk, DM Serif Display, IBM Plex Mono –
   SIL Open Font License 1.1 (Google Fonts).
 - jsPDF – MIT License, (c) 2010-2021 James Hall and contributors.
-- mapshaper (build-time only) – MPL-2.0.
+- mapshaper (build-time only) – MPL-2.0. d3-contour (build-time only) – ISC.

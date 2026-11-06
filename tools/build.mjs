@@ -343,7 +343,9 @@ const adm1 = {};
     }
   }
 }
-const data = { dk, world, adm1 };
+// Elevation contours for the terrain relief (tools/prepare-elevation.mjs)
+const elev = fs.existsSync(A('geo/elevation.json')) ? readJSON('geo/elevation.json') : null;
+const data = { dk, world, adm1, elev };
 
 // ---------- Fonte ----------
 const b64 = (p) => fs.readFileSync(A(p)).toString('base64');
@@ -443,6 +445,9 @@ html = html
   .replace('/*__FONTS__*/', () => 'const FONTS = ' + JSON.stringify(fonts) + ';')
   .replace('/*__JSPDF__*/', () => fs.readFileSync(A('jspdf.umd.min.js'), 'utf8'))
   .replace(/\/\*__DESIGNSYSTEMS__\*\/\s*\[\]/, () => JSON.stringify(designSystems))
+  .replace(/\/\*__DEFAULT_PROJECT__\*\/\s*null/, () =>
+    JSON.stringify(JSON.parse(fs.readFileSync(path.join(root, 'src', 'default-project.json'), 'utf8'))),
+  )
   .replace(/\/\*__I18N__\*\/\s*\{\}/, () => {
     const a = JSON.parse(fs.readFileSync(path.join(root, 'src', 'i18n.json'), 'utf8'));
     const bfile = path.join(root, 'src', 'i18n-extra.json');

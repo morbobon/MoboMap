@@ -1,4 +1,14 @@
-const CK = ['labels', 'detail', 'legend', 'showText', 'showLogo', 'showFooter', 'showCities', 'showNeighbours'];
+const CK = [
+  'labels',
+  'detail',
+  'legend',
+  'showText',
+  'showLogo',
+  'showFooter',
+  'showCities',
+  'showNeighbours',
+  'relief',
+];
 function projectState() {
   const D = DS[S.ds];
   return {
@@ -39,7 +49,9 @@ function saveProject() {
   );
   toast(t('ts_proj_saved'));
 }
-function loadProject(p) {
+// Start-up state: src/default-project.json (a saved project), inlined by the build
+const DEFAULT_PROJECT = /*__DEFAULT_PROJECT__*/ null;
+function loadProject(p, quiet) {
   if (!p || p.format !== 'mobomap-project') throw new Error(t('ts_not_project'));
   if (p.designSystemData) {
     const r = addDS(p.designSystemData, 'user');
@@ -76,11 +88,11 @@ function loadProject(p) {
   }));
   document.getElementById('title').value = p.title ?? '';
   document.getElementById('sub').value = p.sub ?? '';
-  document.getElementById('footerLabel').value = p.footerLabel ?? '';
+  document.getElementById('footerLabel').value = p.footerLabel ?? loc(D.footer.label);
   for (const k of CK) if (p.checks && k in p.checks) document.getElementById(k).checked = !!p.checks[k];
   ui();
   render();
-  toast(t('ts_proj_opened'));
+  if (!quiet) toast(t('ts_proj_opened'));
 }
 function openProjectFile(file) {
   if (!file) return;

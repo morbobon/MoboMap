@@ -2,7 +2,7 @@
   "name": "mobomap",
   "version": "1.0.0",
   "private": true,
-  "description": "Single-file map design studio – world countries with drill-down to regions, custom design systems, 24 styles, highlight groups, attributes, projections, PNG/JPG/PDF export, 10 UI languages.",
+  "description": "Single-file map design studio – world countries with drill-down to regions, custom design systems, 28 map styles, terrain relief, highlight groups, attributes, projections, PNG/JPG/PDF export, 10 UI languages.",
   "scripts": {
     "geo": "node tools/prepare-geo.mjs && node tools/prepare-admin1.mjs",
     "build": "node tools/build.mjs",
@@ -10,9 +10,11 @@
     "check": "node tools/check.mjs",
     "format": "prettier --write \"src/js/*.js\" src/app.css src/app.html \"tools/*.mjs\"",
     "stats": "node tools/prepare-stats.mjs",
-    "export-ds": "node tools/export-ds.mjs"
+    "export-ds": "node tools/export-ds.mjs",
+    "elevation": "node tools/prepare-elevation.mjs"
   },
   "devDependencies": {
+    "d3-contour": "^4.0.3",
     "mapshaper": "^0.6.0",
     "prettier": "^3.9.10"
   },

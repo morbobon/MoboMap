@@ -15,6 +15,7 @@ Thumbs.db
 
 # large geodata sources (downloaded by tools/prepare-*.mjs)
 assets/geo/source-admin1.geojson
+assets/geo/source-etopo.csv
 
 # local Claude Code / editor settings
 .claude/

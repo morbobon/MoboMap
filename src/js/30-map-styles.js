@@ -120,7 +120,7 @@ const SP = {
     stroke: '#8fb77a',
     ink: '#2d4a3a',
     dark: false,
-    filter: 'hillshade',
+    relief: true, // real elevation (ETOPO1) with hypsometric tints
     regionLines: true,
     sea: true,
     labels: 'bold',

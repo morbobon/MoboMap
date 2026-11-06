@@ -211,7 +211,10 @@
   "pos_tr": "Top right",
   "pos_bl": "Bottom left",
   "pos_bc": "Bottom centre",
-  "pos_br": "Bottom right"
+  "pos_br": "Bottom right",
+  "show_relief": "Terrain relief (elevation)",
+  "elevation": "Elevation",
+  "elev_source": "Elevation: ETOPO1 (NOAA)"
  },
  "da": {
   "yes": "Ja",
@@ -425,7 +428,10 @@
   "pos_tr": "Øverst til højre",
   "pos_bl": "Nederst til venstre",
   "pos_bc": "Nederst i midten",
-  "pos_br": "Nederst til højre"
+  "pos_br": "Nederst til højre",
+  "show_relief": "Terræn (højdekurver)",
+  "elevation": "Højde over havet",
+  "elev_source": "Højde: ETOPO1 (NOAA)"
  },
  "de": {
   "yes": "Ja",
@@ -639,7 +645,10 @@
   "pos_tr": "Oben rechts",
   "pos_bl": "Unten links",
   "pos_bc": "Unten mittig",
-  "pos_br": "Unten rechts"
+  "pos_br": "Unten rechts",
+  "show_relief": "Geländerelief (Höhen)",
+  "elevation": "Höhe",
+  "elev_source": "Höhe: ETOPO1 (NOAA)"
  },
  "fr": {
   "yes": "Oui",
@@ -853,7 +862,10 @@
   "pos_tr": "En haut à droite",
   "pos_bl": "En bas à gauche",
   "pos_bc": "En bas au centre",
-  "pos_br": "En bas à droite"
+  "pos_br": "En bas à droite",
+  "show_relief": "Relief du terrain (altitude)",
+  "elevation": "Altitude",
+  "elev_source": "Altitude : ETOPO1 (NOAA)"
  },
  "es": {
   "yes": "Sí",
@@ -1067,7 +1079,10 @@
   "pos_tr": "Arriba a la derecha",
   "pos_bl": "Abajo a la izquierda",
   "pos_bc": "Abajo al centro",
-  "pos_br": "Abajo a la derecha"
+  "pos_br": "Abajo a la derecha",
+  "show_relief": "Relieve del terreno (altitud)",
+  "elevation": "Altitud",
+  "elev_source": "Altitud: ETOPO1 (NOAA)"
  },
  "sv": {
   "yes": "Ja",
@@ -1281,7 +1296,10 @@
   "pos_tr": "Uppe till höger",
   "pos_bl": "Nere till vänster",
   "pos_bc": "Nere i mitten",
-  "pos_br": "Nere till höger"
+  "pos_br": "Nere till höger",
+  "show_relief": "Terrängrelief (höjd)",
+  "elevation": "Höjd",
+  "elev_source": "Höjd: ETOPO1 (NOAA)"
  },
  "no": {
   "yes": "Ja",
@@ -1495,7 +1513,10 @@
   "pos_tr": "Øverst til høyre",
   "pos_bl": "Nederst til venstre",
   "pos_bc": "Nederst i midten",
-  "pos_br": "Nederst til høyre"
+  "pos_br": "Nederst til høyre",
+  "show_relief": "Terrengrelieff (høyde)",
+  "elevation": "Høyde",
+  "elev_source": "Høyde: ETOPO1 (NOAA)"
  },
  "fi": {
   "yes": "Kyllä",
@@ -1709,7 +1730,10 @@
   "pos_tr": "Ylhäällä oikealla",
   "pos_bl": "Alhaalla vasemmalla",
   "pos_bc": "Alhaalla keskellä",
-  "pos_br": "Alhaalla oikealla"
+  "pos_br": "Alhaalla oikealla",
+  "show_relief": "Maaston korkeus",
+  "elevation": "Korkeus",
+  "elev_source": "Korkeus: ETOPO1 (NOAA)"
  },
  "nl": {
   "yes": "Ja",
@@ -1923,7 +1947,10 @@
   "pos_tr": "Rechtsboven",
   "pos_bl": "Linksonder",
   "pos_bc": "Midden onder",
-  "pos_br": "Rechtsonder"
+  "pos_br": "Rechtsonder",
+  "show_relief": "Terreinreliëf (hoogte)",
+  "elevation": "Hoogte",
+  "elev_source": "Hoogte: ETOPO1 (NOAA)"
  },
  "it": {
   "yes": "Sì",
@@ -2137,6 +2164,9 @@
   "pos_tr": "In alto a destra",
   "pos_bl": "In basso a sinistra",
   "pos_bc": "In basso al centro",
-  "pos_br": "In basso a destra"
+  "pos_br": "In basso a destra",
+  "show_relief": "Rilievo del terreno (altitudine)",
+  "elevation": "Altitudine",
+  "elev_source": "Altitudine: ETOPO1 (NOAA)"
  }
 }

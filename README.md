@@ -5,7 +5,7 @@
 Single-file, offline-capable generator for stylised maps with highlighted units, in your own design system. Start from **the world (176 countries)** and drill down via **Focus** into any country's **regions/states/provinces** (Natural Earth admin-1, ~240 countries) – or **Denmark's 98 municipalities** in full detail.
 
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
-- **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, topographic, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
+- **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, **topographic (real elevation)**, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
 - **Highlight groups** – several groups at once, each with its own colour and modes (solid, hatched, dots, tint, glow, outline, raised, pin, label, callout, dim others).
 - **Colour by** – 28 attributes in six categories, or turn any of them into highlight groups with one click:
@@ -17,13 +17,25 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
   - *Environment*: CO₂ per person, renewable electricity
   
   Statistics use fixed classes with sequential colour ramps (red = burden, blue = development), a grey "No data" class and a source line with the data year in the legend.
+- **Terrain relief** – elevation bands and contours from ETOPO1 (0.25°, low detail): hypsometric tints in the topographic style, or subtle shading on top of any style (Display → Terrain relief); sea depths too.
 - **Projections**: Miller (default for the world), Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée.
 - **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend. **Automatic title/subtitle** from the focus, the selection and the "Colour by" attribute; title and subtitle can each be placed top/bottom × left/centre/right.
 - **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
 - **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
-- **13 design systems** built in – default **Aurora (dark)**, plus Sunset, Ocean, Mono / brutalist, Pastel, Nordic minimal, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.
+- **10 design systems** built in – Aurora (dark), Nordic minimal (used by the start project), Sunset, Ocean, Mono / brutalist, Pastel, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.
 
-Everything ships as one `index.html` (~3.8 MB) that works from `file://` without a server.
+## Examples
+
+| | |
+|---|---|
+| ![Topographic world map with elevation tints](docs/examples/world-topographic.jpg) | ![Neon world map](docs/examples/world-neon.jpg) |
+| **Topographic** – real elevation (ETOPO1), Robinson | **Neon** – Tech / dark profile |
+| ![World population, stone relief](docs/examples/world-population-stone.jpg) | ![Life expectancy by country](docs/examples/world-life-expectancy.jpg) |
+| **Stone relief** – colour by population | **Regions** – life expectancy (Our World in Data) |
+| ![Denmark, typographic](docs/examples/denmark-typographic.jpg) | ![China by region, 3D block](docs/examples/china-regions-3d.jpg) |
+| **Typographic** – Denmark's 98 municipalities | **3D block** – China, colour by region |
+
+Everything ships as one `index.html` (~4.4 MB) that works from `file://` without a server.
 
 ## Quick start
 
@@ -36,7 +48,7 @@ npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public vari
 node tools/serve.mjs . 8787   # optional local server for development
 ```
 
-Open `index.html` in a browser. It starts on the world map in English with the Aurora profile (language, light/dark mode and open panel sections are remembered). To prepare geodata from scratch (only needed if the source files change): `npm run geo`. To refresh the statistics from Our World in Data: `npm run stats`.
+Open `index.html` in a browser. It starts from `src/default-project.json` – a saved project (topographic world, Nordic profile) – so replacing that file with any saved `.mobomap.json` changes the start view. Language, light/dark mode and open panel sections are remembered. To prepare geodata from scratch (only needed if the source files change): `npm run geo`. To refresh the statistics from Our World in Data: `npm run stats`. To rebuild the elevation contours: `npm run elevation`.
 
 ## Design systems
 
@@ -110,6 +122,8 @@ Country statistics come from [Our World in Data](https://ourworldindata.org) (CC
 | CO₂ per person | Global Carbon Project | 2024 |
 | Renewable share of electricity | Ember / Energy Institute | 2025 |
 
+Elevation comes from **ETOPO1** (NOAA NCEI, public domain), sampled at 0.25° through NOAA CoastWatch ERDDAP by `tools/prepare-elevation.mjs`, contoured (d3-contour) at 100–5000 m and −200 / −2000 m, simplified and delta-encoded into `assets/geo/elevation.json` (~630 KB).
+
 Classes are fixed per statistic (see `stat(...)` in `src/js/43-attributes.js`); countries without data are shown as "No data".
 
 Adding a dataset: a `dataset({...})` call in `tools/build.mjs`, a branch in `countryData()` (`src/js/40-datasets.js`) and, optionally, extra attributes in `ATTRS` (`src/js/43-attributes.js`).
@@ -131,15 +145,19 @@ src/js/NN-*.js             the app, concatenated in name order:
   42-viewport                focus/framing, layout, map -> screen
   43-attributes              "Colour by" attributes and "→ groups"
   50-flags, 51-pixel, 52-neighbours, 53-auto-text   style helpers and automatic title/subtitle
+  54-relief                  terrain relief (elevation bands, depth tints, legend)
   60-render                  render(): builds the SVG
   70-ui                      side panel, focus/drill-down, groups, map events
   80-export, 81-project      PNG/JPG/PDF export, project save/open
   99-start                   boot
 src/i18n.json, i18n-extra.json   UI strings per language
+src/default-project.json   start-up state (a saved project)
+docs/examples/             README images
 designsystems/             public profiles (committed) · designsystems/private/ (gitignored)
 assets/geo/                source and simplified geodata · assets/fonts/ · assets/jspdf.umd.min.js
 tools/prepare-geo.mjs      mapshaper pipeline (simplify, dissolve, inner lines, centroids)
 tools/prepare-admin1.mjs   downloads NE 10m admin-1 (40 MB, gitignored) and writes assets/geo/admin1.json
+tools/prepare-elevation.mjs  downloads ETOPO1 (0.25°, gitignored cache) and writes assets/geo/elevation.json
 tools/build.mjs            inlines everything into index.html (--public skips private profiles, --out=path)
 tools/check.mjs            npm run check
 tools/release.mjs          builds release/*.zip (full and public)
