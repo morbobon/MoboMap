@@ -50,6 +50,8 @@ function ui() {
     : `<option>${esc(t('projection'))}: UTM 32N</option>`;
   ps.disabled = !GEO.geo;
   fxUI();
+  document.getElementById('dsColours').checked = !!S.dsColours;
+  document.getElementById('guard').checked = S.guard !== false;
   const far = document.getElementById('farSel');
   far.style.display = farParts(S.country ? countryData(S.country) : DATA.world) ? '' : 'none';
   far.value = S.far;
@@ -419,20 +421,32 @@ svg.addEventListener('mousemove', (e) => {
 // The hover outline is a separate, non-clickable overlay. Never move the hovered path in the DOM:
 // mousedown and mouseup would then hit different elements and the click would never fire.
 function hoverLine(p) {
-  let h = document.getElementById('hoverline');
+  let g = document.getElementById('hoverwrap');
   if (!p) {
-    if (h) h.remove();
+    if (g) g.remove();
     return;
   }
-  if (!h) {
-    h = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  if (!g || g.parentNode !== svg) {
+    // a clipped group (stays on the sheet), holding the outline path
+    g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.id = 'hoverwrap';
+    const h = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     h.id = 'hoverline';
+    g.appendChild(h);
   }
+  if (document.getElementById('fxclip')) g.setAttribute('clip-path', 'url(#fxclip)');
+  const h = g.firstChild;
   h.setAttribute('d', p.getAttribute('d'));
-  const t = p.parentNode.getAttribute('transform');
+  // same placement as the unit: the frame/sheet transform, then the unit's own (raised highlight)
+  const t = [
+    FXL.active ? 'translate(' + FXL.tx + ',' + FXL.ty + ') scale(' + FXL.s + ')' : '',
+    p.parentNode.getAttribute('transform') || '',
+  ]
+    .join(' ')
+    .trim();
   if (t) h.setAttribute('transform', t);
   else h.removeAttribute('transform');
-  svg.appendChild(h);
+  svg.appendChild(g);
 }
 svg.addEventListener('mouseleave', () => {
   tip.style.display = 'none';

@@ -398,7 +398,8 @@ function fxWrap(content, bg, ink, accent) {
   const P = [px0, py0, px1, py1];
   let sheet = rect(P, `fill="${bg}"`);
   const cf = /<filter id="fxcontent"/.test(fxDefs()) ? ' filter="url(#fxcontent)"' : '';
-  sheet += `<g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g>`;
+  // the content – a zoomed map included – never leaves the sheet
+  sheet += `<clipPath id="fxclip">${rect(P)}</clipPath><g clip-path="url(#fxclip)"><g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g></g>`;
   const R = fxRng(S.fx.seed);
   const pw = px1 - px0,
     ph = py1 - py0;

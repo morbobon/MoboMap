@@ -178,6 +178,27 @@
               <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
             </h2>
             <div class="body">
+              <label class="ck" data-i18n-title="ds_colours_t"
+                ><input
+                  type="checkbox"
+                  id="dsColours"
+                  onchange="
+                    S.dsColours = this.checked;
+                    render();
+                  " />
+                <span data-i18n="ds_colours"></span
+              ></label>
+              <label class="ck" data-i18n-title="guard_t"
+                ><input
+                  type="checkbox"
+                  id="guard"
+                  checked
+                  onchange="
+                    S.guard = this.checked;
+                    render();
+                  " />
+                <span data-i18n="guard"></span
+              ></label>
               <div class="grid3" id="styles"></div>
             </div>
           </section>

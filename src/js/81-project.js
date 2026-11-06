@@ -22,6 +22,8 @@ function projectState() {
     focus: S.focus,
     focusHide: !!S.focusHide,
     far: S.far,
+    dsColours: !!S.dsColours,
+    guard: S.guard !== false,
     fx: S.fx,
     zoom: S.zoom,
     frame: document.getElementById('frameSel').value,
@@ -67,6 +69,8 @@ function loadProject(p, quiet) {
   S.ds = DS[p.designSystem] ? p.designSystem : DSORDER[0];
   const D = DS[S.ds];
   S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';
+  S.dsColours = !!p.dsColours;
+  S.guard = p.guard !== false;
   S.fx = Object.assign({ fx: [], frame: 'none', surface: '#e8e4dc', seed: 7, preset: '' }, p.fx || {});
   S.fx.fx = (S.fx.fx || []).filter((id) => FX_IDS.includes(id));
   if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';

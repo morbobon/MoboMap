@@ -96,6 +96,8 @@ function thumbKey() {
     S.partners.length,
     S.zoom,
     S.focusHide,
+    S.dsColours,
+    S.guard,
     CK.map((k) => document.getElementById(k).checked),
     ['title', 'sub', 'titlePos', 'subPos', 'frameSel', 'footerLabel', 'autoText'].map((k) => {
       const el = document.getElementById(k);

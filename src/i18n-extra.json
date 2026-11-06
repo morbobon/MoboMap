@@ -318,7 +318,11 @@
   "look_plain": "Plain",
   "look_save": "Save current look",
   "look_name": "Name of the look",
-  "look_mine": "My look"
+  "look_mine": "My look",
+  "ds_colours": "Use design-system colours",
+  "ds_colours_t": "Map styles with their own palette (topographic, neon, vintage …) take background, land, borders and text from the design system and keep their effects",
+  "guard": "Keep text readable (contrast guard)",
+  "guard_t": "Title, text and labels use the design-system colour that reads best on the background; highlight colours that blend into the land get an outline"
  },
  "da": {
   "yes": "Ja",
@@ -639,7 +643,11 @@
   "look_plain": "Ren",
   "look_save": "Gem nuværende udseende",
   "look_name": "Navn på udseendet",
-  "look_mine": "Mit udseende"
+  "look_mine": "Mit udseende",
+  "ds_colours": "Brug designsystemets farver",
+  "ds_colours_t": "Kortstile med egen palet (topografisk, neon, vintage …) tager baggrund, land, grænser og tekst fra designsystemet og beholder deres effekter",
+  "guard": "Hold tekst læsbar (kontrastvagt)",
+  "guard_t": "Titel, tekst og navne bruger den designfarve, der læses bedst på baggrunden; fremhævningsfarver, der flyder sammen med landet, får en kontur"
  },
  "de": {
   "yes": "Ja",
@@ -960,7 +968,11 @@
   "look_plain": "Schlicht",
   "look_save": "Aktuelles Aussehen speichern",
   "look_name": "Name des Aussehens",
-  "look_mine": "Mein Look"
+  "look_mine": "Mein Look",
+  "ds_colours": "Farben des Designsystems verwenden",
+  "ds_colours_t": "Kartenstile mit eigener Palette (topografisch, Neon, Vintage …) übernehmen Hintergrund, Land, Grenzen und Text aus dem Designsystem und behalten ihre Effekte",
+  "guard": "Text lesbar halten (Kontrastschutz)",
+  "guard_t": "Titel, Text und Namen nutzen die Designfarbe, die auf dem Hintergrund am besten lesbar ist; Hervorhebungen, die mit dem Land verschmelzen, erhalten eine Kontur"
  },
  "fr": {
   "yes": "Oui",
@@ -1281,7 +1293,11 @@
   "look_plain": "Simple",
   "look_save": "Enregistrer l’apparence",
   "look_name": "Nom de l’apparence",
-  "look_mine": "Mon apparence"
+  "look_mine": "Mon apparence",
+  "ds_colours": "Utiliser les couleurs du système de design",
+  "ds_colours_t": "Les styles à palette propre (topographique, néon, vintage …) prennent fond, terres, frontières et texte du système de design et gardent leurs effets",
+  "guard": "Garder le texte lisible (contrôle du contraste)",
+  "guard_t": "Titre, texte et noms prennent la couleur du système la plus lisible sur le fond ; les surbrillances qui se confondent avec les terres reçoivent un contour"
  },
  "es": {
   "yes": "Sí",
@@ -1602,7 +1618,11 @@
   "look_plain": "Sencillo",
   "look_save": "Guardar el aspecto actual",
   "look_name": "Nombre del aspecto",
-  "look_mine": "Mi aspecto"
+  "look_mine": "Mi aspecto",
+  "ds_colours": "Usar los colores del sistema de diseño",
+  "ds_colours_t": "Los estilos con paleta propia (topográfico, neón, vintage …) toman fondo, tierra, fronteras y texto del sistema de diseño y conservan sus efectos",
+  "guard": "Mantener el texto legible (control de contraste)",
+  "guard_t": "Título, texto y nombres usan el color del sistema que mejor se lee sobre el fondo; los resaltados que se confunden con la tierra reciben un contorno"
  },
  "sv": {
   "yes": "Ja",
@@ -1923,7 +1943,11 @@
   "look_plain": "Enkel",
   "look_save": "Spara nuvarande utseende",
   "look_name": "Namn på utseendet",
-  "look_mine": "Mitt utseende"
+  "look_mine": "Mitt utseende",
+  "ds_colours": "Använd designsystemets färger",
+  "ds_colours_t": "Kartstilar med egen palett (topografisk, neon, vintage …) tar bakgrund, land, gränser och text från designsystemet och behåller sina effekter",
+  "guard": "Håll texten läsbar (kontrastskydd)",
+  "guard_t": "Titel, text och namn använder den designfärg som syns bäst mot bakgrunden; markeringar som smälter in i landet får en kontur"
  },
  "no": {
   "yes": "Ja",
@@ -2244,7 +2268,11 @@
   "look_plain": "Enkel",
   "look_save": "Lagre nåværende utseende",
   "look_name": "Navn på utseendet",
-  "look_mine": "Mitt utseende"
+  "look_mine": "Mitt utseende",
+  "ds_colours": "Bruk designsystemets farger",
+  "ds_colours_t": "Kartstiler med egen palett (topografisk, neon, vintage …) tar bakgrunn, land, grenser og tekst fra designsystemet og beholder effektene",
+  "guard": "Hold teksten lesbar (kontrastvakt)",
+  "guard_t": "Tittel, tekst og navn bruker designfargen som leses best mot bakgrunnen; uthevinger som flyter sammen med landet får en kontur"
  },
  "fi": {
   "yes": "Kyllä",
@@ -2565,7 +2593,11 @@
   "look_plain": "Pelkistetty",
   "look_save": "Tallenna nykyinen ulkoasu",
   "look_name": "Ulkoasun nimi",
-  "look_mine": "Oma ulkoasu"
+  "look_mine": "Oma ulkoasu",
+  "ds_colours": "Käytä suunnittelujärjestelmän värejä",
+  "ds_colours_t": "Omalla paletilla varustetut tyylit (topografinen, neon, vintage …) ottavat taustan, maan, rajat ja tekstin suunnittelujärjestelmästä ja säilyttävät efektinsä",
+  "guard": "Pidä teksti luettavana (kontrastivahti)",
+  "guard_t": "Otsikko, teksti ja nimet käyttävät taustalla parhaiten erottuvaa väriä; maahan sulautuvat korostukset saavat ääriviivan"
  },
  "nl": {
   "yes": "Ja",
@@ -2886,7 +2918,11 @@
   "look_plain": "Puur",
   "look_save": "Huidig uiterlijk bewaren",
   "look_name": "Naam van het uiterlijk",
-  "look_mine": "Mijn uiterlijk"
+  "look_mine": "Mijn uiterlijk",
+  "ds_colours": "Kleuren van het ontwerpsysteem gebruiken",
+  "ds_colours_t": "Kaartstijlen met een eigen palet (topografisch, neon, vintage …) nemen achtergrond, land, grenzen en tekst over van het ontwerpsysteem en houden hun effecten",
+  "guard": "Tekst leesbaar houden (contrastbewaking)",
+  "guard_t": "Titel, tekst en namen gebruiken de ontwerpkleur die het best leesbaar is op de achtergrond; markeringen die opgaan in het land krijgen een omlijning"
  },
  "it": {
   "yes": "Sì",
@@ -3207,6 +3243,10 @@
   "look_plain": "Semplice",
   "look_save": "Salva l’aspetto attuale",
   "look_name": "Nome dell’aspetto",
-  "look_mine": "Il mio aspetto"
+  "look_mine": "Il mio aspetto",
+  "ds_colours": "Usa i colori del design system",
+  "ds_colours_t": "Gli stili con palette propria (topografico, neon, vintage …) prendono sfondo, terre, confini e testo dal design system e mantengono i loro effetti",
+  "guard": "Mantieni il testo leggibile (controllo del contrasto)",
+  "guard_t": "Titolo, testo e nomi usano il colore del sistema più leggibile sullo sfondo; le evidenziazioni che si confondono con le terre ricevono un contorno"
  }
 }

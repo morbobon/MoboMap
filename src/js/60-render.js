@@ -8,7 +8,51 @@ function render(target) {
     det = document.getElementById('detail').checked,
     all = document.getElementById('labels').checked;
   const ds = Object.assign({ head: D.fonts.heading, body: D.fonts.body }, D.colors);
-  const sp = SP[st] || {};
+  let sp = SP[st] || {};
+  if (S.dsColours) {
+    const L = D.colors;
+    sp = Object.assign({}, sp, {
+      bg: L.bg,
+      land: L.land,
+      landAlt: L.landAlt,
+      // outline draws only borders: they need ink; doodle patterns are white with black lines
+      stroke:
+        st === 'silhouette'
+          ? L.land
+          : st === 'outline'
+            ? readable([L.dark ? L.ink : L.land, L.ink, L.primary], L.bg, 3)
+            : sp.patterns
+              ? '#111111'
+              : st === 'neon'
+                ? readable([L.accent, L.ink], L.bg, 3)
+                : L.stroke,
+      ink: L.ink,
+      dark: !!L.dark,
+      heading: L.dark ? L.headingOnDark : L.heading,
+      labelColor: undefined,
+      textColor: sp.textColor && (light(L.land) ? '#1b1b1b' : '#ffffff'),
+      wordColors: sp.wordColors && D.highlight.slice(0, 3),
+      bgGradient: sp.bgGradient && [mix(L.bg, '#ffffff', 0.08), mix(L.bg, '#000000', 0.3)],
+      extrudeColor: sp.extrudeColor && mix(L.land, '#000000', 0.45),
+      landGlow: sp.landGlow && L.accent,
+      // real elevation stays, but as neutral shading over the profile's land instead of hypsometric tints
+      relief: false,
+      reliefShade: !!sp.relief,
+    });
+  }
+  const dsc = !!S.dsColours;
+  // style line colours that follow the profile with "design-system colours" (blueprint grid, network lines)
+  const bpLine = dsc
+    ? readable([D.colors.dark ? D.colors.ink : D.colors.land, D.colors.ink, D.colors.primary], D.colors.bg, 3)
+    : '#9fd3ff';
+  const net = dsc
+    ? {
+        glow: D.colors.accent,
+        line: mix(D.colors.accent, D.colors.ink, 0.3),
+        link: mix(D.colors.accent, D.colors.ink, 0.3),
+        node: D.colors.dark ? D.colors.ink : D.colors.accent,
+      }
+    : { glow: '#7cc4ff', line: '#9fd6ff', link: '#8fd0ff', node: '#cfeeff' };
   const dark = sp.dark != null ? sp.dark : ds.dark || st === 'neon' || st === 'blueprint';
   let bg = ds.bg,
     land = ds.land,
@@ -63,6 +107,17 @@ function render(target) {
   if (sp.pixel) {
     stroke = 'none';
   }
+  const guard = S.guard !== false;
+  const ink0 = ink;
+  // backgrounds behind page text: the gradient stops, the neon vignette, the stone concrete overlay
+  const textBgs = [bg];
+  if (sp.bgGradient) textBgs.push(sp.bgGradient[0], sp.bgGradient[1]);
+  if (st === 'neon' && dark) textBgs.push(mix(bg, '#000000', 0.4));
+  if (sp.concrete) textBgs.push(mix(bg, '#ffffff', 0.2), mix(bg, '#000000', 0.15));
+  if (guard) ink = readable([ink, ds.ink, ds.primary], textBgs, 4.5, 0.9);
+  // opacity for faint secondary text (sources, footer label, sea names): kept unless it costs readability
+  const tOp = (o) =>
+    guard && Math.min(...textBgs.filter(isHex).map((b) => contrast(mix(ink, b, 1 - o), b))) < 4.5 ? 1 : o;
   const groups = S.groups;
   const selAll = new Set(groups.flatMap((g) => [...g.sel]));
   const AT = attrDef();
@@ -79,7 +134,7 @@ function render(target) {
   <filter id="neonf" ${FR}><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="longshadow" ${FR}>${[...Array(14)].map((_, i) => `<feOffset in="SourceAlpha" dx="${(i + 1) * 3}" dy="${(i + 1) * 3}" result="o${i}"/>`).join('')}<feMerge>${[...Array(14)].map((_, i) => `<feMergeNode in="o${i}"/>`).join('')}</feMerge><feColorMatrix type="matrix" values="0 0 0 0 0.1 0 0 0 0 0.2 0 0 0 0 0.3 0 0 0 0.35 0"/><feGaussianBlur stdDeviation="2"/></filter>
   <pattern id="dotsBase" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="${bg}"/><circle cx="3.5" cy="3.5" r="2.3" fill="${land === 'none' ? stroke : land}"/></pattern>
-  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#9fd3ff" stroke-opacity=".25" stroke-width=".7"/><path d="M10 0V50M20 0V50M30 0V50M40 0V50M0 10H50M0 20H50M0 30H50M0 40H50" stroke="#9fd3ff" stroke-opacity=".1" stroke-width=".4"/></pattern>
+  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="${bpLine}" stroke-opacity=".25" stroke-width=".7"/><path d="M10 0V50M20 0V50M30 0V50M40 0V50M0 10H50M0 20H50M0 30H50M0 40H50" stroke="${bpLine}" stroke-opacity=".1" stroke-width=".4"/></pattern>
   <linearGradient id="glassg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
   <linearGradient id="extrSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mix(land, '#000', 0.35)}"/><stop offset="1" stop-color="${mix(land, '#000', 0.6)}"/></linearGradient>
   <filter id="slatef" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.015" numOctaves="2" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="screen"/></filter>
@@ -123,8 +178,8 @@ function render(target) {
   defs += fxDefs() + '</defs>';
   let out = `<rect width="${W}" height="${H}" fill="${bg}"/>`;
   if (st === 'blueprint')
-    out += `<rect width="${W}" height="${H}" fill="url(#grid)"/><rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="#9fd3ff" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="#9fd3ff" fill-opacity=".7">${[...Array(9)].map((_, i) => `<text x="${PAD.l + (i * (W - PAD.l - PAD.r)) / 8}" y="${H - FOOT - 26}">${(8 + i * 0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_, i) => `<text x="26" y="${150 + (i * (H - 200)) / 5}" transform="rotate(-90 26 ${150 + (i * (H - 200)) / 5})">${(57.8 - i * 0.5).toFixed(1)}°N</text>`).join('')}</g>`;
-  if (st === 'neon') out += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
+    out += `<rect width="${W}" height="${H}" fill="url(#grid)"/><rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="${bpLine}" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="${guard ? readable([bpLine, D.colors.ink, D.colors.primary], textBgs, 4.5, 0.85) : bpLine}" fill-opacity="${guard ? 0.85 : 0.7}">${[...Array(9)].map((_, i) => `<text x="${PAD.l + (i * (W - PAD.l - PAD.r)) / 8}" y="${H - FOOT - 26}">${(8 + i * 0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_, i) => `<text x="26" y="${150 + (i * (H - 200)) / 5}" transform="rotate(-90 26 ${150 + (i * (H - 200)) / 5})">${(57.8 - i * 0.5).toFixed(1)}°N</text>`).join('')}</g>`;
+  if (st === 'neon' && dark) out += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
   if (sp.bgGradient) out += `<rect width="${W}" height="${H}" fill="url(#midbg)"/>`;
   if (sp.stars) {
     let r = 12345;
@@ -139,12 +194,15 @@ function render(target) {
   const fsel = document.getElementById('frameSel').value;
   const frame = fsel === 'on' || (fsel !== 'off' && !!sp.frame);
   if (frame)
-    out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink}" stroke-opacity=".6" stroke-width="1.5"/>`;
+    out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink0}" stroke-opacity=".6" stroke-width="1.5"/>`;
   const relief = reliefOn(sp);
   if (relief) out += reliefSea(sp, bg, dark);
   if (sp.sea) {
-    const sea = S.focus ? [] : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
-    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity=".7" ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
+    const sea =
+      S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
+        ? []
+        : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
+    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
     for (const [fx, fy, t] of sea)
       out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;
     out += '</g>';
@@ -158,7 +216,7 @@ function render(target) {
   }
   // inset box (Bornholm), drawn over the neighbours so its frame stays clean
   for (const R of insetRects()) {
-    out += `<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="${bg}" fill-opacity=".92" stroke="${st === 'neon' ? stroke : ink}" stroke-opacity=".45" stroke-width="1" ${st === 'blueprint' ? 'stroke-dasharray="4 3"' : ''}/>`;
+    out += `<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="${bg}" fill-opacity=".92" stroke="${st === 'neon' ? stroke : ink0}" stroke-opacity=".45" stroke-width="1" ${st === 'blueprint' ? 'stroke-dasharray="4 3"' : ''}/>`;
   }
   if (sp.flag && S.map !== 'world') {
     const iso = S.country || 'DNK',
@@ -188,10 +246,10 @@ function render(target) {
   const baseFill = (k) => {
     if (sp.flag) return S.map === 'world' ? (FLAGS[k.c] ? `url(#fl_${k.c})` : mix(land, '#888888', 0.3)) : land;
     if (st === 'halftone') return 'url(#dotsBase)';
-    if (st === 'blueprint') return '#1d4a73';
+    if (st === 'blueprint') return dsc ? land : '#1d4a73';
     if (AT && !sp.patterns && !sp.text) return attrColor(AT, AT.f(k), ATC, land);
     if (st === 'shades') {
-      const i = (parseInt(k.c) * 7) % 5;
+      const i = (codeNum(k.c) * 7) % 5;
       return [land, landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12)][i];
     }
     if (st === 'regions') {
@@ -199,10 +257,10 @@ function render(target) {
       return mix(land, bg, (0.75 * REGI[k.r]) / (n - 1));
     }
     if (st === 'patchwork') {
-      return PATCH[(parseInt(k.c) * 13 + REGI[k.r]) % PATCH.length];
+      return PATCH[(codeNum(k.c) * 13 + (REGI[k.r] || 0)) % PATCH.length];
     }
     if (sp.patterns) {
-      return 'url(' + DOODLE[(parseInt(k.c) * 7 + REGI[k.r]) % DOODLE.length] + ')';
+      return 'url(' + DOODLE[(codeNum(k.c) * 7 + (REGI[k.r] || 0)) % DOODLE.length] + ')';
     }
     return land;
   };
@@ -239,7 +297,7 @@ function render(target) {
     out += reliefLand(sp, allPath, borders, strokeBase, swBase, land);
   }
   if (sp.network) {
-    out += `<path d="${allPath}" fill="none" stroke="#7cc4ff" stroke-width="5" filter="url(#landglow)" opacity=".55" pointer-events="none"/><path d="${allPath}" fill="none" stroke="#9fd6ff" stroke-width="1.2" pointer-events="none"/>`;
+    out += `<path d="${allPath}" fill="none" stroke="${net.glow}" stroke-width="5" filter="url(#landglow)" opacity=".55" pointer-events="none"/><path d="${allPath}" fill="none" stroke="${net.line}" stroke-width="1.2" pointer-events="none"/>`;
     const nodes = GEO.units
       .filter((k) => !(S.focusHide && !inFocus(k)) && !isBH(k))
       .map((k) => {
@@ -262,11 +320,11 @@ function render(target) {
       }
     }
     out +=
-      `<path d="${ls}" stroke="#8fd0ff" stroke-width=".7" opacity=".5" fill="none" pointer-events="none"/><g filter="url(#neonf)" pointer-events="none">` +
+      `<path d="${ls}" stroke="${net.link}" stroke-width=".7" opacity=".5" fill="none" pointer-events="none"/><g filter="url(#neonf)" pointer-events="none">` +
       nodes
         .map((n) => {
           const gi = groupOf(n.k.c);
-          return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${gi >= 0 ? 4.5 : 2.2}" fill="${gi >= 0 ? S.groups[gi].color : '#cfeeff'}"/>`;
+          return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${gi >= 0 ? 4.5 : 2.2}" fill="${gi >= 0 ? S.groups[gi].color : net.node}"/>`;
         })
         .join('') +
       '</g>';
@@ -289,6 +347,16 @@ function render(target) {
   }
   if (st === 'silhouette')
     out += `<path d="${allPath}" fill="none" stroke="${mix(land, '#000', 0.2)}" stroke-width="1" pointer-events="none"/>`;
+  // region names cross land, sea and highlights: colour chosen for all of them under the guard
+  const regBgs = [
+    st === 'regions' ? land : isHex(land) ? land : bg,
+    st === 'regions' ? mix(land, bg, 0.75) : bg,
+  ].filter(isHex);
+  const regCol = guard
+    ? readable([ds.dark ? ink : '#355a78', ink, '#222222', '#ffffff'], regBgs.length ? regBgs : [bg], 3, 0.9)
+    : ds.dark
+      ? ink
+      : '#355a78';
   if (sp.regionLines) {
     const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
     out += `<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`;
@@ -341,20 +409,32 @@ function render(target) {
   }
   if (st === 'atlas' || st === 'regions') {
     const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
-    out += `<path d="${rl}" fill="none" stroke="${ds.dark ? ink : '#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
-    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity=".65" fill="${ds.dark ? ink : '#355a78'}">`;
+    out += `<path d="${rl}" fill="none" stroke="${guard ? readable([ds.dark ? ink : '#4a6a85', ink, '#222222', '#ffffff'], regBgs, 1.8) : ds.dark ? ink : '#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
+    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity="${guard ? 0.9 : 0.65}" fill="${regCol}" ${guard ? `stroke="${light(regCol) ? '#000000' : '#ffffff'}" stroke-opacity=".6" stroke-width="2.4" paint-order="stroke"` : ''}>`;
     for (const r in REGC) {
       if (S.focus) break;
       const [x, y] = P(REGC[r][0], REGC[r][1]);
       out += `<text x="${x.toFixed(0)}" y="${(y + 3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`;
     }
     if (st === 'atlas') {
-      const sea = S.focus ? [] : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
+      const sea =
+        S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
+          ? []
+          : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
       for (const [fx, fy, t] of sea)
         out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`;
     }
     out += '</g>';
   }
+  // the colour a unit shows when not highlighted: its fill, pattern base, or the page when land is see-through
+  const unitBase = (k) => {
+    if (st === 'outline' || sp.pixel) return bg;
+    if (st === 'halftone') return mix(bg, land, 0.35);
+    const f = baseFill(k);
+    if (isHex(f)) return f;
+    if (sp.patterns) return '#ffffff';
+    return isHex(baseLand) ? baseLand : bg;
+  };
   // highlight groups (drawn in order; later groups on top)
   groups.forEach((g, gi) => {
     const col = g.color,
@@ -379,6 +459,10 @@ function render(target) {
       if (hl.has('outline')) {
         strk = hl.has('fill') && !hl.has('hatch') && !hl.has('dots') ? onCol(col) : col;
         sw = 3.2;
+      } else if (guard && hl.has('fill') && contrast(col, unitBase(k)) < 1.4) {
+        // stands out from the fill and from the ordinary borders
+        strk = readable([ds.accent, D.colors.accent2, onCol(col)], isHex(strokeBase) ? [col, strokeBase] : [col], 2);
+        sw = Math.max(swBase + 1.4, 2.4);
       }
       const tr = hl.has('emboss') ? 'transform="translate(0,-6)"' : '';
       const f = hl.has('emboss') ? 'filter="url(#emboss)"' : '';
@@ -410,6 +494,35 @@ function render(target) {
     }
     out += '</g>';
   }
+  let labelFill = sp.labelColor || (st === 'outline' || st === 'halftone' ? ink : light(land) ? '#222' : '#fff');
+  const labelBg = sp.patterns
+    ? '#ffffff'
+    : st === 'blueprint' && !dsc
+      ? '#1d4a73'
+      : sp.network
+        ? mix(land, bg, 0.45)
+        : st === 'outline' || !isHex(land)
+          ? bg
+          : st === 'halftone'
+            ? [bg, mix(bg, land, 0.35)]
+            : st === 'glass' || st === 'slate'
+              ? [land, mix(land, '#ffffff', 0.45)]
+              : st === 'regions'
+                ? [land, mix(land, bg, 0.75)]
+                : land;
+  if (guard) labelFill = readable([labelFill, '#222222', '#ffffff'], labelBg, 3, 0.9);
+  const labelHalo =
+    guard &&
+    (sp.flag ||
+      sp.patterns ||
+      sp.network ||
+      !!AT ||
+      ['patchwork', 'shades', 'halftone', 'glass', 'slate', 'regions', 'blueprint'].includes(st) ||
+      (isHex(bg) && contrast(labelFill, bg) < 3) ||
+      groups.some((g) => g.sel.size && g.hl.has('fill') && contrast(labelFill, g.color) < 3) ||
+      reliefOn(sp))
+      ? `stroke="${light(labelFill) ? '#000000' : '#ffffff'}" stroke-opacity=".7" stroke-width="2.4" paint-order="stroke"`
+      : '';
   // navne, pins, labels, callouts
   const lf = ds.body;
   out += '<g pointer-events="none">';
@@ -418,7 +531,7 @@ function render(target) {
       const [x, y] = kc(k);
       if (k.a < (sp.labels ? TH.h : TH.l) && !isBH(k)) continue;
       const caps = sp.labels === 'caps';
-      out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5}" ${caps ? 'letter-spacing="1.2"' : 'font-weight="700"'} text-anchor="middle" fill="${sp.labelColor || (st === 'outline' || st === 'halftone' ? ink : light(land) ? '#222' : '#fff')}" opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
+      out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5}" ${caps ? 'letter-spacing="1.2"' : 'font-weight="700"'} text-anchor="middle" fill="${labelFill}" ${labelHalo} opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
     }
   const margin = { l: [], r: [] };
   groups.forEach((g) => {
@@ -464,7 +577,8 @@ function render(target) {
   const title = document.getElementById('title').value,
     sub = document.getElementById('sub').value;
   const showText = document.getElementById('showText').checked;
-  const hcol = sp.bg ? sp.heading || ink : dark ? ds.headingOnDark : ds.heading;
+  let hcol = sp.bg ? sp.heading || ink0 : dark ? ds.headingOnDark : ds.heading;
+  if (guard) hcol = readable([hcol, ds.heading, ds.headingOnDark, ds.accent, ds.primary, ink0, ink], textBgs, 3);
   const ts = Math.round(W * 0.038);
   let tp = document.getElementById('titlePos').value;
   if (tp === 'auto') tp = 't' + (sp.titleAlign || 'left')[0];
@@ -519,7 +633,7 @@ function render(target) {
         if (o.head)
           out += `<text x="${x}" y="${y + 11}" font-family="'${lf}'" font-size="11" font-weight="700" fill="${ink}">${esc(o.label)}</text>`;
         else if (o.src)
-          out += `<text x="${x}" y="${y + 10}" font-family="'${lf}'" font-size="9" fill="${ink}" opacity=".65">${esc(o.label)}</text>`;
+          out += `<text x="${x}" y="${y + 10}" font-family="'${lf}'" font-size="9" fill="${ink}" opacity="${tOp(0.65)}">${esc(o.label)}</text>`;
         else
           out += `<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;
         y += 18;
@@ -547,7 +661,11 @@ function render(target) {
       const uniformDark =
         dark &&
         (bg.toLowerCase() === (L.boxColor || '').toLowerCase() || st === 'neon' || st === 'blueprint' || ds.dark);
-      const box = L.box === 'always' || (L.box === 'auto' && !uniformDark);
+      const box =
+        L.box === 'always' ||
+        (L.box === 'auto' && !uniformDark) ||
+        // a box-less logo (white lettering on dark profiles) gets its box back where the page is too light for it
+        (guard && L.box === 'auto' && ds.dark && isHex(bg) && contrast('#ffffff', bg) < 3);
       if (!box)
         out += `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`;
       else
@@ -565,7 +683,11 @@ function render(target) {
     const fy = H - FOOT;
     const label = document.getElementById('footerLabel').value;
     const dv = D.footer.divider;
-    const dcol = dv.color || ds.primary;
+    let dcol = dv.color || ds.primary;
+    // the brand divider keeps its colour unless it would disappear on this background
+    const dop = dv.opacity != null ? dv.opacity : 1;
+    const dvis = (c) => Math.min(...textBgs.filter(isHex).map((b) => contrast(mix(c, b, 1 - dop), b)));
+    if (guard && dvis(dcol) < 2) dcol = readable([dcol, ds.accent, ds.primary, ink0, ink], textBgs, 3, dop);
     const dw = dv.width <= 1 ? (W - 2 * (PAD.l - 12)) * dv.width : dv.width;
     const dx = dv.align === 'center' ? (W - dw) / 2 : dv.align === 'right' ? W - PAD.l + 12 - dw : PAD.l - 12;
     out += '<g pointer-events="none">';
@@ -578,7 +700,7 @@ function render(target) {
       gap = Math.round(W * 0.03);
     const ty = fy + FOOT / 2;
     if (label) {
-      out += `<text x="${x}" y="${(ty + 4).toFixed(1)}" font-family="'${lf}'" font-size="11" letter-spacing="1" fill="${ink}" opacity=".75">${esc(label.toUpperCase())}</text>`;
+      out += `<text x="${x}" y="${(ty + 4).toFixed(1)}" font-family="'${lf}'" font-size="11" letter-spacing="1" fill="${ink}" opacity="${tOp(0.75)}">${esc(label.toUpperCase())}</text>`;
       x += label.length * 7.2 + gap;
     }
     for (const p of S.partners) {

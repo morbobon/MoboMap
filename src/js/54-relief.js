@@ -47,7 +47,7 @@ const HYPSO = {
   5000: '#f3f0ec',
 };
 function reliefOn(sp) {
-  return !!DATA.elev && (sp.relief || document.getElementById('relief').checked);
+  return !!DATA.elev && (sp.relief || sp.reliefShade || document.getElementById('relief').checked);
 }
 // Sea depths: drawn under the land.
 function reliefSea(sp, bg, dark) {
