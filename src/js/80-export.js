@@ -49,9 +49,13 @@ async function exportMap(fmt) {
     const x0 = (pw - W * r) / 2,
       y0 = (ph - H * r) / 2;
     pdf.addImage(c.toDataURL('image/jpeg', 0.95), 'JPEG', x0, y0, W * r, H * r);
-    for (const l of window._links || []) pdf.link(x0 + l.x * r, y0 + l.y * r, l.w * r, l.h * r, { url: l.url });
+    const lk = (x, y, w, h, url) => {
+      const [ax, ay] = fxToArt(x, y);
+      pdf.link(x0 + ax * r, y0 + ay * r, w * FXL.s * r, h * FXL.s * r, { url });
+    };
+    for (const l of window._links || []) lk(l.x, l.y, l.w, l.h, l.url);
     const D = DS[S.ds];
-    if (D.company.link) pdf.link(x0 + (W - PAD.l - 240) * r, y0 + 30 * r, 260 * r, 70 * r, { url: D.company.link });
+    if (D.company.link) lk(W - PAD.l - 240, 30, 260, 70, D.company.link);
     pdf.save(name + '.pdf');
   }
   toast(fmt.toUpperCase() + ' ' + t('ts_downloaded'));

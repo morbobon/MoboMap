@@ -28,9 +28,19 @@ const STYLES = [
   'pixel',
   'stone',
   'midnight',
+  'blackgold',
 ].map((id) => ({ id }));
 // Style properties used generically by render(): colours, filters, labels, title alignment, decorations
 const SP = {
+  blackgold: {
+    bg: '#151413',
+    land: '#a8813f',
+    stroke: '#a8813f',
+    ink: '#e6d2a6',
+    heading: '#d6b26a',
+    dark: true,
+    strokeW: 0,
+  },
   flag: { bg: '#a9c8c6', land: '#ffffff', stroke: '#ffffff', ink: '#24403f', dark: false, flag: true, strokeW: 0.6 },
   network: {
     bg: '#0b2f78',

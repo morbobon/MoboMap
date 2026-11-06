@@ -612,3 +612,10 @@ header small {
 #wrap.panning .k {
   cursor: grabbing;
 }
+.fxcat {
+  font-size: 11px;
+  color: var(--mute);
+  margin: 8px 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

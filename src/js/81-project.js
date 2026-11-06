@@ -22,6 +22,7 @@ function projectState() {
     focus: S.focus,
     focusHide: !!S.focusHide,
     far: S.far,
+    fx: S.fx,
     zoom: S.zoom,
     frame: document.getElementById('frameSel').value,
     lang: S.lang,
@@ -66,6 +67,9 @@ function loadProject(p, quiet) {
   S.ds = DS[p.designSystem] ? p.designSystem : DSORDER[0];
   const D = DS[S.ds];
   S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';
+  S.fx = Object.assign({ fx: [], frame: 'none', surface: '#e8e4dc', seed: 7, preset: '' }, p.fx || {});
+  S.fx.fx = (S.fx.fx || []).filter((id) => FX_IDS.includes(id));
+  if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
   document.getElementById('titlePos').value = p.titlePos || 'auto';

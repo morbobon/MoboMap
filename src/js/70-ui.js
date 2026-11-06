@@ -49,6 +49,7 @@ function ui() {
         .join('')
     : `<option>${esc(t('projection'))}: UTM 32N</option>`;
   ps.disabled = !GEO.geo;
+  fxUI();
   const far = document.getElementById('farSel');
   far.style.display = farParts(S.country ? countryData(S.country) : DATA.world) ? '' : 'none';
   far.value = S.far;
@@ -334,7 +335,7 @@ svg.addEventListener('click', (e) => {
 function svgPoint(e) {
   const r = svg.getBoundingClientRect();
   if (!r.width || !r.height) return [W / 2, H / 2];
-  return [((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H];
+  return fxToContent([((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H]);
 }
 let zoomRaf = 0;
 function zoomChanged() {

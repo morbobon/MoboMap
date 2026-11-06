@@ -1,5 +1,6 @@
 function render() {
   setLayout(S.layout);
+  fxLayout();
   const D = DS[S.ds],
     st = S.style,
     det = document.getElementById('detail').checked,
@@ -117,7 +118,7 @@ function render() {
     defs += `<pattern id="hatch${i}" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="${base}"/><line x1="0" y1="0" x2="0" y2="9" stroke="${lineCol}" stroke-width="3" stroke-opacity=".85"/></pattern>
   <pattern id="dots${i}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="4" cy="4" r="2.2" fill="${lineCol}" fill-opacity=".9"/></pattern>`;
   });
-  defs += '</defs>';
+  defs += fxDefs() + '</defs>';
   let out = `<rect width="${W}" height="${H}" fill="${bg}"/>`;
   if (st === 'blueprint')
     out += `<rect width="${W}" height="${H}" fill="url(#grid)"/><rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="#9fd3ff" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="#9fd3ff" fill-opacity=".7">${[...Array(9)].map((_, i) => `<text x="${PAD.l + (i * (W - PAD.l - PAD.r)) / 8}" y="${H - FOOT - 26}">${(8 + i * 0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_, i) => `<text x="26" y="${150 + (i * (H - 200)) / 5}" transform="rotate(-90 26 ${150 + (i * (H - 200)) / 5})">${(57.8 - i * 0.5).toFixed(1)}°N</text>`).join('')}</g>`;
@@ -216,6 +217,7 @@ function render() {
               ? 0
               : 0.9;
   const strokeBase = st === 'silhouette' ? 'none' : stroke;
+  out += fxUnder(allPath, ink);
   out += `<g id="unsel"${st === 'paper' ? ' filter="url(#paper)"' : sp.filter ? ' filter="url(#' + sp.filter + ')"' : ''}>`;
   for (const k of unsel) {
     const fo = !inFocus(k);
@@ -223,6 +225,7 @@ function render() {
     out += `<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim || fo ? 'opacity=".3"' : ''} ${st === 'outline' || sp.pixel || (sp.flag && S.map !== 'world') ? 'fill-opacity="0"' : sp.network ? 'fill-opacity=".55"' : ''} ${sp.flag && S.map !== 'world' ? 'stroke-opacity=".45"' : ''}/>`;
   }
   out += '</g>';
+  out += fxLand(allPath);
   if (relief) {
     const borders =
       strokeBase === 'none'
@@ -386,6 +389,7 @@ function render() {
     }
     out += '</g>';
   });
+  out += fxMap(allPath);
   // major cities (country views, or focused units in the world view)
   const CL =
     S.map === 'adm1'
@@ -592,9 +596,10 @@ function render() {
     }
     out += '</g>';
   }
-  document.getElementById('svg').innerHTML = defs + out;
+  out += fxContentTop(ink, ds.accent);
+  document.getElementById('svg').innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
   const wrap = document.getElementById('wrap');
-  wrap.style.background = bg;
+  wrap.style.background = FXL.active ? S.fx.surface : bg;
   wrap.style.setProperty('--hl', (groups[S.active] || groups[0] || { color: ds.accent }).color);
   document.getElementById('textInfo').textContent = !document.getElementById('showText').checked
     ? t('off')

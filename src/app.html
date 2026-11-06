@@ -228,6 +228,37 @@
             ></label>
           </div>
         </section>
+        <section class="sec" data-sec="fx">
+          <h2 onclick="toggleSec('fx')">
+            <span class="chev"></span><span data-i18n="sec_fx"></span><span class="sum" id="fxInfo"></span>
+          </h2>
+          <div class="body">
+            <select id="fxPreset" onchange="applyFxPreset(this.value)"></select>
+            <select
+              id="fxFrame"
+              onchange="
+                S.fx.frame = this.value;
+                S.fx.preset = '';
+                ui();
+                render();
+              "
+            ></select>
+            <div id="fxList"></div>
+            <div class="row">
+              <label class="ck"
+                ><span data-i18n="fx_surface"></span>
+                <input
+                  type="color"
+                  id="fxSurface"
+                  oninput="
+                    S.fx.surface = this.value;
+                    render();
+                  "
+              /></label>
+              <button class="chip" onclick="fxShuffle()" data-i18n="fx_shuffle"></button>
+            </div>
+          </div>
+        </section>
         <section class="sec" data-sec="ds">
           <h2 onclick="toggleSec('ds')">
             <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
