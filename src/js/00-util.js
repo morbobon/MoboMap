@@ -21,3 +21,8 @@ const mix = (a, b, t) => {
     ).join('')
   );
 };
+// true for white-ish colours (partner logos need a white plate on anything else)
+const nearWhite = (h) => {
+  const [r, g, b] = hex2rgb(h);
+  return Math.min(r, g, b) > 235;
+};

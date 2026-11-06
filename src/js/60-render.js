@@ -546,7 +546,7 @@ function render() {
           lw = Math.min(lh * a, W * 0.2);
         const bx = x,
           by = ty - lh / 2;
-        out += `<rect x="${bx - 6}" y="${by - 6}" width="${lw + 12}" height="${lh + 12}" rx="4" fill="#ffffff" fill-opacity="${dark ? 0.92 : 0}"/><image href="${p.logo.src}" x="${bx}" y="${by.toFixed(1)}" width="${lw.toFixed(1)}" height="${lh.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
+        out += `<rect x="${bx - 6}" y="${by - 6}" width="${lw + 12}" height="${lh + 12}" rx="4" fill="#ffffff" fill-opacity="${dark || !nearWhite(bg) ? 0.92 : 0}"/><image href="${p.logo.src}" x="${bx}" y="${by.toFixed(1)}" width="${lw.toFixed(1)}" height="${lh.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
         if (p.link) window._links.push({ x: bx, y: by, w: lw, h: lh, url: p.link });
         x += lw + gap;
       } else if (p.name) {

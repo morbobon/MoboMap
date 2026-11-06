@@ -136,6 +136,13 @@ function ui() {
   document.getElementById('partnerCount').textContent = S.partners.length + ' ' + t('partners');
 }
 function setDS(v) {
+  // groups using the previous profile's palette take the matching colour of the new one; custom colours stay
+  const prev = DS[S.ds];
+  if (prev && prev !== DS[v])
+    S.groups.forEach((g) => {
+      const i = prev.highlight.findIndex((c) => c.toLowerCase() === String(g.color).toLowerCase());
+      if (i >= 0) g.color = DS[v].highlight[Math.min(i, DS[v].highlight.length - 1)];
+    });
   S.ds = v;
   const D = DS[v];
   const d = D.defaults;
