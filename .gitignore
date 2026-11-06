@@ -1,6 +1,17 @@
+# dependencies
 node_modules/
-# Release-build indeholder private logoer/designsystemer
+
+# build output (contains whatever is in designsystems/, incl. private logos)
 index.html
-# Private designsystemer (fx kundelogoer) – deles ikke
-designsystems/private/
 release/
+
+# private design systems / client brands – never committed
+designsystems/private/
+
+# local sidecar profiles and editor/OS noise
+designsystems.js
+.DS_Store
+Thumbs.db
+
+# large geodata sources (downloaded by tools/prepare-*.mjs)
+assets/geo/source-admin1.geojson

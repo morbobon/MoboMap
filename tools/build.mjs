@@ -1,5 +1,5 @@
-// Bygger én selvstændig HTML-fil (index.html) fra src/app.html + assets.
-// Kør: node tools/build.mjs
+// Bygger én selvstændig HTML-fil (index.html) fra src/app.html + assets + designsystems.
+// Kør: node tools/build.mjs [--public] [--out=sti]
 import fs from 'fs';
 import path from 'path';
 
@@ -7,11 +7,8 @@ const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace
 const A = (p) => path.join(root, 'assets', p);
 const readJSON = (p) => JSON.parse(fs.readFileSync(A(p), 'utf8'));
 
-// ---------- Geometri ----------
-const X0 = 441000, Y0 = 6403000, S = 300; // 1 kortenhed = 300 m
+// ---------- Geometri-hjælpere ----------
 const r1 = (v) => Math.round(v * 10) / 10;
-const tx = ([x, y]) => [r1((x - X0) / S), r1((Y0 - y) / S)];
-
 const geoms = (fc) => (fc.features ? fc.features.map((f) => f.geometry) : fc.geometries || [fc]);
 function polys(g) {
   if (!g) return [];
@@ -27,24 +24,6 @@ function lines(g) {
   if (g.type === 'GeometryCollection') return g.geometries.flatMap(lines);
   return [];
 }
-// Ring -> flad talrække [x0,y0,x1,y1,...] (uden lukkepunkt)
-function flatRing(ring) {
-  const pts = ring.map(tx);
-  if (pts.length > 1) {
-    const a = pts[0], b = pts[pts.length - 1];
-    if (a[0] === b[0] && a[1] === b[1]) pts.pop();
-  }
-  // fjern dubletter
-  const out = [];
-  for (const p of pts) {
-    const q = out[out.length - 1];
-    if (!q || q[0] !== p[0] || q[1] !== p[1]) out.push(p);
-  }
-  return out.flat();
-}
-const flatLine = (l) => l.map(tx).flat();
-const ringsOf = (g) => polys(g).flatMap((poly) => poly.map(flatRing)).filter((r) => r.length >= 6);
-
 function bboxOf(rings) {
   const b = [Infinity, Infinity, -Infinity, -Infinity];
   for (const r of rings) for (let i = 0; i < r.length; i += 2) {
@@ -59,40 +38,89 @@ function areaOf(rings) {
   return Math.round(Math.abs(a));
 }
 
-const kd = readJSON('geo/k_detail.json');
-const ks = readJSON('geo/k_simple.json');
-const pts = readJSON('geo/points.json');
-const ptBy = Object.fromEntries(pts.features.map((f) => [f.properties.lau_1, tx(f.geometry.coordinates)]));
-const simpleBy = Object.fromEntries(ks.features.map((f) => [f.properties.lau_1, ringsOf(f.geometry)]));
-
-const REGION = { 'DK-81': 'Nordjylland', 'DK-82': 'Midtjylland', 'DK-83': 'Syddanmark', 'DK-84': 'Hovedstaden', 'DK-85': 'Sjælland' };
-const kommuner = kd.features.map((f) => {
-  const p = f.properties;
-  const d = ringsOf(f.geometry);
+// Et datasæt = enheder (kommuner/lande) + landmasse + indre grænser + gruppegrænser, alt i kort-enheder
+// hvor (X0,Y0) er øverste venstre hjørne og S er meter pr. enhed.
+function dataset({ X0, Y0, S, files, key, unit, groups, sort }) {
+  const tx = ([x, y]) => [r1((x - X0) / S), r1((Y0 - y) / S)];
+  function flatRing(ring) {
+    const pts = ring.map(tx);
+    if (pts.length > 1) { const a = pts[0], b = pts[pts.length - 1]; if (a[0] === b[0] && a[1] === b[1]) pts.pop(); }
+    const out = [];
+    for (const p of pts) { const q = out[out.length - 1]; if (!q || q[0] !== p[0] || q[1] !== p[1]) out.push(p); }
+    return out.flat();
+  }
+  const flatLine = (l) => l.map(tx).flat();
+  const ringsOf = (g) => polys(g).flatMap((poly) => poly.map(flatRing)).filter((r) => r.length >= 6);
+  const kd = readJSON(files.detail), ks = readJSON(files.simple), pts = readJSON(files.points);
+  const ptBy = Object.fromEntries(pts.features.map((f) => [key(f.properties), tx(f.geometry.coordinates)]));
+  const simpleBy = Object.fromEntries(ks.features.map((f) => [key(f.properties), ringsOf(f.geometry)]));
+  const units = kd.features.map((f) => {
+    const p = f.properties, d = ringsOf(f.geometry), c = key(p);
+    return Object.assign({ c, p: ptBy[c], b: bboxOf(d), a: areaOf(d), d, s: simpleBy[c] || d }, unit(p));
+  }).sort(sort);
+  const linesOf = (file) => geoms(readJSON(file)).flatMap(lines).map(flatLine);
   return {
-    c: p.lau_1.padStart(3, '0'), n: p.label_dk, r: p.iso_3166_2,
-    p: ptBy[p.lau_1], b: bboxOf(d), a: areaOf(d),
-    d, s: simpleBy[p.lau_1] || d,
+    unitM: S, units, groups,
+    land: { d: ringsOf(geoms(readJSON(files.land_d))[0]), s: ringsOf(geoms(readJSON(files.land_s))[0]) },
+    inner: { d: linesOf(files.inner_d), s: linesOf(files.inner_s) },
+    rlines: { d: linesOf(files.rl_d), s: linesOf(files.rl_s) },
   };
-}).sort((a, b) => a.n.localeCompare(b.n, 'da'));
+}
 
-const bh = kommuner.find((k) => k.c === '400');
-// Indsat boks til Bornholm øverst til højre (som på klassiske danmarkskort)
-const mainB = bboxOf(kommuner.filter((k) => k !== bh).flatMap((k) => k.d));
-const bw = bh.b[2] - bh.b[0], bhh = bh.b[3] - bh.b[1];
-const pad = 14;
-const box = [r1(mainB[2] - bw - 2 * pad), r1(mainB[1] + 6), r1(mainB[2]), r1(mainB[1] + 6 + bhh + 2 * pad)];
-const inset = { dx: r1(box[0] + pad - bh.b[0]), dy: r1(box[1] + pad - bh.b[1]), box };
+// ---------- Danmark: 98 kommuner, UTM32, 1 enhed = 300 m ----------
+const dk = dataset({
+  X0: 441000, Y0: 6403000, S: 300,
+  files: { detail: 'geo/k_detail.json', simple: 'geo/k_simple.json', points: 'geo/points.json', land_d: 'geo/land_detail.json', land_s: 'geo/land_simple.json', inner_d: 'geo/inner_detail.json', inner_s: 'geo/inner_simple.json', rl_d: 'geo/regionlines_detail.json', rl_s: 'geo/regionlines_simple.json' },
+  key: (p) => p.lau_1.padStart(3, '0'),
+  unit: (p) => ({ n: p.label_dk, r: p.iso_3166_2 }),
+  groups: { 'DK-81': 'Nordjylland', 'DK-82': 'Midtjylland', 'DK-83': 'Syddanmark', 'DK-84': 'Hovedstaden', 'DK-85': 'Sjælland' },
+  sort: (a, b) => a.n.localeCompare(b.n, 'da'),
+});
+{ // Bornholm i indsat boks øverst til højre
+  const bh = dk.units.find((k) => k.c === '400');
+  const mainB = bboxOf(dk.units.filter((k) => k !== bh).flatMap((k) => k.d));
+  const bw = bh.b[2] - bh.b[0], bhh = bh.b[3] - bh.b[1], pad = 14;
+  const box = [r1(mainB[2] - bw - 2 * pad), r1(mainB[1] + 6), r1(mainB[2]), r1(mainB[1] + 6 + bhh + 2 * pad)];
+  dk.main = mainB;
+  dk.inset = { unit: '400', dx: r1(box[0] + pad - bh.b[0]), dy: r1(box[1] + pad - bh.b[1]), box };
+  dk.sea = [[0.12, 0.31, 'Nordsøen'], [0.64, 0.29, 'Kattegat'], [0.56, 0.9, 'Østersøen'], [0.9, 0.41, 'Sverige']];
+  dk.alias = { kbh: '101', copenhagen: '101', århus: '751', ålborg: '851', nørresundby: '851', brønderslev: '810', 'brønderslev-dronninglund': '810', åbenrå: '580', als: '540', mors: '773', thy: '787', møn: '390', falster: '376', 'nykøbing falster': '376', skagen: '813', amager: '101', lyngby: '173', taastrup: '169' };
+}
 
-const data = {
-  unit: S, main: mainB, inset, regions: REGION,
-  kommuner,
-  land: { d: ringsOf(geoms(readJSON('geo/land_detail.json'))[0]), s: ringsOf(geoms(readJSON('geo/land_simple.json'))[0]) },
-  inner: { d: geoms(readJSON('geo/inner_detail.json')).flatMap(lines).map(flatLine), s: geoms(readJSON('geo/inner_simple.json')).flatMap(lines).map(flatLine) },
-  rlines: { d: geoms(readJSON('geo/regionlines_detail.json')).flatMap(lines).map(flatLine), s: geoms(readJSON('geo/regionlines_simple.json')).flatMap(lines).map(flatLine) },
-};
+// ---------- Verden: 176 lande, Robinson, 1 enhed = 20 km ----------
+const extra = readJSON('geo/world-extra.json');
+const CONT = { Africa: 'AF', Asia: 'AS', Europe: 'EU', 'North America': 'NA', 'South America': 'SA', Oceania: 'OC', 'Seven seas (open ocean)': 'OC', Antarctica: 'AN' };
+const world = dataset({
+  X0: -180, Y0: 90, S: 1, // grader: x = lon+180, y = 90-lat; projiceres i appen (valgbar projektion)
+  files: { detail: 'geo/w_detail.json', simple: 'geo/w_simple.json', points: 'geo/wpoints.json', land_d: 'geo/wland_detail.json', land_s: 'geo/wland_simple.json', inner_d: 'geo/winner_detail.json', inner_s: 'geo/winner_simple.json', rl_d: 'geo/wregionlines_detail.json', rl_s: 'geo/wregionlines_simple.json' },
+  key: (p) => p.ADM0_A3,
+  unit: (p) => ({
+    n: p.NAME_EN, r: CONT[p.CONTINENT] || 'OC',
+    names: { da: extra.names_da[p.ADM0_A3] || p.NAME_EN, de: p.NAME_DE, fr: p.NAME_FR, es: p.NAME_ES, sv: p.NAME_SV, nl: p.NAME_NL, it: p.NAME_IT },
+    at: { un: p.REGION_UN, sub: p.SUBREGION, eco: p.ECONOMY.replace(/^\d\. /, ''), inc: p.INCOME_GRP.replace(/^\d\. /, ''), pop: p.POP_EST, gdp: p.GDP_MD, rel: extra.religion[p.ADM0_A3] || 'unknown' },
+  }),
+  groups: { AF: 'Africa', AS: 'Asia', EU: 'Europe', NA: 'North America', SA: 'South America', OC: 'Oceania' },
+  sort: (a, b) => a.n.localeCompare(b.n, 'en'),
+});
+world.geo = true; // koordinater i grader -> runtime-projektion
+world.main = bboxOf(world.units.flatMap((k) => k.d));
+world.inset = null;
+world.lists = { eu: extra.eu, nato: extra.nato, g20: extra.g20, nordic: extra.nordic };
+dk.lists = { fyn: extra.dk_fyn, storkbh: extra.dk_storkbh };
+// Større byer pr. land (Natural Earth 50m populated places): op til 8 pr. land efter indbyggertal + hovedstad
+{
+  const places = readJSON('geo/source-places.geojson').features.map((f) => f.properties);
+  const by = {};
+  for (const p of places) { (by[p.adm0_a3] = by[p.adm0_a3] || []).push({ n: p.name, x: r1(p.longitude + 180), y: r1(90 - p.latitude), pop: p.pop_max, cap: p.adm0cap === 1 ? 1 : 0 }); }
+  world.cities = {};
+  for (const [c, arr] of Object.entries(by)) world.cities[c] = arr.sort((a, b) => b.cap - a.cap || b.pop - a.pop).slice(0, 8);
+}
+world.sea = [[0.2, 0.45, 'Atlantic Ocean'], [0.8, 0.5, 'Pacific Ocean'], [0.62, 0.7, 'Indian Ocean'], [0.5, 0.06, 'Arctic Ocean']];
+world.alias = { uk: 'GBR', 'united kingdom': 'GBR', britain: 'GBR', england: 'GBR', us: 'USA', usa: 'USA', 'united states': 'USA', america: 'USA', holland: 'NLD', czechia: 'CZE', 'south korea': 'KOR', 'north korea': 'PRK', russia: 'RUS', 'ivory coast': 'CIV', 'dr congo': 'COD', congo: 'COG', burma: 'MMR', eswatini: 'SWZ', swaziland: 'SWZ', macedonia: 'MKD', bosnia: 'BIH', uae: 'ARE', emirates: 'ARE', palestine: 'PSX', 'east timor': 'TLS', 'timor-leste': 'TLS' };
 
-// ---------- Fonte & logo ----------
+const data = { dk, world };
+
+// ---------- Fonte ----------
 const b64 = (p) => fs.readFileSync(A(p)).toString('base64');
 const fonts = {
   'Arvo': b64('fonts/arvo700.woff2'),
@@ -119,6 +147,7 @@ const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.
 const designSystems = walk(DSDIR).sort((a, b) => path.basename(a).localeCompare(path.basename(b))).map((f) => {
   const dir = path.dirname(f);
   const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+  if (path.relative(DSDIR, f).split(path.sep)[0] === 'private') d.private = true;
   const inlineLogo = (L, what) => {
     if (!L || !L.src || /^data:/.test(L.src)) return;
     const lp = path.join(dir, L.src);
@@ -135,10 +164,16 @@ const designSystems = walk(DSDIR).sort((a, b) => path.basename(a).localeCompare(
 console.log('designsystemer:', designSystems.map((d) => d.id).join(', '));
 
 let html = fs.readFileSync(path.join(root, 'src', 'app.html'), 'utf8');
-html = html.replace('/*__DATA__*/', () => 'const DK = ' + JSON.stringify(data) + ';')
+html = html.replace('/*__DATA__*/', () => 'const DATA = ' + JSON.stringify(data) + ';')
   .replace('/*__FONTS__*/', () => 'const FONTS = ' + JSON.stringify(fonts) + ';')
   .replace('/*__JSPDF__*/', () => fs.readFileSync(A('jspdf.umd.min.js'), 'utf8'))
-  .replace('/*__DESIGNSYSTEMS__*/[]', () => JSON.stringify(designSystems));
+  .replace('/*__DESIGNSYSTEMS__*/[]', () => JSON.stringify(designSystems))
+  .replace('/*__I18N__*/{}', () => {
+    const a = JSON.parse(fs.readFileSync(path.join(root, 'src', 'i18n.json'), 'utf8'));
+    const bfile = path.join(root, 'src', 'i18n-extra.json');
+    if (fs.existsSync(bfile)) { const b = JSON.parse(fs.readFileSync(bfile, 'utf8')); for (const l of Object.keys(b)) a[l] = Object.assign(a[l] || {}, b[l]); }
+    return JSON.stringify(a);
+  });
 fs.mkdirSync(path.dirname(path.join(root, OUT)), { recursive: true });
 fs.writeFileSync(path.join(root, OUT), html);
-console.log(OUT, (html.length / 1024).toFixed(0) + ' KB', 'kommuner:', kommuner.length, 'inset:', JSON.stringify(inset));
+console.log(OUT, (html.length / 1024).toFixed(0) + ' KB', 'dk:', dk.units.length, 'world:', world.units.length, 'world bbox:', JSON.stringify(world.main));

@@ -2,7 +2,7 @@
   "name": "mobomap",
   "version": "1.0.0",
   "private": true,
-  "description": "Interaktiv generator til danmarkskort med markerede kommuner",
+  "description": "Single-file map design studio – world countries with drill-down to regions, custom design systems, 24 styles, highlight groups, attributes, projections, PNG/JPG/PDF export, 10 UI languages.",
   "scripts": {
     "geo": "node tools/prepare-geo.mjs",
     "build": "node tools/build.mjs",
@@ -10,5 +10,22 @@
   },
   "devDependencies": {
     "mapshaper": "^0.6.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morbobon/MoboMap.git"
+  },
+  "keywords": [
+    "map",
+    "denmark",
+    "municipalities",
+    "world",
+    "countries",
+    "svg",
+    "design-system",
+    "poster",
+    "export",
+    "pdf"
+  ]
 }

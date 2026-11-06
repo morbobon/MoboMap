@@ -10,3 +10,14 @@ for (const [lvl, pct, minArea] of [['detail', '35%', '0.3km2'], ['simple', '4%',
   await mapshaper.runCommands(`-i ${g}k_${lvl}.json -dissolve2 iso_3166_2 -innerlines -o ${g}regionlines_${lvl}.json format=geojson precision=10`);
 }
 await mapshaper.runCommands(`-i ${g}k_detail.json -points inner -o ${g}points.json format=geojson precision=10`);
+
+// ---------- Verden (Natural Earth 110m, Robinson) ----------
+const w = 'assets/geo/';
+const fields = 'ADM0_A3,NAME_EN,NAME_DE,NAME_FR,NAME_ES,NAME_SV,NAME_NL,NAME_IT,CONTINENT,REGION_UN,SUBREGION,ECONOMY,INCOME_GRP,POP_EST,GDP_MD';
+for (const [lvl, pct] of [['detail', '60%'], ['simple', '20%']]) {
+  await mapshaper.runCommands(`-i ${w}source-world.geojson -filter "ADM0_A3 != 'ATA'" -filter-fields ${fields}  -simplify ${pct} keep-shapes -clean -o ${w}w_${lvl}.json format=geojson precision=0.001`);
+  await mapshaper.runCommands(`-i ${w}w_${lvl}.json -dissolve2 -o ${w}wland_${lvl}.json format=geojson precision=0.001`);
+  await mapshaper.runCommands(`-i ${w}w_${lvl}.json -innerlines -o ${w}winner_${lvl}.json format=geojson precision=0.001`);
+  await mapshaper.runCommands(`-i ${w}w_${lvl}.json -dissolve2 CONTINENT -innerlines -o ${w}wregionlines_${lvl}.json format=geojson precision=0.001`);
+}
+await mapshaper.runCommands(`-i ${w}w_detail.json -points inner -o ${w}wpoints.json format=geojson precision=0.001`);

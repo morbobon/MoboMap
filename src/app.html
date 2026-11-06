@@ -59,8 +59,9 @@ label.ck{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:8px;c
 #wrap{position:relative;box-shadow:0 20px 60px #0003;border-radius:6px;overflow:hidden;background:#fff;max-width:100%;max-height:100%}
 #wrap svg{display:block;width:100%;height:100%}
 .k{cursor:pointer;transition:fill .2s,stroke .2s,filter .2s}
-.k:hover{filter:brightness(1.15) drop-shadow(0 0 3px var(--hl));stroke:var(--hl)!important;stroke-width:2.2!important;stroke-dasharray:none}
+.k:hover{filter:brightness(1.15)}
 #wrap:hover .k{transition:none}
+#hoverline{fill:none;stroke:var(--hl);stroke-width:2.2;stroke-linejoin:round;pointer-events:none;filter:drop-shadow(0 0 3px var(--hl))}
 #tip{position:fixed;pointer-events:none;display:none;background:var(--pet);color:var(--on-pet);font-size:11px;padding:4px 8px;border-radius:6px;z-index:9;white-space:nowrap}
 #tip b{color:var(--acc-on-pet)}
 #toast{position:fixed;bottom:16px;right:16px;background:var(--pet);color:var(--on-pet);padding:9px 14px;border-radius:9px;font-size:12px;opacity:0;transition:.3s;transform:translateY(10px);z-index:10}
@@ -73,10 +74,11 @@ code{font-family:'IBM Plex Mono',monospace;font-size:10.5px}
 </head>
 <body>
 <header>
-  <div><h1>Danmarkskort – Design Studio<small>Vælg designsystem, layout, kortstil og markeringsgrupper · klik på kommuner eller indsæt lister · eksportér</small></h1></div>
+  <div><h1><span data-i18n="app_title">MoboMap – Design Studio</span><small data-i18n="app_sub">Vælg designsystem, kort, layout, kortstil og markeringsgrupper · klik på kortet eller indsæt lister · eksportér</small></h1></div>
   <div class="btns">
-    <button onclick="document.getElementById('projFile').click()" title="Åbn projekt (.mobomap.json)">Åbn projekt</button>
-    <button onclick="saveProject()" title="Gem projekt (.mobomap.json)">Gem projekt</button>
+    <select id="langSel" onchange="setLang(this.value)" style="width:auto;padding:5px 8px;font-size:12px"></select>
+    <button onclick="document.getElementById('projFile').click()" data-i18n="open_project">Åbn projekt</button>
+    <button onclick="saveProject()" data-i18n="save_project">Gem projekt</button>
     <input type="file" id="projFile" accept=".json,application/json" style="display:none" onchange="openProjectFile(this.files[0]);this.value=''">
     <span style="width:8px"></span>
     <button class="exp alt" onclick="exportMap('png')">PNG</button>
@@ -87,72 +89,86 @@ code{font-family:'IBM Plex Mono',monospace;font-size:10.5px}
 <main>
 <aside>
   <section>
-    <h2>1. Designsystem / virksomhedsprofil <span id="dsName"></span></h2>
+    <h2><span data-i18n="sec_ds">1. Designsystem / virksomhedsprofil</span> <span id="dsName"></span></h2>
     <select id="ds" onchange="setDS(this.value)"></select>
     <div class="row" id="dsSw" style="margin-top:8px"></div>
     <div class="row" style="margin-top:8px">
-      <button class="chip" onclick="document.getElementById('dsFile').click()">Importér (.json/.js)</button>
-      <button class="chip" onclick="openEditor()">Redigér / ny</button>
-      <button class="chip" onclick="exportDS()">Eksportér JSON</button>
+      <button class="chip" onclick="document.getElementById('dsFile').click()"><span data-i18n="import">Importér (.json/.js)</span></button>
+      <button class="chip" onclick="openEditor()"><span data-i18n="edit_new">Redigér / ny</span></button>
+      <button class="chip" onclick="exportDS()"><span data-i18n="export_json">Eksportér JSON</span></button>
       <button class="chip" onclick="exportSidecar()" title="Alle egne designsystemer som designsystems.js">designsystems.js</button>
-      <button class="chip" id="dsDel" onclick="deleteDS()">Slet</button>
+      <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete">Slet</span></button>
       <input type="file" id="dsFile" accept=".json,.js,application/json" style="display:none" onchange="importDSFile(this.files[0]);this.value=''">
     </div>
     <details id="editor" style="margin-top:8px">
-      <summary style="font-size:11px;cursor:pointer;color:var(--mute)">JSON-editor (profil: navn, logo, link, farver, fonte, partnere)</summary>
+      <summary style="font-size:11px;cursor:pointer;color:var(--mute)" data-i18n="editor_sum">JSON-editor (profil: navn, logo, link, farver, fonte, partnere)</summary>
       <textarea id="dsJson" rows="12" style="font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:6px"></textarea>
       <div class="row" style="margin-top:6px">
-        <button class="chip" onclick="document.getElementById('logoFile').click()">Vælg logo (PNG/SVG)</button>
+        <button class="chip" onclick="document.getElementById('logoFile').click()"><span data-i18n="pick_logo">Vælg logo (PNG/SVG)</span></button>
         <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="pickLogo(this.files[0]);this.value=''">
-        <button class="chip on" onclick="applyEditor()">Gem</button>
+        <button class="chip on" onclick="applyEditor()"><span data-i18n="save">Gem</span></button>
       </div>
-      <p class="note">Gemmes i browseren (localStorage). Del via "Eksportér JSON", eller læg <code>designsystems.js</code> ved siden af index.html – så indlæses den automatisk. Du kan også trække en .json-fil ind på siden.</p>
+      <p class="note" data-i18n="editor_note">Gemmes i browseren (localStorage). Del via "Eksportér JSON", eller læg designsystems.js ved siden af index.html – så indlæses den automatisk. Du kan også trække en .json-fil ind på siden.</p>
     </details>
   </section>
   <section>
-    <h2>2. Layout <span id="layoutInfo"></span></h2>
+    <h2><span data-i18n="sec_map">2. Kort</span> <span id="mapInfo"></span></h2>
+    <div class="row">
+      <select id="mapSel" onchange="setMap(this.value)" style="flex:1"></select>
+      <select id="attrSel" onchange="S.attr=this.value;ui();render()" style="flex:1"></select>
+      <button class="chip" onclick="attrToGroups()" title="" id="attrBtn"><span data-i18n="attr_to_groups">→ grupper</span></button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <select id="projSel" onchange="S.proj=this.value;ui();render()" style="flex:1"></select>
+      <select id="focusSel" onchange="S.focus=this.value;ui();render()" style="flex:1"></select>
+      <label class="ck" style="margin:0"><input type="checkbox" id="focusHide" onchange="S.focusHide=this.checked;render()"> <span data-i18n="focus_hide">Skjul resten</span></label>
+    </div>
+    <p class="note" data-i18n="map_note">Vælg kort (Danmark med kommuner, eller verden med lande) og evt. en egenskab som alle enheder farvelægges efter.</p>
+  </section>
+  <section>
+    <h2><span data-i18n="sec_layout">3. Layout</span> <span id="layoutInfo"></span></h2>
     <div class="grid4" id="layouts"></div>
   </section>
   <section>
-    <h2>3. Markeringsgrupper <span class="sel" id="count"></span></h2>
+    <h2><span data-i18n="sec_groups">4. Markeringsgrupper</span> <span class="sel" id="count"></span></h2>
     <div id="groups"></div>
     <div class="row">
-      <button class="chip" onclick="addGroup()">+ Ny gruppe</button>
-      <button class="chip" onclick="presetRegionActive('DK-84')">Hovedstaden → aktiv</button>
-      <button class="chip" onclick="presetRegionActive('DK-82')">Midtjylland → aktiv</button>
+      <button class="chip" onclick="addGroup()"><span data-i18n="new_group">+ Ny gruppe</span></button>
+      <button class="chip" onclick="S.groups=[newGroup(t('group')+' 1',['fill'],DS[S.ds].highlight[0])];S.active=0;ui();render()"><span data-i18n="clear_groups">Ryd grupper</span></button>
+      <span id="regionPresets" class="row"></span>
     </div>
-    <p class="note">Klik på kortet lægger kommunen i den <b>aktive</b> gruppe (klik igen fjerner). Hver gruppe har sin egen farve og markeringsformer – fx én gruppe fuldfarvet, en anden skraveret. Navne adskilles med komma/linjeskift; "Aarhus Kommune", "Århus", "Kbh" forstås.</p>
-    <label class="ck"><input type="checkbox" id="labels" onchange="render()"> Vis navne på alle kommuner</label>
-    <label class="ck"><input type="checkbox" id="detail" checked onchange="render()"> Detaljeret kystlinje</label>
-    <label class="ck"><input type="checkbox" id="legend" checked onchange="render()"> Vis signaturforklaring (gruppenavne)</label>
+    <p class="note" data-i18n="groups_note">Klik på kortet lægger enheden i den aktive gruppe (klik igen fjerner). Hver gruppe har sin egen farve og markeringsformer. Navne adskilles med komma/linjeskift.</p>
+    <label class="ck"><input type="checkbox" id="labels" onchange="render()"> <span data-i18n="show_all_names">Vis navne på alle kommuner</span></label>
+    <label class="ck"><input type="checkbox" id="detail" checked onchange="render()"> <span data-i18n="detail_coast">Detaljeret kystlinje</span></label>
+    <label class="ck"><input type="checkbox" id="legend" checked onchange="render()"> <span data-i18n="show_legend">Vis signaturforklaring (gruppenavne)</span></label>
   </section>
   <section>
-    <h2>4. Kortstil <span id="styleNo"></span></h2>
+    <h2><span data-i18n="sec_style">5. Kortstil</span> <span id="styleNo"></span></h2>
     <div class="grid" id="styles"></div>
   </section>
   <section>
-    <h2>5. Tekst på kortet</h2>
-    <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="showText" checked onchange="render()"> Vis overskrift og undertekst</label>
-    <input type="text" id="title" value="Vi er her" oninput="render()" placeholder="Overskrift">
-    <input type="text" id="sub" value="Danmark" oninput="render()" placeholder="Undertekst" style="margin-top:6px">
-    <label class="ck"><input type="checkbox" id="showLogo" checked onchange="render()"> Vis virksomhedslogo (højre side)</label>
+    <h2 data-i18n="sec_text">6. Tekst på kortet</h2>
+    <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="showText" checked onchange="render()"> <span data-i18n="show_title">Vis overskrift og undertekst</span></label>
+    <input type="text" id="title" value="Vi er her" oninput="render()" data-i18n-ph="ph_title" placeholder="Overskrift">
+    <input type="text" id="sub" value="Danmark" oninput="render()" data-i18n-ph="ph_sub" placeholder="Undertekst" style="margin-top:6px">
+    <label class="ck"><input type="checkbox" id="showLogo" checked onchange="render()"> <span data-i18n="show_logo">Vis virksomhedslogo (højre side)</span></label>
   </section>
   <section>
-    <h2>6. Footer / partnere <span id="partnerCount"></span></h2>
-    <label class="ck" style="margin:0 0 6px"><input type="checkbox" id="showFooter" checked onchange="render()"> Vis footer med partnerlogoer</label>
-    <input type="text" id="footerLabel" value="" oninput="render()" placeholder="Footer-tekst, fx 'I samarbejde med'">
+    <h2><span data-i18n="sec_footer">7. Footer / partnere</span> <span id="partnerCount"></span></h2>
+    <label class="ck" style="margin:0 0 6px"><input type="checkbox" id="showFooter" checked onchange="render()"> <span data-i18n="show_footer">Vis footer med partnerlogoer</span></label>
+    <input type="text" id="footerLabel" value="" oninput="render()" data-i18n-ph="ph_footer" placeholder="Footer-tekst">
     <div id="partners" style="margin-top:6px"></div>
     <details style="margin-top:6px">
-      <summary style="font-size:11px;cursor:pointer;color:var(--mute)">Tilføj partner</summary>
-      <input type="text" id="pName" placeholder="Navn" style="margin-top:6px">
-      <input type="url" id="pLink" placeholder="Link (https://…)" style="margin-top:6px">
+      <summary style="font-size:11px;cursor:pointer;color:var(--mute)"><span data-i18n="add_partner">Tilføj partner</span></summary>
+      <input type="text" id="pName" data-i18n-ph="ph_name" placeholder="Navn" style="margin-top:6px">
+      <input type="url" id="pLink" data-i18n-ph="ph_link" placeholder="Link (https://…)" style="margin-top:6px">
       <div class="row" style="margin-top:6px">
-        <button class="chip" onclick="document.getElementById('pFile').click()">Vælg logo</button>
+        <button class="chip" onclick="document.getElementById('pFile').click()"><span data-i18n="pick_logo_p">Vælg logo</span></button>
         <input type="file" id="pFile" accept="image/*" style="display:none" onchange="pickPartnerLogo(this.files[0]);this.value=''">
         <span id="pFileName" class="note" style="margin:0"></span>
-        <button class="chip on" onclick="addPartner()">Tilføj</button>
+        <button class="chip on" onclick="addPartner()"><span data-i18n="add">Tilføj</span></button>
       </div>
-      <p class="note">Partnere følger profilen i session; "Eksportér JSON" i afsnit 1 gemmer dem i profilen. Links kommer med i PDF-eksport.</p>
+      <p class="note" data-i18n="partner_note">Partnere følger profilen i session; "Eksportér JSON" i afsnit 1 gemmer dem i profilen. Links kommer med i PDF-eksport.</p>
     </details>
   </section>
 </aside>
@@ -172,6 +188,13 @@ const hex2rgb=h=>{h=String(h).trim();if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h
 const light=h=>{const[r,g,b]=hex2rgb(h);return (0.299*r+0.587*g+0.114*b)/255>0.6};
 const mix=(a,b,t)=>{const A=hex2rgb(a),B=hex2rgb(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
 
+// ---------- Sprog (UI) ----------
+const LANGN={en:'English',da:'Dansk',de:'Deutsch',fr:'Français',es:'Español',sv:'Svenska',no:'Norsk',fi:'Suomi',nl:'Nederlands',it:'Italiano'};
+const T=/*__I18N__*/{};
+function t(k){return (T[S.lang]&&T[S.lang][k])||T.en[k]||k}
+function setLang(l,silent){if(!T[l])l='en';S.lang=l;localStorage.setItem('mobomap.lang',l);document.documentElement.lang=l;
+ document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh)});
+ if(!silent){ui();render()}}
 // ---------- Layouts ----------
 const LAYOUTS=[
  {id:'land',n:'Liggende',d:'1000×800',w:1000,h:800},
@@ -195,7 +218,7 @@ function normDS(d,source){
  const co=Object.assign({name:d.name||d.id,link:''},d.company||{});co.logo=normLogo(co.logo||d.logo,c);
  const partners=(d.partners||[]).map(p=>({name:p.name||'',link:p.link||'',logo:typeof p.logo==='string'?{src:p.logo}:(p.logo||{})})).filter(p=>p.name||p.logo.src);
  const footer=Object.assign({label:''},d.footer||{});footer.divider=Object.assign({style:'line',color:'',opacity:0.8,height:5,width:0.18,align:'left'},footer.divider||{});
- return {id:String(d.id),name:d.name||d.id,note:d.note||'',defaults:d.defaults||null,colors:c,fonts:f,company:co,partners,footer,highlight:(d.highlight&&d.highlight.length?d.highlight:[c.accent,c.accent2,c.primary,'#FFFFFF']),swatches:d.swatches||[c.primary,c.accent,c.accent2],source};
+ return {id:String(d.id),name:d.name||d.id,note:d.note||'',private:!!d.private,defaults:d.defaults||null,colors:c,fonts:f,company:co,partners,footer,highlight:(d.highlight&&d.highlight.length?d.highlight:[c.accent,c.accent2,c.primary,'#FFFFFF']),swatches:d.swatches||[c.primary,c.accent,c.accent2],source};
 }
 const DS={};const DSORDER=[];
 function addDS(d,source){try{const n=normDS(d,source);if(!DS[n.id])DSORDER.push(n.id);DS[n.id]=n;(n.fonts.faces||[]).forEach(injectFace);return n}catch(e){console.warn('Designsystem ignoreret:',e.message,d);return null}}
@@ -210,11 +233,11 @@ function loadDS(){
 function saveUserDS(){localStorage.setItem(LS_KEY,JSON.stringify(DSORDER.filter(i=>DS[i].source==='user').map(i=>stripDS(DS[i]))))}
 function stripDS(d){const{source,...rest}=d;return rest}
 function currentDSExport(){const d=stripDS(DS[S.ds]);d.partners=S.partners.map(p=>({name:p.name,link:p.link,logo:p.logo}));d.footer=Object.assign({},DS[S.ds].footer,{label:document.getElementById('footerLabel').value});return d}
-function importDSObject(obj){const list=Array.isArray(obj)?obj:(obj.designSystems||[obj]);let n=null;for(const d of list){const r=addDS(d,'user');if(r)n=r}if(!n)return toast('Ingen gyldige designsystemer fundet');saveUserDS();setDS(n.id);toast('Importeret: '+n.name)}
-function importDSFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{let t=rd.result;if(/\.js$/i.test(file.name)){const m=t.match(/=\s*(\[[\s\S]*\])\s*;?\s*$/);t=m?m[1]:t}importDSObject(JSON.parse(t))}catch(e){toast('Kunne ikke læse filen: '+e.message)}};rd.readAsText(file)}
+function importDSObject(obj){const list=Array.isArray(obj)?obj:(obj.designSystems||[obj]);let n=null;for(const d of list){const r=addDS(d,'user');if(r)n=r}if(!n)return toast(t('ts_none'));saveUserDS();setDS(n.id);toast(t('ts_imported')+': '+n.name)}
+function importDSFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{let t=rd.result;if(/\.js$/i.test(file.name)){const m=t.match(/=\s*(\[[\s\S]*\])\s*;?\s*$/);t=m?m[1]:t}importDSObject(JSON.parse(t))}catch(e){toast(t('ts_readfail')+': '+e.message)}};rd.readAsText(file)}
 function exportDS(){const d=currentDSExport();dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(d,null,2)),'designsystem-'+d.id+'.json')}
-function exportSidecar(){const list=DSORDER.filter(i=>DS[i].source!=='builtin').map(i=>i===S.ds?currentDSExport():stripDS(DS[i]));if(!list.length)return toast('Ingen egne designsystemer at eksportere');dl('data:text/javascript;charset=utf-8,'+encodeURIComponent('// Læg denne fil ved siden af index.html – den indlæses automatisk.\nwindow.DESIGN_SYSTEMS = '+JSON.stringify(list,null,2)+';\n'),'designsystems.js')}
-function deleteDS(){const d=DS[S.ds];if(d.source!=='user')return toast('Kun egne (importerede) designsystemer kan slettes');if(!confirm('Slet "'+d.name+'"?'))return;delete DS[d.id];DSORDER.splice(DSORDER.indexOf(d.id),1);saveUserDS();setDS(DSORDER[0])}
+function exportSidecar(){const list=DSORDER.filter(i=>DS[i].source!=='builtin').map(i=>i===S.ds?currentDSExport():stripDS(DS[i]));if(!list.length)return toast(t('ts_noown'));dl('data:text/javascript;charset=utf-8,'+encodeURIComponent('// Læg denne fil ved siden af index.html – den indlæses automatisk.\nwindow.DESIGN_SYSTEMS = '+JSON.stringify(list,null,2)+';\n'),'designsystems.js')}
+function deleteDS(){const d=DS[S.ds];if(d.source!=='user')return toast(t('ts_onlyown'));if(!confirm(t('ts_confirm_del')+' "'+d.name+'"?'))return;delete DS[d.id];DSORDER.splice(DSORDER.indexOf(d.id),1);saveUserDS();setDS(DSORDER.find(i=>!DS[i].private)||DSORDER[0])}
 const shortSrc=o=>{if(o&&o.src&&o.src.length>200)return Object.assign({},o,{src:'(behold)'});return o};
 function openEditor(){const d=currentDSExport();const isB=DS[S.ds].source!=='user';const copy=Object.assign({},d,{id:isB?d.id+'-kopi':d.id,name:isB?d.name+' (kopi)':d.name});
  copy.company=Object.assign({},copy.company,{logo:shortSrc(copy.company.logo)});copy.partners=copy.partners.map(p=>Object.assign({},p,{logo:shortSrc(p.logo)}));
@@ -223,12 +246,12 @@ function applyEditor(){try{const obj=JSON.parse(document.getElementById('dsJson'
  if(obj.company&&obj.company.logo&&obj.company.logo.src==='(behold)')obj.company.logo.src=cur.company.logo.src;
  (obj.partners||[]).forEach((p,i)=>{if(p.logo&&p.logo.src==='(behold)'){const o=S.partners[i]||cur.partners[i];p.logo.src=o?o.logo.src:null}});
  if(pendingLogo){obj.company=obj.company||{};obj.company.logo=Object.assign({},obj.company.logo||{},pendingLogo);pendingLogo=null}
- importDSObject(obj);document.getElementById('editor').open=false}catch(e){toast('Ugyldig JSON: '+e.message)}}
+ importDSObject(obj);document.getElementById('editor').open=false}catch(e){toast(t('ts_badjson')+': '+e.message)}}
 let pendingLogo=null,pendingPartnerLogo=null;
 function readImage(file,cb){const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>cb({src:rd.result,aspect:img.width/img.height},img);img.src=rd.result};rd.readAsDataURL(file)}
-function pickLogo(file){if(!file)return;readImage(file,(l,img)=>{pendingLogo=l;toast('Logo valgt ('+img.width+'×'+img.height+') – tryk Gem')})}
+function pickLogo(file){if(!file)return;readImage(file,(l,img)=>{pendingLogo=l;toast(t('ts_logo_picked')+' ('+img.width+'×'+img.height+')')})}
 function pickPartnerLogo(file){if(!file)return;readImage(file,(l)=>{pendingPartnerLogo=l;document.getElementById('pFileName').textContent=file.name})}
-function addPartner(){const name=document.getElementById('pName').value.trim(),link=document.getElementById('pLink').value.trim();if(!name&&!pendingPartnerLogo)return toast('Angiv navn og/eller logo');
+function addPartner(){const name=document.getElementById('pName').value.trim(),link=document.getElementById('pLink').value.trim();if(!name&&!pendingPartnerLogo)return toast(t('ts_need_name'));
  S.partners.push({name,link,logo:pendingPartnerLogo||{}});pendingPartnerLogo=null;document.getElementById('pName').value='';document.getElementById('pLink').value='';document.getElementById('pFileName').textContent='';ui();render()}
 function removePartner(i){S.partners.splice(i,1);ui();render()}
 function applyTheme(){const d=DS[S.ds],c=d.colors,r=document.documentElement.style;
@@ -239,30 +262,30 @@ function applyTheme(){const d=DS[S.ds],c=d.colors,r=document.documentElement.sty
 
 // ---------- Kortstile ----------
 const STYLES=[
- {id:'flat',n:'Flad',d:'Rene flader, grænser i baggrundsfarve'},
- {id:'silhouette',n:'Silhuet',d:'Én samlet form, grænser kun ved markering'},
- {id:'shades',n:'Nuancer',d:'Kommuner i skiftende nuancer'},
- {id:'regions',n:'Regioner',d:'Fem regioner i toner af én farve'},
- {id:'patchwork',n:'Patchwork',d:'Kommuner i kraftige, skiftende farver'},
- {id:'atlas',n:'Atlas',d:'Lyst kort, regionsgrænser, havnavne'},
- {id:'paper',n:'Papirklip',d:'Lagdelt papir med bløde skygger'},
- {id:'glass',n:'Glas & lang skygge',d:'Blankt glas, diagonal skygge'},
- {id:'neon',n:'Mørk neon',d:'Mørkt kort, selvlysende kyst'},
- {id:'blueprint',n:'Blueprint',d:'Teknisk tegning, gitter, koordinater'},
- {id:'halftone',n:'Halftone',d:'Grafisk prikraster'},
- {id:'outline',n:'Stregtegning',d:'Kun konturer, ingen fyld'},
- {id:'extrude',n:'3D-blok',d:'Ekstruderet landmasse med sidekanter'},
- {id:'slate',n:'Skifer',d:'Mørk stentekstur, hvide byprikker, spatierede navne'},
- {id:'poster',n:'Plakat mørk',d:'Koksgrå kommuner, alle navne i hvid'},
- {id:'golf',n:'Golfplakat',d:'Støvet grøn/blågrøn, centreret titel, ramme'},
- {id:'cutout',n:'Silhuet på papir',d:'Petroleumsblå silhuet på beige, ramme'},
- {id:'retro',n:'Retro plakat',d:'Oliven land, bølger i havet, cremefarvet titel'},
- {id:'topo',n:'Topografisk',d:'Grønt land med relief, blåt hav, regioner'},
- {id:'doodle',n:'Doodle',d:'Håndtegnede mønstre i sort/hvid'},
- {id:'typo',n:'Typografisk',d:'Kommunenavnet fylder formen'},
- {id:'vintage',n:'Vintage 1919',d:'Sort land, hvide grænser, kapitæler'},
- {id:'words',n:'Ordkort',d:'Formen bygget af navne i tre farver'},
- {id:'midnight',n:'Midnat 3D',d:'Dyb navy, glød, ekstruderet kant, stjerner'},
+ {id:'flat',n:'Flad',d:'Rene flader, grænser i baggrundsfarve',e:'Clean shapes, borders in background colour'},
+ {id:'silhouette',n:'Silhuet',d:'Én samlet form, grænser kun ved markering',e:'One solid shape, borders only when highlighted'},
+ {id:'shades',n:'Nuancer',d:'Kommuner i skiftende nuancer',e:'Units in alternating tints'},
+ {id:'regions',n:'Regioner',d:'Fem regioner i toner af én farve',e:'Groups in tints of one colour'},
+ {id:'patchwork',n:'Patchwork',d:'Kommuner i kraftige, skiftende farver',e:'Units in strong alternating colours'},
+ {id:'atlas',n:'Atlas',d:'Lyst kort, regionsgrænser, havnavne',e:'Light map, group borders, sea names'},
+ {id:'paper',n:'Papirklip',d:'Lagdelt papir med bløde skygger',e:'Layered paper with soft shadows'},
+ {id:'glass',n:'Glas & lang skygge',d:'Blankt glas, diagonal skygge',e:'Glossy glass, diagonal shadow'},
+ {id:'neon',n:'Mørk neon',d:'Mørkt kort, selvlysende kyst',e:'Dark map, glowing coast'},
+ {id:'blueprint',n:'Blueprint',d:'Teknisk tegning, gitter, koordinater',e:'Technical drawing, grid, coordinates'},
+ {id:'halftone',n:'Halftone',d:'Grafisk prikraster',e:'Graphic dot screen'},
+ {id:'outline',n:'Stregtegning',d:'Kun konturer, ingen fyld',e:'Outlines only, no fill'},
+ {id:'extrude',n:'3D-blok',d:'Ekstruderet landmasse med sidekanter',e:'Extruded landmass with side faces'},
+ {id:'slate',n:'Skifer',d:'Mørk stentekstur, hvide byprikker, spatierede navne',e:'Dark stone texture, white dots, spaced names'},
+ {id:'poster',n:'Plakat mørk',d:'Koksgrå kommuner, alle navne i hvid',e:'Charcoal units, all names in white'},
+ {id:'golf',n:'Golfplakat',d:'Støvet grøn/blågrøn, centreret titel, ramme',e:'Dusty green/teal, centred title, frame'},
+ {id:'cutout',n:'Silhuet på papir',d:'Petroleumsblå silhuet på beige, ramme',e:'Petrol silhouette on beige, frame'},
+ {id:'retro',n:'Retro plakat',d:'Oliven land, bølger i havet, cremefarvet titel',e:'Olive land, waves in the sea, cream title'},
+ {id:'topo',n:'Topografisk',d:'Grønt land med relief, blåt hav, regioner',e:'Green land with relief, blue sea, groups'},
+ {id:'doodle',n:'Doodle',d:'Håndtegnede mønstre i sort/hvid',e:'Hand-drawn black & white patterns'},
+ {id:'typo',n:'Typografisk',d:'Kommunenavnet fylder formen',e:'The name fills the shape'},
+ {id:'vintage',n:'Vintage 1919',d:'Sort land, hvide grænser, kapitæler',e:'Black land, white borders, small caps'},
+ {id:'words',n:'Ordkort',d:'Formen bygget af navne i tre farver',e:'Shape built from names in three colours'},
+ {id:'midnight',n:'Midnat 3D',d:'Dyb navy, glød, ekstruderet kant, stjerner',e:'Deep navy, glow, extruded edge, stars'},
 ];
 // Stil-egenskaber for de nye stile (bruges generisk i render)
 const SP={
@@ -293,35 +316,94 @@ const HLS=[
  {id:'callout',n:'Callout',t:'Linje til navn i margen'},
  {id:'dim',n:'Dæmp resten',t:'Alle umarkerede kommuner tones ned'},
 ];
-const S={ds:null,layout:'land',style:'flat',groups:[],active:0,partners:[]};
+const S={ds:null,map:'dk',attr:'none',proj:'robinson',lon0:0,focus:'',lang:'en',layout:'land',style:'flat',groups:[],active:0,partners:[]};
 const newGroup=(name,hl,color)=>({name,sel:new Set(),hl:new Set(hl),color,bad:[]});
 
-// ---------- Opslag af kommunenavne ----------
-const norm=s=>s.toLowerCase().replace(/\s+kommune$/,'').replace(/aa/g,'å').replace(/[^a-zæøå\-\s]/g,'').trim();
-const ALIAS={kbh:'101',copenhagen:'101',århus:'751',ålborg:'851',nørresundby:'851',brønderslev:'810','brønderslev-dronninglund':'810',åbenrå:'580',als:'540',mors:'773',thy:'787',møn:'390',falster:'376','nykøbing falster':'376',skagen:'813',amager:'101','lyngby':'173','taastrup':'169'};
-const byName={};DK.kommuner.forEach(k=>{byName[norm(k.n)]=k.c;byName[k.c]=k.c;});
-function lookup(t){const n=norm(t);if(!n)return null;if(byName[n])return byName[n];if(ALIAS[n])return ALIAS[n];
- const cand=DK.kommuner.filter(k=>norm(k.n).startsWith(n)||norm(k.n).split('-').includes(n));return cand.length===1?cand[0].c:null;}
+// ---------- Datasæt (kort) ----------
+const MAPS={
+ dk:{n:'Danmark',unitKey:'municipality',defaults:['101','751'],th:{l:2500,h:6000,big:20000},ex:'København, Aarhus'},
+ world:{n:'World',unitKey:'country',defaults:['DNK','SWE','NOR'],th:{l:6,h:20,big:120},ex:'Denmark, Germany, Brazil'},
+};
+// ---------- Projektioner (kun datasæt i grader) ----------
+const RAD=Math.PI/180;
+const ROB_X=[1,0.9986,0.9954,0.99,0.9822,0.973,0.96,0.9427,0.9216,0.8962,0.8679,0.835,0.7986,0.7597,0.7186,0.6732,0.6213,0.5722,0.5322];
+const ROB_Y=[0,0.062,0.124,0.186,0.248,0.31,0.372,0.434,0.4958,0.5571,0.6176,0.6769,0.7346,0.7903,0.8435,0.8936,0.9394,0.9761,1];
+const robin=(a,i,t)=>a[i]+(a[Math.min(i+1,18)]-a[i])*t;
+const PROJS={
+ robinson:{n:'Robinson',f:(l,p)=>{const d=Math.abs(p)/RAD,i=Math.min(17,Math.floor(d/5)),t=(d-i*5)/5;return[0.8487*robin(ROB_X,i,t)*l,1.3523*robin(ROB_Y,i,t)*Math.sign(p)]}},
+ equalEarth:{n:'Equal Earth',f:(l,p)=>{const A1=1.340264,A2=-0.081106,A3=0.000893,A4=0.003796,M=Math.sqrt(3)/2;const th=Math.asin(M*Math.sin(p)),t2=th*th,t6=t2*t2*t2;return[l*Math.cos(th)/(M*(A1+3*A2*t2+t6*(7*A3+9*A4*t2))),th*(A1+A2*t2+t6*(A3+A4*t2))]}},
+ naturalEarth:{n:'Natural Earth',f:(l,p)=>{const p2=p*p,p4=p2*p2;return[l*(0.8707-0.131979*p2+p4*(-0.013791+p4*(0.003971*p2-0.001529*p4))),p*(1.007226+p2*(0.015085+p4*(-0.044475+0.028874*p2-0.005916*p4)))]}},
+ mollweide:{n:'Mollweide',f:(l,p)=>{let th=p;for(let i=0;i<8;i++){const d=(2*th+Math.sin(2*th)-Math.PI*Math.sin(p))/(2+2*Math.cos(2*th));th-=d;if(Math.abs(d)<1e-7)break}return[2*Math.SQRT2/Math.PI*l*Math.cos(th),Math.SQRT2*Math.sin(th)]}},
+ winkel3:{n:'Winkel Tripel',f:(l,p)=>{const c=Math.acos(Math.cos(p)*Math.cos(l/2)),sc=c?Math.sin(c)/c:1;const cp=Math.acos(2/Math.PI);return[(l*cp+2*Math.cos(p)*Math.sin(l/2)/sc)/2,(p+Math.sin(p)/sc)/2]}},
+ mercator:{n:'Mercator',f:(l,p)=>{p=Math.max(-83*RAD,Math.min(83*RAD,p));return[l,Math.log(Math.tan(Math.PI/4+p/2))]}},
+ equirect:{n:'Plate carrée',f:(l,p)=>[l,p]},
+ miller:{n:'Miller',f:(l,p)=>[l,1.25*Math.log(Math.tan(Math.PI/4+0.4*p))]},
+};
+function prj(x,y){const f=(PROJS[S.proj]||PROJS.robinson).f;const[px,py]=f((x-180+S.lon0*0)*RAD,(90-y)*RAD);return[px*100,-py*100]}
+const focusUnits=()=>{if(!S.focus)return null;if(GEO.groups[S.focus])return GEO.units.filter(k=>k.r===S.focus);const u=GEO.units.find(k=>k.c===S.focus);return u?[u]:null};
+const inFocus=k=>{const f=focusUnits();return !f||f.includes(k)};
+function computeMain(){const key='main|'+S.map+'|'+S.proj+'|'+S.focus;if(cache[key])return cache[key];
+ const fu=focusUnits();let b;
+ if(!GEO.geo&&!fu)b=GEO.main.slice();
+ else{b=[Infinity,Infinity,-Infinity,-Infinity];const units=fu||GEO.units;const wide=k=>fu&&fu.length>1&&GEO.geo&&(k.b[2]-k.b[0])>120;for(const k of units){if(!fu&&isBH(k))continue;if(wide(k)){let[x,y]=k.p;[x,y]=prj(x,y);if(x<b[0])b[0]=x;if(y<b[1])b[1]=y;if(x>b[2])b[2]=x;if(y>b[3])b[3]=y;continue}const d=k.s;for(const r of d)for(let i=0;i<r.length;i+=2){let x=r[i],y=r[i+1];if(GEO.geo)[x,y]=prj(x,y);if(x<b[0])b[0]=x;if(y<b[1])b[1]=y;if(x>b[2])b[2]=x;if(y>b[3])b[3]=y}}
+  if(fu){const px=(b[2]-b[0])*0.08,py=(b[3]-b[1])*0.08;b=[b[0]-px,b[1]-py,b[2]+px,b[3]+py]}}
+ return cache[key]=b}
+let GEO,M,I,mw,mh,byName={},REGC={},REGI={};
+const nm=k=>(k.names&&k.names[S.lang])||k.n;
+const norm=s=>s.toLowerCase().replace(/\s+(kommune|municipality|county)$/,'').replace(/aa/g,'å').replace(/[^\p{L}\-\s]/gu,'').trim();
+function setData(id){S.map=DATA[id]?id:'dk';GEO=DATA[S.map];I=GEO.inset;S.focus='';for(const k in cache)delete cache[k];M=computeMain();mw=M[2]-M[0];mh=M[3]-M[1];
+ byName={};GEO.units.forEach(k=>{byName[norm(k.n)]=k.c;byName[k.c.toLowerCase()]=k.c;if(k.names)for(const v of Object.values(k.names))if(v)byName[norm(v)]=k.c});
+ REGC={};REGI={};Object.keys(GEO.groups).forEach((r,i)=>{REGI[r]=i;let sx=0,sy=0,sa=0;for(const k of GEO.units)if(k.r===r&&!isBH(k)){sx+=k.p[0]*k.a;sy+=k.p[1]*k.a;sa+=k.a}if(sa)REGC[r]=[sx/sa,sy/sa]});
+ for(const k in cache)delete cache[k]}
+function lookup(t){const n=norm(t);if(!n)return null;if(byName[n])return byName[n];if(GEO.alias&&GEO.alias[n])return GEO.alias[n];
+ const cand=GEO.units.filter(k=>norm(nm(k)).startsWith(n)||norm(k.n).startsWith(n)||norm(k.n).split(/[\s\-]/).includes(n));return cand.length===1?cand[0].c:null;}
+// Attribut-farvelægning (farvelæg alle enheder efter en egenskab)
+const band=(v,cuts,labels)=>{let i=0;while(i<cuts.length&&v>=cuts[i])i++;return labels[i]};
+const REL={christian:'Christian',muslim:'Muslim',hindu:'Hindu',buddhist:'Buddhist',jewish:'Jewish',folk:'Folk / traditional',unaffiliated:'Unaffiliated',unknown:'Unknown'};
+const YN=k=>t(k?'yes':'no');
+const areaBand=k=>{const a=GEO.units.map(u=>u.a).sort((x,y)=>x-y);const q=i=>a[Math.floor(a.length*i)];return k.a<q(0.25)?t('area_s'):k.a<q(0.5)?t('area_m'):k.a<q(0.75)?t('area_l'):t('area_xl')};
+const ATTRS={
+ dk:[{id:'group',n:'attr_region',f:k=>GEO.groups[k.r]},
+  {id:'landsdel',n:'attr_landsdel',f:k=>k.c==='400'?'Bornholm':GEO.lists.fyn.includes(k.c)?'Fyn':['360','376'].includes(k.c)?'Lolland-Falster':['DK-81','DK-82','DK-83'].includes(k.r)?'Jylland':'Sjælland'},
+  {id:'storkbh',n:'attr_storkbh',f:k=>YN(GEO.lists.storkbh.includes(k.c))},
+  {id:'area',n:'attr_area',ordKeys:['area_s','area_m','area_l','area_xl'],f:areaBand},
+  {id:'initial',n:'attr_initial',f:k=>nm(k)[0].toUpperCase()}],
+ world:[
+  {id:'group',n:'attr_continent',f:k=>GEO.groups[k.r]},
+  {id:'un',n:'attr_un',f:k=>k.at.un},
+  {id:'sub',n:'attr_sub',f:k=>k.at.sub},
+  {id:'eco',n:'attr_eco',ord:['Developed region: G7','Developed region: nonG7','Emerging region: BRIC','Emerging region: MIKT','Emerging region: G20','Developing region','Least developed region'],f:k=>k.at.eco},
+  {id:'inc',n:'attr_inc',ord:['High income: OECD','High income: nonOECD','Upper middle income','Lower middle income','Low income'],f:k=>k.at.inc},
+  {id:'pop',n:'attr_pop',ord:['< 1 M','1–10 M','10–50 M','50–200 M','> 200 M'],f:k=>band(k.at.pop,[1e6,1e7,5e7,2e8],['< 1 M','1–10 M','10–50 M','50–200 M','> 200 M'])},
+  {id:'gdp',n:'attr_gdp',ord:['< $2k','$2–8k','$8–20k','$20–45k','> $45k'],f:k=>band(k.at.gdp*1e6/Math.max(1,k.at.pop),[2000,8000,20000,45000],['< $2k','$2–8k','$8–20k','$20–45k','> $45k'])},
+  {id:'rel',n:'attr_rel',f:k=>REL[k.at.rel]||k.at.rel},
+  {id:'eu',n:'attr_eu',f:k=>YN(GEO.lists.eu.includes(k.c))},{id:'nato',n:'attr_nato',f:k=>YN(GEO.lists.nato.includes(k.c))},{id:'g20',n:'attr_g20',f:k=>YN(GEO.lists.g20.includes(k.c))},{id:'nordic',n:'attr_nordic',f:k=>YN(GEO.lists.nordic.includes(k.c))},
+  {id:'hemi',n:'attr_hemi',f:k=>t(k.p[1]<90?'hemi_n':'hemi_s')},
+  {id:'area',n:'attr_area',ordKeys:['area_s','area_m','area_l','area_xl'],f:areaBand},
+  {id:'initial',n:'attr_initial',f:k=>nm(k)[0].toUpperCase()},
+ ]};
+function attrToGroups(){const a=attrDef();if(!a)return;const cats=attrCats(a);const D=DS[S.ds];
+ cats.forEach((v,i)=>{const col=a.ord||a.ordKeys?mix(mix(D.colors.land,'#ffffff',0.72),D.colors.land,cats.length>1?i/(cats.length-1):1):PATCH[(i+S.groups.length)%PATCH.length];const g=newGroup(String(v),['fill'],col);GEO.units.forEach(k=>{if(a.f(k)===v){S.groups.forEach(o=>o.sel.delete(k.c));g.sel.add(k.c)}});S.groups.push(g)});
+ S.attr='none';S.active=S.groups.length-1;ui();render();toast(t('groups_added').replace('{n}',cats.length))}
+function attrDef(){return (ATTRS[S.map]||[]).find(a=>a.id===S.attr)||null}
+function attrCats(a){const vals=[...new Set(GEO.units.map(a.f))];const ord=a.ord||(a.ordKeys&&a.ordKeys.map(t));return ord?ord.filter(v=>vals.includes(v)):vals.sort()}
 
 // ---------- Projektion (afhænger af layout) ----------
-const M=DK.main,I=DK.inset;const mw=M[2]-M[0],mh=M[3]-M[1];
-function setLayout(id){const L=LAYOUTS.find(l=>l.id===id)||LAYOUTS[0];S.layout=L.id;W=L.w;H=L.h;
+function setLayout(id){const L=LAYOUTS.find(l=>l.id===id)||LAYOUTS[0];S.layout=L.id;W=L.w;H=L.h;M=computeMain();mw=M[2]-M[0];mh=M[3]-M[1];
  const foot=document.getElementById('showFooter').checked&&S.partners.length?Math.round(H*0.11)+20:0;FOOT=foot;
  PAD={l:Math.round(W*0.06),r:Math.round(W*0.06),t:Math.round(H*0.15),b:Math.round(H*0.06)+foot};
  sc=Math.min((W-PAD.l-PAD.r)/mw,(H-PAD.t-PAD.b)/mh);
  ox=PAD.l+((W-PAD.l-PAD.r)-mw*sc)/2-M[0]*sc;oy=PAD.t+((H-PAD.t-PAD.b)-mh*sc)/2-M[1]*sc;
- for(const k in cache)delete cache[k];
+ for(const k in cache)if(!k.startsWith('main|'))delete cache[k];
  const svg=document.getElementById('svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const wrap=document.getElementById('wrap');wrap.style.aspectRatio=W+'/'+H;wrap.style.width=`min(100%,calc((100vh - 110px) * ${(W/H).toFixed(4)}))`;}
-const P=(x,y,bh)=>bh?[(x+I.dx)*sc+ox,(y+I.dy)*sc+oy]:[x*sc+ox,y*sc+oy];
+const P=(x,y,bh)=>{if(bh&&I){x+=I.dx;y+=I.dy}if(GEO.geo){[x,y]=prj(x,y)}return[x*sc+ox,y*sc+oy]};
 function pathOf(rings,bh){let s='';for(const r of rings){for(let i=0;i<r.length;i+=2){const[x,y]=P(r[i],r[i+1],bh);s+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}s+='Z'}return s}
 function pathLines(ls){let s='';for(const l of ls){for(let i=0;i<l.length;i+=2){const[x,y]=P(l[i],l[i+1]);s+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}}return s}
-const isBH=k=>k.c==='400';
-const REGC={};for(const r of Object.keys(DK.regions)){let sx=0,sy=0,sa=0;for(const k of DK.kommuner)if(k.r===r&&!isBH(k)){sx+=k.p[0]*k.a;sy+=k.p[1]*k.a;sa+=k.a}REGC[r]=[sx/sa,sy/sa]}
-const REGI={'DK-81':0,'DK-82':1,'DK-83':2,'DK-85':3,'DK-84':4};
-const PATCH=['#E63946','#F4A261','#2A9D8F','#457B9D','#8E44AD','#F2C94C','#3DA35D','#FF7F50','#1F4E79','#C2185B'];
+const isBH=k=>!!I&&k.c===I.unit;
+const PATCH=['#E63946','#F4A261','#2A9D8F','#457B9D','#8E44AD','#F2C94C','#3DA35D','#FF7F50','#1F4E79','#C2185B','#6D597A','#B56576','#355070','#EAAC8B','#43AA8B','#90BE6D','#F9C74F','#577590'];
 function kp(k,det){const key=k.c+(det?'d':'s');return cache[key]||(cache[key]=pathOf(det?k.d:k.s,isBH(k)))}
 function kc(k){return P(k.p[0],k.p[1],isBH(k))}
-function landPath(det){return cache['land'+det]||(cache['land'+det]=pathOf(det?DK.land.d:DK.land.s,false))}
+function landPath(det){return cache['land'+det]||(cache['land'+det]=pathOf(det?GEO.land.d:GEO.land.s,false))}
 const bhRect=()=>{const[a,b]=P(I.box[0],I.box[1]),[c,d]=P(I.box[2],I.box[3]);return{x:a,y:b,w:c-a,h:d-b}};
 const groupOf=c=>S.groups.findIndex(g=>g.sel.has(c));
 
@@ -341,8 +423,8 @@ function render(){
  if(st==='patchwork'){stroke='#ffffff'}
  if(st==='paper'){stroke=mix(land,bg,0.35)}
  if(sp.bg){bg=sp.bg;land=sp.land;stroke=sp.stroke;ink=sp.ink;landAlt=sp.landAlt||mix(land,bg,0.25)}
- const groups=S.groups;const selAll=new Set(groups.flatMap(g=>[...g.sel]));
- const unsel=DK.kommuner.filter(k=>!selAll.has(k.c));
+ const groups=S.groups;const selAll=new Set(groups.flatMap(g=>[...g.sel]));const AT=attrDef();const ATC=AT?attrCats(AT):[];
+ const unsel=GEO.units.filter(k=>!selAll.has(k.c));
  const onCol=c=>light(c)?'#1b1b1b':'#ffffff';
  let defs=`<defs>
   <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -381,10 +463,10 @@ function render(){
  if(sp.stars){let r=12345;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;out+='<g pointer-events="none">';for(let i=0;i<160;i++)out+=`<circle cx="${(rnd()*W).toFixed(0)}" cy="${(rnd()*(H-FOOT)).toFixed(0)}" r="${(0.4+rnd()*1.2).toFixed(1)}" fill="#fff" opacity="${(0.2+rnd()*0.6).toFixed(2)}"/>`;out+='</g>'}
  if(sp.waves)out+=`<rect width="${W}" height="${H}" fill="url(#waves)"/>`;
  if(sp.frame)out+=`<rect x="18" y="18" width="${W-36}" height="${H-36}" fill="none" stroke="${ink}" stroke-opacity=".6" stroke-width="1.5"/>`;
- if(sp.sea){const sea=[[0.12,0.31,'NORDSØEN'],[0.64,0.29,'KATTEGAT'],[0.56,0.9,'ØSTERSØEN'],[0.9,0.41,'SVERIGE']];out+=`<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity=".7" ${sp.seaItalic?'font-style="italic"':''}>`;for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;out+='</g>'}
- const R=bhRect();
- out+=`<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="none" stroke="${st==='neon'?stroke:ink}" stroke-opacity=".45" stroke-width="1" ${st==='blueprint'?'stroke-dasharray="4 3"':''}/>`;
- const allPath=landPath(det)+kp(DK.kommuner.find(isBH),det);
+ if(sp.sea){const sea=S.focus?[]:(GEO.sea||[]).map(x=>[x[0],x[1],x[2].toUpperCase()]);out+=`<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity=".7" ${sp.seaItalic?'font-style="italic"':''}>`;for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;out+='</g>'}
+ if(I){const R=bhRect();
+ out+=`<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="none" stroke="${st==='neon'?stroke:ink}" stroke-opacity=".45" stroke-width="1" ${st==='blueprint'?'stroke-dasharray="4 3"':''}/>`}
+ const allPath=landPath(det)+(I?kp(GEO.units.find(isBH),det):'');
  if(sp.landGlow)out+=`<path d="${allPath}" fill="none" stroke="${sp.landGlow}" stroke-width="14" filter="url(#landglow)" opacity=".5"/>`;
  if(st==='extrude'||sp.extrude){const ec=sp.extrudeColor||mix(land,'#000',0.45);for(let i=14;i>0;i--)out+=`<path d="${allPath}" transform="translate(${-i*0.6},${i*1.1})" fill="${i===1?'url(#extrSide)':ec}" stroke="${mix(ec,'#fff',0.12)}" stroke-width=".6"/>`}
  if(st==='glass')out+=`<path d="${allPath}" fill="#000" filter="url(#longshadow)" opacity=".9"/>`;
@@ -394,8 +476,9 @@ function render(){
  const baseFill=k=>{
   if(st==='halftone')return 'url(#dotsBase)';
   if(st==='blueprint')return '#1d4a73';
+  if(AT&&!sp.patterns&&!sp.text){const v=AT.f(k),i=Math.max(0,ATC.indexOf(v));return (AT.ord||AT.ordKeys)?mix(mix(land,'#ffffff',0.72),land,ATC.length>1?i/(ATC.length-1):1):PATCH[i%PATCH.length]}
   if(st==='shades'){const i=(parseInt(k.c)*7)%5;return [land,landAlt,mix(land,bg,0.25),mix(land,bg,0.4),mix(land,'#000',0.12)][i]}
-  if(st==='regions'){return [land,mix(land,bg,0.25),mix(land,bg,0.45),mix(land,bg,0.6),mix(land,bg,0.75)][REGI[k.r]]}
+  if(st==='regions'){const n=Math.max(2,Object.keys(GEO.groups).length);return mix(land,bg,0.75*REGI[k.r]/(n-1))}
   if(st==='patchwork'){return PATCH[(parseInt(k.c)*13+REGI[k.r])%PATCH.length]}
   if(sp.patterns){return 'url('+DOODLE[(parseInt(k.c)*7+REGI[k.r])%DOODLE.length]+')'}
   if(st==='topo'){return (parseInt(k.c)*7)%3?land:landAlt}
@@ -404,26 +487,26 @@ function render(){
  const swBase=sp.strokeW!=null?sp.strokeW:st==='outline'?1.2:st==='blueprint'?0.8:st==='neon'?0.8:st==='silhouette'?0:0.9;
  const strokeBase=st==='silhouette'?'none':stroke;
  out+=`<g id="unsel"${st==='paper'?' filter="url(#paper)"':sp.filter?' filter="url(#'+sp.filter+')"':''}>`;
- for(const k of unsel)out+=`<path class="k" data-c="${k.c}" d="${kp(k,det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim?'opacity=".35"':''} ${st==='outline'?'fill-opacity="0"':''}/>`;
+ for(const k of unsel){const fo=!inFocus(k);if(fo&&S.focusHide)continue;out+=`<path class="k" data-c="${k.c}" d="${kp(k,det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim||fo?'opacity=".3"':''} ${st==='outline'?'fill-opacity="0"':''}/>`}
  out+='</g>';
  if(st==='glass'){out+=`<path d="${allPath}" fill="url(#glassg)" pointer-events="none" opacity=".55"/><path d="${allPath}" fill="none" stroke="#fff" stroke-width="1.2" pointer-events="none" opacity=".8"/>`}
  if(st==='silhouette')out+=`<path d="${allPath}" fill="none" stroke="${mix(land,'#000',0.2)}" stroke-width="1" pointer-events="none"/>`;
- if(sp.regionLines){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?DK.rlines.d:DK.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`}
- if(sp.dotted){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?DK.rlines.d:DK.rlines.s));out+=`<path d="${rl}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`}
- if(sp.text){out+='<g pointer-events="none">';DK.kommuner.forEach((k,i)=>{if(selAll.has(k.c))return;const[x0,y0]=P(k.b[0],k.b[1],isBH(k)),[x1,y1]=P(k.b[2],k.b[3],isBH(k));const bw=x1-x0,bh=y1-y0;const n=k.n.toUpperCase();
+ if(sp.regionLines){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`}
+ if(sp.dotted){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`}
+ if(sp.text){out+='<g pointer-events="none">';GEO.units.forEach((k,i)=>{if(selAll.has(k.c))return;const cs=[P(k.b[0],k.b[1],isBH(k)),P(k.b[2],k.b[3],isBH(k)),P(k.b[0],k.b[3],isBH(k)),P(k.b[2],k.b[1],isBH(k))];const x0=Math.min(...cs.map(c=>c[0])),x1=Math.max(...cs.map(c=>c[0])),y0=Math.min(...cs.map(c=>c[1])),y1=Math.max(...cs.map(c=>c[1]));const bw=x1-x0,bh=y1-y0;const n=nm(k).toUpperCase();
    out+=`<clipPath id="ck${k.c}"><path d="${kp(k,det)}"/></clipPath><g clip-path="url(#ck${k.c})">`;
    if(sp.text==='typo'){const fs=Math.max(6,Math.min(bh*0.95,bw*1.6/n.length));out+=`<text x="${(x0+bw/2).toFixed(1)}" y="${(y0+bh/2+fs*0.36).toFixed(1)}" text-anchor="middle" font-family="'${ds.head}'" font-weight="700" font-size="${fs.toFixed(1)}" textLength="${(bw*0.96).toFixed(1)}" lengthAdjust="spacingAndGlyphs" fill="${sp.textColor}">${esc(n)}</text>`}
    else{const fs=Math.max(5,Math.min(bw*1.5/n.length,bh*0.6,18));const rows=Math.max(1,Math.ceil(bh/(fs*0.95)));for(let r=0;r<rows;r++){const col=sp.wordColors[(i+r)%sp.wordColors.length];out+=`<text x="${(x0+bw/2).toFixed(1)}" y="${(y0+fs*0.85+r*fs*0.95).toFixed(1)}" text-anchor="middle" font-family="'${ds.head}'" font-weight="700" font-size="${fs.toFixed(1)}" textLength="${(bw*0.98).toFixed(1)}" lengthAdjust="spacingAndGlyphs" fill="${col}">${esc(n)}</text>`}}
    out+='</g>'});out+='</g>'}
- if(sp.cityDots){out+='<g pointer-events="none">';for(const k of unsel){if(k.a<6000&&!isBH(k))continue;const[x,y]=kc(k);out+=`<circle cx="${x.toFixed(1)}" cy="${(y+8).toFixed(1)}" r="3.2" fill="#fff" stroke="${land}" stroke-width="1"/>`}out+='</g>'}
- if(st==='atlas'||st==='regions'){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?DK.rlines.d:DK.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ds.dark?ink:'#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
+ if(sp.cityDots){out+='<g pointer-events="none">';for(const k of unsel){if(k.a<MAPS[S.map].th.h&&!isBH(k))continue;const[x,y]=kc(k);out+=`<circle cx="${x.toFixed(1)}" cy="${(y+8).toFixed(1)}" r="3.2" fill="#fff" stroke="${land}" stroke-width="1"/>`}out+='</g>'}
+ if(st==='atlas'||st==='regions'){const rl=cache['rl'+det]||(cache['rl'+det]=pathLines(det?GEO.rlines.d:GEO.rlines.s));out+=`<path d="${rl}" fill="none" stroke="${ds.dark?ink:'#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
   out+=`<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity=".65" fill="${ds.dark?ink:'#355a78'}">`;
-  for(const r in REGC){const[x,y]=P(REGC[r][0],REGC[r][1]);out+=`<text x="${x.toFixed(0)}" y="${(y+3).toFixed(0)}" text-anchor="middle">${DK.regions[r].toUpperCase()}</text>`}
-  if(st==='atlas'){const sea=[[0.12,0.31,'NORDSØEN'],[0.64,0.29,'KATTEGAT'],[0.56,0.9,'ØSTERSØEN'],[0.9,0.41,'SVERIGE']];for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`}
+  for(const r in REGC){if(S.focus)break;const[x,y]=P(REGC[r][0],REGC[r][1]);out+=`<text x="${x.toFixed(0)}" y="${(y+3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`}
+  if(st==='atlas'){const sea=S.focus?[]:(GEO.sea||[]).map(x=>[x[0],x[1],x[2].toUpperCase()]);for(const[fx,fy,t]of sea)out+=`<text x="${(fx*W).toFixed(0)}" y="${(fy*(H-FOOT)).toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`}
   out+='</g>'}
  // markerede grupper (tegnes i rækkefølge; senere grupper øverst)
  groups.forEach((g,gi)=>{const col=g.color,hl=g.hl;out+=`<g id="g${gi}">`;
-  for(const c of g.sel){const k=DK.kommuner.find(k=>k.c===c);if(!k)continue;
+  for(const c of g.sel){const k=GEO.units.find(k=>k.c===c);if(!k)continue;
    let fill=hl.has('fill')?col:(hl.has('tint')?mix(baseFill(k)==='url(#dotsBase)'?baseLand:baseFill(k).startsWith('url')?baseLand:baseFill(k),col,0.5):baseFill(k));
    if(hl.has('hatch'))fill=`url(#hatch${gi})`;else if(hl.has('dots'))fill=`url(#dots${gi})`;
    let strk=strokeBase,sw=swBase;
@@ -432,23 +515,27 @@ function render(){
    const fillAttr=st==='outline'&&!hl.has('fill')&&!hl.has('hatch')&&!hl.has('dots')&&!hl.has('tint')?'fill-opacity="0"':'';
    out+=`<g ${tr}>${hl.has('glow')?`<path d="${kp(k,det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity=".85" pointer-events="none"/>`:''}<path class="k" data-c="${k.c}" d="${kp(k,det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`}
   out+='</g>'});
+ // byer i fokus (kun datasæt med cities)
+ if(S.focus&&GEO.cities){const fu=focusUnits()||[];out+='<g pointer-events="none">';for(const u of fu){for(const c of (GEO.cities[u.c]||[])){const[x,y]=P(c.x,c.y);const big=c.cap||c.pop>2e6;out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big?4.5:3}" fill="${c.cap?ds.accent:'#ffffff'}" stroke="${ink}" stroke-width="1.2"/><text x="${(x+7).toFixed(1)}" y="${(y+4).toFixed(1)}" font-family="'${ds.body}'" font-size="${big?12:10}" font-weight="${c.cap?700:500}" fill="${ink}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(c.n)}</text>`}}out+='</g>'}
  // navne, pins, labels, callouts
  const lf=ds.body;out+='<g pointer-events="none">';
- if(all||sp.labels)for(const k of unsel){const[x,y]=kc(k);if(k.a<(sp.labels?6000:2500)&&!isBH(k))continue;const caps=sp.labels==='caps';out+=`<text x="${x.toFixed(0)}" y="${(y-(sp.cityDots?2:0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps?(k.a>20000?7.5:6.5):(k.a>20000?8:6.5)}" ${caps?'letter-spacing="1.2"':'font-weight="700"'} text-anchor="middle" fill="${sp.labelColor||(st==='outline'||st==='halftone'?ink:(light(land)?'#222':'#fff'))}" opacity=".9">${esc(caps?k.n.toUpperCase():k.n)}</text>`}
+ if(all||sp.labels)for(const k of unsel){const[x,y]=kc(k);if(k.a<(sp.labels?MAPS[S.map].th.h:MAPS[S.map].th.l)&&!isBH(k))continue;const caps=sp.labels==='caps';out+=`<text x="${x.toFixed(0)}" y="${(y-(sp.cityDots?2:0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps?(k.a>MAPS[S.map].th.big?7.5:6.5):(k.a>MAPS[S.map].th.big?8:6.5)}" ${caps?'letter-spacing="1.2"':'font-weight="700"'} text-anchor="middle" fill="${sp.labelColor||(st==='outline'||st==='halftone'?ink:(light(land)?'#222':'#fff'))}" opacity=".9">${esc(caps?nm(k).toUpperCase():nm(k))}</text>`}
  const margin={l:[],r:[]};
- groups.forEach(g=>{const col=g.color,hl=g.hl;for(const c of g.sel){const k=DK.kommuner.find(k=>k.c===c);if(!k)continue;const[x,y]=kc(k);
+ groups.forEach(g=>{const col=g.color,hl=g.hl;for(const c of g.sel){const k=GEO.units.find(k=>k.c===c);if(!k)continue;const[x,y]=kc(k);
   if(hl.has('pin'))out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${col}" stroke-width="2.5" class="pulse"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" stroke="${onCol(col)}" stroke-width="1.6"/>`;
-  if(hl.has('label')&&!hl.has('callout')){const w=k.n.length*6.6+16;out+=`<g transform="translate(${x.toFixed(1)},${(y-(hl.has('pin')?16:0)).toFixed(1)})"><rect x="${-w/2}" y="-20" width="${w}" height="18" rx="4" fill="${dark?col:ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark?onCol(col):onCol(ds.primary)}">${esc(k.n)}</text></g>`}
+  if(hl.has('label')&&!hl.has('callout')){const w=nm(k).length*6.6+16;out+=`<g transform="translate(${x.toFixed(1)},${(y-(hl.has('pin')?16:0)).toFixed(1)})"><rect x="${-w/2}" y="-20" width="${w}" height="18" rx="4" fill="${dark?col:ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark?onCol(col):onCol(ds.primary)}">${esc(nm(k))}</text></g>`}
   if(hl.has('callout'))(x<W/2?margin.l:margin.r).push({k,x,y,col})}});
  for(const side of ['l','r']){const arr=margin[side].sort((a,b)=>a.y-b.y);const n=arr.length;if(!n)continue;const avail=H-FOOT-260;const step=Math.min(70,avail/n);const y0=(H-FOOT-step*(n-1))/2+40;
   arr.forEach((o,i)=>{const lab=y0+i*step;const lx=side==='l'?PAD.l-18:W-PAD.r+18;const tx=side==='l'?24:W-24;
    const ln=`M${o.x.toFixed(1)} ${o.y.toFixed(1)}L${lx} ${lab.toFixed(1)}`;const lc=o.col.toLowerCase()===land.toLowerCase()?onCol(land):o.col;
-   out+=`<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/><text x="${tx}" y="${(lab-4).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}">${esc(o.k.n)}</text><text x="${tx}" y="${(lab+10).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".7">${DK.regions[o.k.r].toUpperCase()}</text>`})}
+   out+=`<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/><text x="${tx}" y="${(lab-4).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}">${esc(nm(o.k))}</text><text x="${tx}" y="${(lab+10).toFixed(1)}" text-anchor="${side==='l'?'start':'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".7">${GEO.groups[o.k.r].toUpperCase()}</text>`})}
  // signaturforklaring
- if(document.getElementById('legend').checked){const gs=groups.filter(g=>g.sel.size);if(gs.length>1||(gs.length===1&&gs[0].name)){let y=H-FOOT-14-gs.length*18;const lw=Math.max(...gs.map(g=>g.name.length))*6.5+50;const x=margin.l.length?(margin.r.length?(W-lw)/2:W-PAD.r+20-lw):PAD.l-20;
-  out+=`<rect x="${x-8}" y="${y-8}" width="${lw}" height="${gs.length*18+12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
-  gs.forEach(g=>{const sw=g.hl.has('hatch')?`url(#hatch${groups.indexOf(g)})`:g.hl.has('dots')?`url(#dots${groups.indexOf(g)})`:(g.hl.has('fill')?g.color:g.hl.has('tint')?mix(baseLand,g.color,0.5):baseLand);
-   out+=`<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${sw}" stroke="${g.hl.has('outline')&&!g.hl.has('fill')?g.color:ink}" stroke-width="${g.hl.has('outline')?2:0.6}"/><text x="${x+20}" y="${y+11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(g.name)} <tspan opacity=".6">(${g.sel.size})</tspan></text>`;y+=18})}}
+ if(document.getElementById('legend').checked){const items=[];const gs=groups.filter(g=>g.sel.size);
+  if(gs.length>1||(gs.length===1&&gs[0].name))gs.forEach(g=>{const sw=g.hl.has('hatch')?`url(#hatch${groups.indexOf(g)})`:g.hl.has('dots')?`url(#dots${groups.indexOf(g)})`:(g.hl.has('fill')?g.color:g.hl.has('tint')?mix(baseLand,g.color,0.5):baseLand);items.push({sw,stroke:g.hl.has('outline')&&!g.hl.has('fill')?g.color:ink,sw2:g.hl.has('outline')?2:0.6,label:g.name+' ('+g.sel.size+')'})});
+  if(AT&&!sp.patterns&&!sp.text)ATC.forEach((v,i)=>items.push({sw:AT.ord?mix(mix(land,'#ffffff',0.72),land,ATC.length>1?i/(ATC.length-1):1):PATCH[i%PATCH.length],stroke:ink,sw2:0.4,label:v}));
+  if(items.length){let y=H-FOOT-14-items.length*18;const lw=Math.max(...items.map(o=>o.label.length))*6.2+50;const x=margin.l.length?(margin.r.length?(W-lw)/2:W-PAD.r+20-lw):PAD.l-20;
+  out+=`<rect x="${x-8}" y="${y-8}" width="${lw}" height="${items.length*18+12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
+  items.forEach(o=>{out+=`<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x+20}" y="${y+11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;y+=18})}}
  out+='</g>';
  // tekst & logo
  const title=document.getElementById('title').value,sub=document.getElementById('sub').value;
@@ -480,59 +567,73 @@ function render(){
   out+='</g>'}
  document.getElementById('svg').innerHTML=defs+out;
  const wrap=document.getElementById('wrap');wrap.style.background=bg;wrap.style.setProperty('--hl',(groups[S.active]||groups[0]||{color:ds.accent}).color);
- document.getElementById('count').textContent=selAll.size+' valgt i '+groups.length+' grupper';
+ document.getElementById('count').textContent=t('count').replace('{n}',selAll.size).replace('{g}',groups.length);
 }
 
 // ---------- UI ----------
 function ui(){
  if(!DS[S.ds])S.ds=DSORDER[0];applyTheme();const D=DS[S.ds];
- const sel=document.getElementById('ds');const grp={builtin:'Fra designsystems/ (bygget ind)',file:'Fra designsystems.js',user:'Importerede'};
- sel.innerHTML=Object.keys(grp).map(g=>{const items=DSORDER.filter(i=>DS[i].source===g);return items.length?`<optgroup label="${grp[g]}">`+items.map(k=>`<option value="${k}">${esc(DS[k].name)}</option>`).join('')+'</optgroup>':''}).join('');sel.value=S.ds;
+ const sel=document.getElementById('ds');const grp={builtin:t('grp_builtin'),private:t('grp_private'),file:t('grp_file'),user:t('grp_user')};
+ sel.innerHTML=Object.keys(grp).map(g=>{const items=DSORDER.filter(i=>g==='private'?DS[i].private:(DS[i].source===g&&!DS[i].private));return items.length?`<optgroup label="${grp[g]}">`+items.map(k=>`<option value="${k}">${esc(DS[k].name)}</option>`).join('')+'</optgroup>':''}).join('');sel.value=S.ds;
  document.getElementById('dsSw').innerHTML=D.swatches.map(c=>`<span class="sw" style="background:${c}" title="${c}"></span>`).join('')+(D.company.link?` <a href="${esc(D.company.link)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--tyr)">${esc(D.company.name)} ↗</a>`:'');
  document.getElementById('dsName').textContent=D.note||(D.source==='user'?'importeret':'');
  document.getElementById('dsDel').style.display=D.source==='user'?'':'none';
- document.getElementById('layouts').innerHTML=LAYOUTS.map(l=>`<button class="tile ${S.layout===l.id?'on':''}" onclick="S.layout='${l.id}';ui();render()"><b>${l.n}</b><i>${l.d}</i></button>`).join('');
+ document.getElementById('mapSel').innerHTML=Object.keys(MAPS).map(m=>`<option value="${m}">${esc(t('map_'+m))}</option>`).join('');document.getElementById('mapSel').value=S.map;
+ document.getElementById('attrSel').innerHTML=`<option value="none">${esc(t('colour_by'))}: ${esc(t('none'))}</option>`+(ATTRS[S.map]||[]).map(a=>`<option value="${a.id}">${esc(t('colour_by'))}: ${esc(t(a.n))}</option>`).join('');document.getElementById('attrSel').value=S.attr;
+ document.getElementById('mapInfo').textContent=GEO.units.length+' '+t(MAPS[S.map].unitKey);
+ document.getElementById('attrBtn').style.display=S.attr==='none'?'none':'';
+ const ps=document.getElementById('projSel');ps.innerHTML=GEO.geo?Object.entries(PROJS).map(([k,p])=>`<option value="${k}">${esc(t('projection'))}: ${p.n}</option>`).join(''):`<option>${esc(t('projection'))}: UTM 32N</option>`;ps.disabled=!GEO.geo;if(GEO.geo)ps.value=S.proj;
+ const fsel=document.getElementById('focusSel');fsel.innerHTML=`<option value="">${esc(t('focus'))}: ${esc(t('focus_all'))}</option>`+Object.entries(GEO.groups).map(([r,n])=>`<option value="${r}">${esc(n)}</option>`).join('')+GEO.units.slice().sort((a,b)=>nm(a).localeCompare(nm(b),S.lang)).map(k=>`<option value="${k.c}">${esc(nm(k))}</option>`).join('');fsel.value=S.focus;
+ document.getElementById('regionPresets').innerHTML=Object.entries(GEO.groups).map(([r,n])=>`<button class="chip" onclick="presetRegionActive('${r}')">${esc(n)} ${esc(t('to_active'))}</button>`).join('');
+ document.getElementById('langSel').innerHTML=Object.keys(T).map(l=>`<option value="${l}">${LANGN[l]}</option>`).join('');document.getElementById('langSel').value=S.lang;
+ document.getElementById('layouts').innerHTML=LAYOUTS.map(l=>`<button class="tile ${S.layout===l.id?'on':''}" onclick="S.layout='${l.id}';ui();render()"><b>${t('lay_'+l.id)}</b><i>${l.d}</i></button>`).join('');
  document.getElementById('layoutInfo').textContent=W+'×'+H;
- document.getElementById('styles').innerHTML=STYLES.map((s,i)=>`<button class="tile ${S.style===s.id?'on':''}" onclick="S.style='${s.id}';ui();render()"><b>${i+1}. ${s.n}</b><i>${s.d}</i></button>`).join('');
+ document.getElementById('styles').innerHTML=STYLES.map((s,i)=>`<button class="tile ${S.style===s.id?'on':''}" onclick="S.style='${s.id}';ui();render()"><b>${i+1}. ${esc(t('st_'+s.id))}</b><i>${esc(t('st_'+s.id+'_d'))}</i></button>`).join('');
  document.getElementById('styleNo').textContent='#'+(STYLES.findIndex(s=>s.id===S.style)+1)+' / '+STYLES.length;
  const cols=D.highlight;
  document.getElementById('groups').innerHTML=S.groups.map((g,i)=>`<div class="grp ${S.active===i?'active':''}" onclick="if(S.active!==${i}){S.active=${i};ui();render()}">
   <div class="hd"><input type="radio" name="act" ${S.active===i?'checked':''} title="Aktiv gruppe (klik på kortet)"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="Gruppenavn"><span class="cnt">${g.sel.size}</span>${S.groups.length>1?`<button class="x" title="Fjern gruppe" onclick="event.stopPropagation();removeGroup(${i})">×</button>`:''}</div>
-  <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="Kommuner, fx København, Aarhus">${esc(g.text!=null?g.text:[...g.sel].map(c=>DK.kommuner.find(k=>k.c===c).n).join(', '))}</textarea>
+  <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}',MAPS[S.map].ex))}">${esc(g.text!=null?g.text:[...g.sel].map(c=>nm(GEO.units.find(k=>k.c===c))).join(', '))}</textarea>
   <div class="warn" id="warn${i}" style="${g.bad.length?'display:block':''}">${g.bad.length?'Ikke genkendt: '+esc(g.bad.join(', ')):''}</div>
-  <div class="row" style="margin-top:6px">${cols.map(c=>`<button class="sw sm ${g.color===c?'on':''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}</div>
-  <div class="row" style="margin-top:6px">${HLS.map(h=>`<button class="chip sm ${g.hl.has(h.id)?'on':''}" title="${h.t}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${h.n}</button>`).join('')}</div>
+  <div class="row" style="margin-top:6px">${cols.map(c=>`<button class="sw sm ${g.color===c?'on':''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
+  <div class="row" style="margin-top:6px">${HLS.map(h=>`<button class="chip sm ${g.hl.has(h.id)?'on':''}" title="${esc(t('hl_'+h.id+'_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_'+h.id))}</button>`).join('')}</div>
  </div>`).join('');
- S.groups.forEach(g=>{if(!cols.includes(g.color))g.color=cols[Math.min(S.groups.indexOf(g),cols.length-1)]});
- document.getElementById('partners').innerHTML=S.partners.map((p,i)=>`<div class="partner">${p.logo&&p.logo.src?`<img src="${p.logo.src}" alt="">`:'<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(tekst)</span>'}<span>${esc(p.name)}${p.link?` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--tyr)">link</a>`:''}</span><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`).join('')||'<p class="note" style="margin:0">Ingen partnere i denne profil.</p>';
- document.getElementById('partnerCount').textContent=S.partners.length+' partnere';
+ S.groups.forEach(g=>{if(!g.color)g.color=cols[Math.min(S.groups.indexOf(g),cols.length-1)]});
+ document.getElementById('partners').innerHTML=S.partners.map((p,i)=>`<div class="partner">${p.logo&&p.logo.src?`<img src="${p.logo.src}" alt="">`:'<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(tekst)</span>'}<span>${esc(p.name)}${p.link?` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--tyr)">link</a>`:''}</span><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`).join('')||'<p class="note" style="margin:0">'+esc(t('no_partners'))+'</p>';
+ document.getElementById('partnerCount').textContent=S.partners.length+' '+t('partners');
 }
 function setDS(v){S.ds=v;const D=DS[v];const d=D.defaults;if(d){if(d.title!=null)document.getElementById('title').value=d.title;if(d.sub!=null)document.getElementById('sub').value=d.sub}
  S.partners=D.partners.map(p=>({name:p.name,link:p.link,logo:Object.assign({},p.logo)}));document.getElementById('footerLabel').value=D.footer.label||'';
- S.groups.forEach((g,i)=>{if(!D.highlight.includes(g.color))g.color=D.highlight[Math.min(i,D.highlight.length-1)]});ui();render()}
-function toggleHL(i,id){const g=S.groups[i];if(g.hl.has(id)){if(g.hl.size>1)g.hl.delete(id);else return toast('Mindst én markeringsform pr. gruppe')}else{g.hl.add(id);const ex=['fill','hatch','dots','tint'];if(ex.includes(id))ex.filter(x=>x!==id).forEach(x=>g.hl.delete(x))}ui();render()}
-function addGroup(){const D=DS[S.ds];const i=S.groups.length;const defaults=[['fill','glow'],['hatch'],['dots'],['tint','outline'],['outline']];S.groups.push(newGroup('Gruppe '+(i+1),defaults[i%defaults.length],D.highlight[Math.min(i,D.highlight.length-1)]));S.active=i;ui();render()}
+ ui();render()}
+function toggleHL(i,id){const g=S.groups[i];if(g.hl.has(id)){if(g.hl.size>1)g.hl.delete(id);else return toast(t('ts_min_one'))}else{g.hl.add(id);const ex=['fill','hatch','dots','tint'];if(ex.includes(id))ex.filter(x=>x!==id).forEach(x=>g.hl.delete(x))}ui();render()}
+function addGroup(){const D=DS[S.ds];const i=S.groups.length;const defaults=[['fill','glow'],['hatch'],['dots'],['tint','outline'],['outline']];S.groups.push(newGroup(t('group')+' '+(i+1),defaults[i%defaults.length],D.highlight[Math.min(i,D.highlight.length-1)]));S.active=i;ui();render()}
 function removeGroup(i){S.groups.splice(i,1);S.active=Math.max(0,Math.min(S.active,S.groups.length-1));ui();render()}
 function fromText(i){const g=S.groups[i];const raw=document.getElementById('list'+i).value;g.text=raw;const toks=raw.split(/[\n,;]+/).map(t=>t.trim()).filter(Boolean);g.sel=new Set();g.bad=[];
  for(const t of toks){const c=lookup(t);if(c){S.groups.forEach((o,j)=>{if(j!==i)o.sel.delete(c)});g.sel.add(c)}else g.bad.push(t)}
  const w=document.getElementById('warn'+i);w.style.display=g.bad.length?'block':'none';w.textContent=g.bad.length?'Ikke genkendt: '+g.bad.join(', '):'';
- S.groups.forEach((o,j)=>{if(j!==i){o.text=null;const el=document.getElementById('list'+j);if(el)el.value=[...o.sel].map(c=>DK.kommuner.find(k=>k.c===c).n).join(', ')}});
+ S.groups.forEach((o,j)=>{if(j!==i){o.text=null;const el=document.getElementById('list'+j);if(el)el.value=[...o.sel].map(c=>nm(GEO.units.find(k=>k.c===c))).join(', ')}});
  document.querySelector(`#groups .grp:nth-child(${i+1}) .cnt`).textContent=g.sel.size;render()}
 function syncText(){S.groups.forEach(g=>{g.text=null;g.bad=[]})}
-function presetRegionActive(r){const g=S.groups[S.active];const list=DK.kommuner.filter(k=>k.r===r).map(k=>k.c);list.forEach(c=>{S.groups.forEach(o=>o.sel.delete(c));g.sel.add(c)});syncText();ui();render()}
+function setMap(id){setData(id);S.attr='none';const D=DS[S.ds];S.groups=[newGroup(t('g_fill'),['fill','glow'],D.highlight[0]),newGroup(t('g_hatch'),['hatch'],D.highlight[1]||D.highlight[0])];MAPS[S.map].defaults.forEach(c=>S.groups[0].sel.add(c));S.active=0;ui();render()}
+function presetRegionActive(r){const g=S.groups[S.active];const list=GEO.units.filter(k=>k.r===r).map(k=>k.c);list.forEach(c=>{S.groups.forEach(o=>o.sel.delete(c));g.sel.add(c)});syncText();ui();render()}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800)}
 const svg=document.getElementById('svg'),tip=document.getElementById('tip');
 svg.addEventListener('click',e=>{const p=e.target.closest('.k');if(!p)return;const c=p.dataset.c;const g=S.groups[S.active];if(g.sel.has(c))g.sel.delete(c);else{S.groups.forEach(o=>o.sel.delete(c));g.sel.add(c)}syncText();ui();render()});
-svg.addEventListener('mousemove',e=>{const p=e.target.closest('.k');if(!p){tip.style.display='none';return}const k=DK.kommuner.find(k=>k.c===p.dataset.c);const gi=groupOf(k.c);tip.innerHTML=`<b>${k.n}</b> · ${DK.regions[k.r]} · ${gi>=0?'i "'+esc(S.groups[gi].name)+'"':'klik → "'+esc(S.groups[S.active].name)+'"'}`;tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY-10+'px'});
-svg.addEventListener('mouseleave',()=>tip.style.display='none');
-svg.addEventListener('mouseover',e=>{const p=e.target.closest('.k');if(!p)return;p.parentNode.appendChild(p)});
+svg.addEventListener('mousemove',e=>{const p=e.target.closest('.k');if(!p){tip.style.display='none';return}const k=GEO.units.find(k=>k.c===p.dataset.c);const gi=groupOf(k.c);tip.innerHTML=`<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi>=0?t('tip_in')+' "'+esc(S.groups[gi].name)+'"':t('tip_click')+' "'+esc(S.groups[S.active].name)+'"'}`;tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY-10+'px'});
+// Hover-kontur tegnes som et separat, ikke-klikbart lag øverst. Den hoverede sti må IKKE flyttes i DOM'en:
+// det får mousedown/mouseup til at ramme forælderen, så click aldrig udløses.
+function hoverLine(p){let h=document.getElementById('hoverline');if(!p){if(h)h.remove();return}
+ if(!h){h=document.createElementNS('http://www.w3.org/2000/svg','path');h.id='hoverline'}
+ h.setAttribute('d',p.getAttribute('d'));const t=p.parentNode.getAttribute('transform');if(t)h.setAttribute('transform',t);else h.removeAttribute('transform');svg.appendChild(h)}
+svg.addEventListener('mouseleave',()=>{tip.style.display='none';hoverLine(null)});
+svg.addEventListener('mouseover',e=>{hoverLine(e.target.closest('.k'))});
 
 // ---------- Eksport ----------
 async function renderCanvas(scale){const el=document.getElementById('svg').cloneNode(true);el.querySelectorAll('.pulse').forEach(c=>c.removeAttribute('class'));el.insertAdjacentHTML('afterbegin',`<style>${allFontCSS()}</style>`);el.setAttribute('width',W);el.setAttribute('height',H);
  const src=new XMLSerializer().serializeToString(el);const c=document.createElement('canvas');c.width=W*scale;c.height=H*scale;const img=new Image();const url=URL.createObjectURL(new Blob([src],{type:'image/svg+xml;charset=utf-8'}));
  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);return c}
 async function exportMap(fmt){
- toast('Genererer '+fmt.toUpperCase()+' …');
+ toast(t('ts_generating')+' '+fmt.toUpperCase()+' …');
  const c=await renderCanvas(3);const name='danmarkskort-'+S.ds+'-'+S.style+'-'+S.layout;
  if(fmt==='png')dl(c.toDataURL('image/png'),name+'.png');
  else if(fmt==='jpg')dl(c.toDataURL('image/jpeg',0.93),name+'.jpg');
@@ -541,7 +642,7 @@ async function exportMap(fmt){
   for(const l of (window._links||[]))pdf.link(x0+l.x*r,y0+l.y*r,l.w*r,l.h*r,{url:l.url});
   const D=DS[S.ds];if(D.company.link)pdf.link(x0+(W-PAD.l-240)*r,y0+30*r,260*r,70*r,{url:D.company.link});
   pdf.save(name+'.pdf')}
- toast(fmt.toUpperCase()+' downloadet');
+ toast(fmt.toUpperCase()+' '+t('ts_downloaded'));
 }
 window._testExport=async()=>(await renderCanvas(1)).toDataURL('image/png');
 function dl(u,n){const a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove()}
@@ -549,30 +650,33 @@ window.exportSVG=()=>new XMLSerializer().serializeToString(document.getElementBy
 // ---------- Projekt: gem/åbn ----------
 const CK=['labels','detail','legend','showText','showLogo','showFooter'];
 function projectState(){const D=DS[S.ds];return {format:'mobomap-project',version:1,saved:new Date().toISOString(),
- designSystem:S.ds,designSystemData:D.source==='builtin'?null:currentDSExport(),
+ map:S.map,attr:S.attr,proj:S.proj,focus:S.focus,focusHide:!!S.focusHide,lang:S.lang,designSystem:S.ds,designSystemData:D.source==='builtin'?null:currentDSExport(),
  layout:S.layout,style:S.style,active:S.active,
  groups:S.groups.map(g=>({name:g.name,color:g.color,hl:[...g.hl],kommuner:[...g.sel]})),
  title:document.getElementById('title').value,sub:document.getElementById('sub').value,footerLabel:document.getElementById('footerLabel').value,
  partners:S.partners,checks:Object.fromEntries(CK.map(k=>[k,document.getElementById(k).checked]))}}
-function saveProject(){const p=projectState();const name=(document.getElementById('title').value||'danmarkskort').toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-|-$/g,'');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(p,null,2)),(name||'projekt')+'.mobomap.json');toast('Projekt gemt')}
-function loadProject(p){if(!p||p.format!=='mobomap-project')throw new Error('Ikke en MoboMap-projektfil');
+function saveProject(){const p=projectState();const name=(document.getElementById('title').value||'danmarkskort').toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-|-$/g,'');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(p,null,2)),(name||'projekt')+'.mobomap.json');toast(t('ts_proj_saved'))}
+function loadProject(p){if(!p||p.format!=='mobomap-project')throw new Error(t('ts_not_project'));
  if(p.designSystemData){const r=addDS(p.designSystemData,'user');if(r){saveUserDS()}}
- if(!DS[p.designSystem])toast('Designsystemet "'+p.designSystem+'" findes ikke her – bruger '+DS[DSORDER[0]].name);
+ if(!DS[p.designSystem])toast(t('ts_ds_missing').replace('{id}',p.designSystem)+' '+DS[DSORDER[0]].name);
  S.ds=DS[p.designSystem]?p.designSystem:DSORDER[0];const D=DS[S.ds];
+ setData(p.map||'dk');S.attr=p.attr||'none';S.proj=PROJS[p.proj]?p.proj:'robinson';S.focus=p.focus||'';S.focusHide=!!p.focusHide;document.getElementById('focusHide').checked=S.focusHide;if(p.lang)setLang(p.lang,true);
  S.layout=LAYOUTS.some(l=>l.id===p.layout)?p.layout:'land';S.style=STYLES.some(s=>s.id===p.style)?p.style:'flat';
  S.groups=(p.groups||[]).map(g=>{const n=newGroup(g.name||'Gruppe',g.hl||['fill'],g.color||D.highlight[0]);(g.kommuner||[]).forEach(c=>{if(byName[c])n.sel.add(c)});return n});if(!S.groups.length)S.groups=[newGroup('Gruppe 1',['fill'],D.highlight[0])];
  S.active=Math.min(p.active||0,S.groups.length-1);
  S.partners=(p.partners||D.partners).map(q=>({name:q.name||'',link:q.link||'',logo:Object.assign({},q.logo||{})}));
  document.getElementById('title').value=p.title??'';document.getElementById('sub').value=p.sub??'';document.getElementById('footerLabel').value=p.footerLabel??'';
  for(const k of CK)if(p.checks&&k in p.checks)document.getElementById(k).checked=!!p.checks[k];
- ui();render();toast('Projekt åbnet')}
-function openProjectFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{loadProject(JSON.parse(rd.result))}catch(e){toast('Kunne ikke åbne: '+e.message)}};rd.readAsText(file)}
+ ui();render();toast(t('ts_proj_opened'))}
+function openProjectFile(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{loadProject(JSON.parse(rd.result))}catch(e){toast(t('ts_openfail')+': '+e.message)}};rd.readAsText(file)}
 document.addEventListener('dragover',e=>{e.preventDefault()});
 document.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(!f)return;if(/\.mobomap\.json$/i.test(f.name))openProjectFile(f);else if(/\.(json|js)$/i.test(f.name))importDSFile(f)});
 // ---------- Start ----------
-loadDS();S.ds=DSORDER[0];
-S.groups=[newGroup('Fuldfarve',['fill','glow'],DS[S.ds].highlight[0]),newGroup('Skraveret',['hatch'],DS[S.ds].highlight[1]||DS[S.ds].highlight[0])];
-['101','751'].forEach(c=>S.groups[0].sel.add(c));
+loadDS();S.ds=DSORDER.find(i=>!DS[i].private)||DSORDER[0];
+setLang(localStorage.getItem('mobomap.lang')||'en',true);
+setData('dk');
+S.groups=[newGroup(t('g_fill'),['fill','glow'],DS[S.ds].highlight[0]),newGroup(t('g_hatch'),['hatch'],DS[S.ds].highlight[1]||DS[S.ds].highlight[0])];
+MAPS.dk.defaults.forEach(c=>S.groups[0].sel.add(c));
 setDS(S.ds);
 </script>
 </body>
