@@ -1,0 +1,38 @@
+{
+  "id": "corp",
+  "name": "Corporate blå",
+  "fonts": {
+    "heading": "Roboto Slab",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#FFFFFF",
+    "land": "#B8C8D4",
+    "landAlt": "#c6d4de",
+    "stroke": "#FFFFFF",
+    "ink": "#0F2A44",
+    "primary": "#0F2A44",
+    "accent": "#F4A261",
+    "accent2": "#2A9D8F"
+  },
+  "highlight": [
+    "#0F2A44",
+    "#E63946",
+    "#F4A261",
+    "#2A9D8F"
+  ],
+  "swatches": [
+    "#0F2A44",
+    "#B8C8D4",
+    "#E63946"
+  ],
+  "company": {
+    "name": "Corporate blå",
+    "link": "",
+    "logo": {
+      "text": "DANMARK",
+      "sub": "98 KOMMUNER"
+    }
+  },
+  "partners": []
+}

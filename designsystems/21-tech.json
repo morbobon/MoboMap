@@ -1,0 +1,40 @@
+{
+  "id": "tech",
+  "name": "Tech / mørk",
+  "fonts": {
+    "heading": "Space Grotesk",
+    "body": "Space Grotesk"
+  },
+  "colors": {
+    "bg": "#0B1C2C",
+    "land": "#13304A",
+    "landAlt": "#17395a",
+    "stroke": "#2E5F85",
+    "ink": "#DDEFFF",
+    "primary": "#0B1C2C",
+    "accent": "#38E8FF",
+    "accent2": "#FF4D8D",
+    "dark": true
+  },
+  "highlight": [
+    "#38E8FF",
+    "#FF4D8D",
+    "#B7FF3C",
+    "#FFD23F"
+  ],
+  "swatches": [
+    "#0B1C2C",
+    "#13304A",
+    "#38E8FF",
+    "#FF4D8D"
+  ],
+  "company": {
+    "name": "Tech / mørk",
+    "link": "",
+    "logo": {
+      "text": "DANMARK",
+      "sub": "98 KOMMUNER"
+    }
+  },
+  "partners": []
+}

@@ -1,0 +1,39 @@
+{
+  "id": "nordic",
+  "name": "Nordisk minimal",
+  "fonts": {
+    "heading": "DM Serif Display",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#F6F3EE",
+    "land": "#2B2B2B",
+    "landAlt": "#3a3a3a",
+    "stroke": "#F6F3EE",
+    "ink": "#1a1a1a",
+    "primary": "#2B2B2B",
+    "accent": "#E8B04B",
+    "accent2": "#C8102E"
+  },
+  "highlight": [
+    "#C8102E",
+    "#E8B04B",
+    "#4A7C59",
+    "#1F4E79"
+  ],
+  "swatches": [
+    "#2B2B2B",
+    "#F6F3EE",
+    "#C8102E",
+    "#E8B04B"
+  ],
+  "company": {
+    "name": "Nordisk minimal",
+    "link": "",
+    "logo": {
+      "text": "DANMARK",
+      "sub": "98 KOMMUNER"
+    }
+  },
+  "partners": []
+}

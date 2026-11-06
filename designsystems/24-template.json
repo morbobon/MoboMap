@@ -1,0 +1,56 @@
+{
+  "id": "template",
+  "name": "Skabelon – grafit & koral",
+  "note": "kopiér og tilpas",
+  "fonts": {
+    "heading": "Roboto Slab",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#FFFFFF",
+    "land": "#2F3E4E",
+    "landAlt": "#3d4f62",
+    "stroke": "#FFFFFF",
+    "ink": "#2F3E4E",
+    "primary": "#2F3E4E",
+    "accent": "#FF6B35",
+    "accent2": "#3A86FF",
+    "heading": "#2F3E4E",
+    "headingOnDark": "#FF6B35"
+  },
+  "highlight": [
+    "#FF6B35",
+    "#3A86FF",
+    "#FFD166",
+    "#06D6A0",
+    "#FFFFFF"
+  ],
+  "swatches": [
+    "#2F3E4E",
+    "#FF6B35",
+    "#3A86FF",
+    "#FFD166"
+  ],
+  "company": {
+    "name": "Dit firma",
+    "link": "",
+    "logo": {
+      "text": "DIT LOGO",
+      "sub": "VÆLG LOGO I EDITOREN"
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "line",
+      "opacity": 0.6,
+      "width": 1,
+      "align": "left"
+    }
+  },
+  "defaults": {
+    "title": "Vi er her",
+    "sub": "Danmark"
+  }
+}

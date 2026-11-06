@@ -1,0 +1,14 @@
+{
+  "name": "mobomap",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interaktiv generator til danmarkskort med markerede kommuner",
+  "scripts": {
+    "geo": "node tools/prepare-geo.mjs",
+    "build": "node tools/build.mjs",
+    "release": "node tools/release.mjs"
+  },
+  "devDependencies": {
+    "mapshaper": "^0.6.0"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "green",
+  "name": "Grøn",
+  "fonts": {
+    "heading": "Roboto Slab",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#FFFFFF",
+    "land": "#5CB531",
+    "landAlt": "#8bcf4e",
+    "stroke": "#FFFFFF",
+    "ink": "#1f5e0f",
+    "primary": "#1f5e0f",
+    "accent": "#FFD400",
+    "accent2": "#5CB531"
+  },
+  "highlight": [
+    "#1f5e0f",
+    "#FFD400",
+    "#FF6B00",
+    "#FFFFFF"
+  ],
+  "swatches": [
+    "#5CB531",
+    "#8bcf4e",
+    "#1f5e0f"
+  ],
+  "company": {
+    "name": "Grøn",
+    "link": "",
+    "logo": {
+      "text": "DANMARK",
+      "sub": "98 KOMMUNER"
+    }
+  },
+  "partners": []
+}
