@@ -26,6 +26,8 @@
       </div>
       <div class="btns">
         <select id="ds" class="hdr" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
+        <button id="undoBtn" class="hdr" onclick="undo()" data-i18n-title="undo">↶</button>
+        <button id="redoBtn" class="hdr" onclick="redo()" data-i18n-title="redo">↷</button>
         <button id="uiMode" class="hdr" onclick="cycleUiMode()"></button>
         <select
           id="langSel"
@@ -44,323 +46,359 @@
             this.value = '';
           "
         />
-        <span style="width: 8px"></span>
-        <button class="exp alt" onclick="exportMap('png')">PNG</button>
-        <button class="exp alt" onclick="exportMap('jpg')">JPG</button>
-        <button class="exp" onclick="exportMap('pdf')">PDF</button>
+        <span class="expwrap">
+          <button class="exp" id="expBtn" onclick="toggleExportMenu(event)"><span data-i18n="export"></span> ▾</button>
+          <span class="expmenu" id="expMenu">
+            <button onclick="exportMap('png')">PNG</button>
+            <button onclick="exportMap('jpg')">JPG</button>
+            <button onclick="exportMap('pdf')">PDF · A4</button>
+          </span>
+        </span>
       </div>
     </header>
     <main>
+      <nav class="rail">
+        <button data-tab="map" onclick="setTab('map')"><b>⌖</b><span data-i18n="tab_map"></span></button>
+        <button data-tab="highlight" onclick="setTab('highlight')">
+          <b>◉</b><span data-i18n="tab_highlight"></span>
+        </button>
+        <button data-tab="look" onclick="setTab('look')"><b>✦</b><span data-i18n="tab_look"></span></button>
+        <button data-tab="page" onclick="setTab('page')"><b>▭</b><span data-i18n="tab_page"></span></button>
+      </nav>
       <aside>
-        <section class="sec" data-sec="map">
-          <h2 onclick="toggleSec('map')">
-            <span class="chev"></span><span data-i18n="sec_map"></span>
-            <span class="help" data-i18n-title="map_note" onclick="event.stopPropagation()">ⓘ</span
-            ><span class="sum" id="mapInfo"></span>
-          </h2>
-          <div class="body">
-            <select id="focusSel2" onchange="setFocus(this.value)" class="strong"></select>
-            <div class="row">
+        <div class="tab" data-tab="map">
+          <section class="sec" data-sec="map">
+            <h2 onclick="toggleSec('map')">
+              <span class="chev"></span><span data-i18n="sec_map"></span>
+              <span class="help" data-i18n-title="map_note" onclick="event.stopPropagation()">ⓘ</span
+              ><span class="sum" id="mapInfo"></span>
+            </h2>
+            <div class="body">
+              <select id="focusSel2" onchange="setFocus(this.value)" class="strong"></select>
+
               <select
-                id="attrSel"
+                id="projSel"
                 onchange="
-                  S.attr = this.value;
+                  S.proj = this.value;
                   ui();
                   render();
                 "
-                style="flex: 1"
               ></select>
-              <button class="chip" onclick="attrToGroups()" id="attrBtn">
-                <span data-i18n="attr_to_groups"></span>
-              </button>
+              <select id="farSel" onchange="setFar(this.value)">
+                <option value="inset" data-i18n="far_inset"></option>
+                <option value="show" data-i18n="far_show"></option>
+                <option value="hide" data-i18n="far_hide"></option>
+              </select>
             </div>
-            <select
-              id="projSel"
-              onchange="
-                S.proj = this.value;
-                ui();
-                render();
-              "
-            ></select>
-            <select id="farSel" onchange="setFar(this.value)">
-              <option value="inset" data-i18n="far_inset"></option>
-              <option value="show" data-i18n="far_show"></option>
-              <option value="hide" data-i18n="far_hide"></option>
-            </select>
-          </div>
-        </section>
-        <section class="sec" data-sec="groups">
-          <h2 onclick="toggleSec('groups')">
-            <span class="chev"></span><span data-i18n="sec_groups"></span>
-            <span class="help" data-i18n-title="groups_note" onclick="event.stopPropagation()">ⓘ</span
-            ><span class="sum" id="count"></span>
-          </h2>
-          <div class="body">
-            <div id="groups"></div>
-            <div class="row">
-              <button class="chip" onclick="addGroup()"><span data-i18n="new_group"></span></button>
-              <button class="chip" onclick="clearGroups()"><span data-i18n="clear_groups"></span></button>
-            </div>
-            <select
-              id="regionPresets"
-              onchange="
-                presetRegionActive(this.value);
-                this.value = '';
-              "
-            ></select>
-          </div>
-        </section>
-        <section class="sec" data-sec="style">
-          <h2 onclick="toggleSec('style')">
-            <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
-          </h2>
-          <div class="body">
-            <div class="grid3" id="styles"></div>
-          </div>
-        </section>
-        <section class="sec" data-sec="layout">
-          <h2 onclick="toggleSec('layout')">
-            <span class="chev"></span><span data-i18n="sec_layout"></span><span class="sum" id="layoutInfo"></span>
-          </h2>
-          <div class="body">
-            <div class="grid4" id="layouts"></div>
-          </div>
-        </section>
-        <section class="sec" data-sec="text">
-          <h2 onclick="toggleSec('text')">
-            <span class="chev"></span><span data-i18n="sec_text"></span><span class="sum" id="textInfo"></span>
-          </h2>
-          <div class="body">
-            <label class="ck"
-              ><input type="checkbox" id="showText" checked onchange="render()" /> <span data-i18n="show_title"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="autoText" checked onchange="render()" /> <span data-i18n="auto_text"></span
-            ></label>
-            <input
-              type="text"
-              id="title"
-              value=""
-              oninput="
-                document.getElementById('autoText').checked = false;
-                render();
-              "
-              data-i18n-ph="ph_title"
-            />
-            <input
-              type="text"
-              id="sub"
-              value=""
-              oninput="
-                document.getElementById('autoText').checked = false;
-                render();
-              "
-              data-i18n-ph="ph_sub"
-            />
-            <div class="row2">
-              <label
-                ><span data-i18n="pos_title_l"></span
-                ><select id="titlePos" onchange="render()">
-                  <option value="auto" data-i18n="pos_auto"></option>
-                  <option value="tl" data-i18n="pos_tl"></option>
-                  <option value="tc" data-i18n="pos_tc"></option>
-                  <option value="tr" data-i18n="pos_tr"></option>
-                  <option value="bl" data-i18n="pos_bl"></option>
-                  <option value="bc" data-i18n="pos_bc"></option>
-                  <option value="br" data-i18n="pos_br"></option></select
-              ></label>
-              <label
-                ><span data-i18n="pos_sub_l"></span
-                ><select id="subPos" onchange="render()">
-                  <option value="under" data-i18n="pos_under"></option>
-                  <option value="tl" data-i18n="pos_tl"></option>
-                  <option value="tc" data-i18n="pos_tc"></option>
-                  <option value="tr" data-i18n="pos_tr"></option>
-                  <option value="bl" data-i18n="pos_bl"></option>
-                  <option value="bc" data-i18n="pos_bc"></option>
-                  <option value="br" data-i18n="pos_br"></option></select
-              ></label>
-            </div>
-          </div>
-        </section>
-        <section class="sec" data-sec="display">
-          <h2 onclick="toggleSec('display')">
-            <span class="chev"></span><span data-i18n="sec_display"></span><span class="sum" id="displayInfo"></span>
-          </h2>
-          <div class="body">
-            <label class="ck"
-              ><input type="checkbox" id="labels" onchange="render()" /> <span data-i18n="show_all_names"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="showCities" checked onchange="render()" />
-              <span data-i18n="show_cities"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="showNeighbours" checked onchange="render()" />
-              <span data-i18n="show_neighbours"></span
-            ></label>
-            <select id="frameSel" onchange="render()">
-              <option value="auto" data-i18n="frame_auto"></option>
-              <option value="on" data-i18n="frame_on"></option>
-              <option value="off" data-i18n="frame_off"></option>
-            </select>
-            <label class="ck"
-              ><input type="checkbox" id="relief" onchange="render()" /> <span data-i18n="show_relief"></span
-            ></label>
-            <label class="ck"
-              ><input
-                type="checkbox"
-                id="focusHide"
-                onchange="
-                  S.focusHide = this.checked;
-                  render();
-                " />
-              <span data-i18n="focus_hide"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="legend" checked onchange="render()" /> <span data-i18n="show_legend"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="showLogo" checked onchange="render()" /> <span data-i18n="show_logo"></span
-            ></label>
-            <label class="ck"
-              ><input type="checkbox" id="detail" checked onchange="render()" /> <span data-i18n="detail_coast"></span
-            ></label>
-          </div>
-        </section>
-        <section class="sec" data-sec="fx">
-          <h2 onclick="toggleSec('fx')">
-            <span class="chev"></span><span data-i18n="sec_fx"></span><span class="sum" id="fxInfo"></span>
-          </h2>
-          <div class="body">
-            <select id="fxPreset" onchange="applyFxPreset(this.value)"></select>
-            <select
-              id="fxFrame"
-              onchange="
-                S.fx.frame = this.value;
-                S.fx.preset = '';
-                ui();
-                render();
-              "
-            ></select>
-            <div id="fxList"></div>
-            <div class="row">
+          </section>
+          <section class="sec" data-sec="display">
+            <h2 onclick="toggleSec('display')">
+              <span class="chev"></span><span data-i18n="sec_display"></span><span class="sum" id="displayInfo"></span>
+            </h2>
+            <div class="body">
               <label class="ck"
-                ><span data-i18n="fx_surface"></span>
-                <input
-                  type="color"
-                  id="fxSurface"
-                  oninput="
-                    S.fx.surface = this.value;
+                ><input type="checkbox" id="labels" onchange="render()" /> <span data-i18n="show_all_names"></span
+              ></label>
+              <label class="ck"
+                ><input type="checkbox" id="showCities" checked onchange="render()" />
+                <span data-i18n="show_cities"></span
+              ></label>
+              <label class="ck"
+                ><input type="checkbox" id="showNeighbours" checked onchange="render()" />
+                <span data-i18n="show_neighbours"></span
+              ></label>
+
+              <label class="ck"
+                ><input type="checkbox" id="relief" onchange="render()" /> <span data-i18n="show_relief"></span
+              ></label>
+              <label class="ck"
+                ><input
+                  type="checkbox"
+                  id="focusHide"
+                  onchange="
+                    S.focusHide = this.checked;
+                    render();
+                  " />
+                <span data-i18n="focus_hide"></span
+              ></label>
+
+              <label class="ck"
+                ><input type="checkbox" id="detail" checked onchange="render()" /> <span data-i18n="detail_coast"></span
+              ></label>
+            </div>
+          </section>
+        </div>
+        <div class="tab" data-tab="highlight">
+          <section class="sec" data-sec="data">
+            <h2 onclick="toggleSec('data')">
+              <span class="chev"></span><span data-i18n="sec_data"></span><span class="sum" id="dataInfo"></span>
+            </h2>
+            <div class="body">
+              <div class="row">
+                <select
+                  id="attrSel"
+                  onchange="
+                    S.attr = this.value;
+                    ui();
                     render();
                   "
-              /></label>
-              <button class="chip" onclick="fxShuffle()" data-i18n="fx_shuffle"></button>
-            </div>
-          </div>
-        </section>
-        <section class="sec" data-sec="ds">
-          <h2 onclick="toggleSec('ds')">
-            <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
-          </h2>
-          <div class="body">
-            <div class="row" id="dsSw"></div>
-            <details id="manage">
-              <summary data-i18n="manage_profiles"></summary>
-              <div class="row">
-                <button class="chip" onclick="document.getElementById('dsFile').click()">
-                  <span data-i18n="import"></span>
+                  style="flex: 1"
+                ></select>
+                <button class="chip" onclick="attrToGroups()" id="attrBtn">
+                  <span data-i18n="attr_to_groups"></span>
                 </button>
-                <button class="chip" onclick="openEditor()"><span data-i18n="edit_new"></span></button>
-                <button class="chip" onclick="exportDS()"><span data-i18n="export_json"></span></button>
-                <button class="chip" onclick="exportSidecar()">designsystems.js</button>
-                <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete"></span></button>
-                <input
-                  type="file"
-                  id="dsFile"
-                  accept=".json,.js,application/json"
-                  hidden
-                  onchange="
-                    importDSFile(this.files[0]);
-                    this.value = '';
-                  "
-                />
               </div>
-              <details id="editor">
-                <summary data-i18n="editor_sum"></summary>
-                <textarea id="dsJson" rows="12" class="mono"></textarea>
+            </div>
+          </section>
+          <section class="sec" data-sec="groups">
+            <h2 onclick="toggleSec('groups')">
+              <span class="chev"></span><span data-i18n="sec_groups"></span>
+              <span class="help" data-i18n-title="groups_note" onclick="event.stopPropagation()">ⓘ</span
+              ><span class="sum" id="count"></span>
+            </h2>
+            <div class="body">
+              <div id="groups"></div>
+              <div class="row">
+                <button class="chip" onclick="addGroup()"><span data-i18n="new_group"></span></button>
+                <button class="chip" onclick="clearGroups()"><span data-i18n="clear_groups"></span></button>
+              </div>
+              <select
+                id="regionPresets"
+                onchange="
+                  presetRegionActive(this.value);
+                  this.value = '';
+                "
+              ></select>
+            </div>
+          </section>
+        </div>
+        <div class="tab" data-tab="look">
+          <section class="sec" data-sec="style">
+            <h2 onclick="toggleSec('style')">
+              <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
+            </h2>
+            <div class="body">
+              <div class="grid3" id="styles"></div>
+            </div>
+          </section>
+          <section class="sec" data-sec="fx">
+            <h2 onclick="toggleSec('fx')">
+              <span class="chev"></span><span data-i18n="sec_fx"></span><span class="sum" id="fxInfo"></span>
+            </h2>
+            <div class="body">
+              <select id="fxPreset" onchange="applyFxPreset(this.value)"></select>
+              <select
+                id="fxFrame"
+                onchange="
+                  S.fx.frame = this.value;
+                  S.fx.preset = '';
+                  ui();
+                  render();
+                "
+              ></select>
+              <div id="fxList"></div>
+              <div class="row">
+                <label class="ck"
+                  ><span data-i18n="fx_surface"></span>
+                  <input
+                    type="color"
+                    id="fxSurface"
+                    oninput="
+                      S.fx.surface = this.value;
+                      render();
+                    "
+                /></label>
+                <button class="chip" onclick="fxShuffle()" data-i18n="fx_shuffle"></button>
+              </div>
+            </div>
+          </section>
+          <section class="sec" data-sec="ds">
+            <h2 onclick="toggleSec('ds')">
+              <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
+            </h2>
+            <div class="body">
+              <div class="row" id="dsSw"></div>
+              <details id="manage">
+                <summary data-i18n="manage_profiles"></summary>
                 <div class="row">
-                  <button class="chip" onclick="document.getElementById('logoFile').click()">
-                    <span data-i18n="pick_logo"></span>
+                  <button class="chip" onclick="document.getElementById('dsFile').click()">
+                    <span data-i18n="import"></span>
                   </button>
+                  <button class="chip" onclick="openEditor()"><span data-i18n="edit_new"></span></button>
+                  <button class="chip" onclick="exportDS()"><span data-i18n="export_json"></span></button>
+                  <button class="chip" onclick="exportSidecar()">designsystems.js</button>
+                  <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete"></span></button>
                   <input
                     type="file"
-                    id="logoFile"
-                    accept="image/*"
+                    id="dsFile"
+                    accept=".json,.js,application/json"
                     hidden
                     onchange="
-                      pickLogo(this.files[0]);
+                      importDSFile(this.files[0]);
                       this.value = '';
                     "
                   />
-                  <button class="chip on" onclick="applyEditor()"><span data-i18n="save"></span></button>
                 </div>
-                <p class="note" data-i18n="editor_note"></p>
+                <details id="editor">
+                  <summary data-i18n="editor_sum"></summary>
+                  <textarea id="dsJson" rows="12" class="mono"></textarea>
+                  <div class="row">
+                    <button class="chip" onclick="document.getElementById('logoFile').click()">
+                      <span data-i18n="pick_logo"></span>
+                    </button>
+                    <input
+                      type="file"
+                      id="logoFile"
+                      accept="image/*"
+                      hidden
+                      onchange="
+                        pickLogo(this.files[0]);
+                        this.value = '';
+                      "
+                    />
+                    <button class="chip on" onclick="applyEditor()"><span data-i18n="save"></span></button>
+                  </div>
+                  <p class="note" data-i18n="editor_note"></p>
+                </details>
               </details>
-            </details>
-          </div>
-        </section>
-        <section class="sec" data-sec="footer">
-          <h2 onclick="toggleSec('footer')">
-            <span class="chev"></span><span data-i18n="sec_footer"></span><span class="sum" id="partnerCount"></span>
-          </h2>
-          <div class="body">
-            <label class="ck"
-              ><input type="checkbox" id="showFooter" checked onchange="render()" />
-              <span data-i18n="show_footer"></span
-            ></label>
-            <input
-              type="text"
-              id="footerLabel"
-              value=""
-              oninput="
-                this.dataset.auto = '0';
-                render();
-              "
-              data-i18n-ph="ph_footer"
-            />
-            <div id="partners"></div>
-            <details>
-              <summary data-i18n="add_partner"></summary>
-              <input type="text" id="pName" data-i18n-ph="ph_name" />
-              <input type="url" id="pLink" data-i18n-ph="ph_link" />
-              <div class="row">
-                <button class="chip" onclick="document.getElementById('pFile').click()">
-                  <span data-i18n="pick_logo_p"></span>
-                </button>
-                <input
-                  type="file"
-                  id="pFile"
-                  accept="image/*"
-                  hidden
-                  onchange="
-                    pickPartnerLogo(this.files[0]);
-                    this.value = '';
-                  "
-                />
-                <span id="pFileName" class="note"></span>
-                <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
+            </div>
+          </section>
+        </div>
+        <div class="tab" data-tab="page">
+          <section class="sec" data-sec="layout">
+            <h2 onclick="toggleSec('layout')">
+              <span class="chev"></span><span data-i18n="sec_layout"></span><span class="sum" id="layoutInfo"></span>
+            </h2>
+            <div class="body">
+              <div class="grid4" id="layouts"></div>
+            </div>
+          </section>
+          <section class="sec" data-sec="text">
+            <h2 onclick="toggleSec('text')">
+              <span class="chev"></span><span data-i18n="sec_text"></span><span class="sum" id="textInfo"></span>
+            </h2>
+            <div class="body">
+              <label class="ck"
+                ><input type="checkbox" id="showText" checked onchange="render()" /> <span data-i18n="show_title"></span
+              ></label>
+              <label class="ck"
+                ><input type="checkbox" id="autoText" checked onchange="render()" /> <span data-i18n="auto_text"></span
+              ></label>
+              <input
+                type="text"
+                id="title"
+                value=""
+                oninput="
+                  document.getElementById('autoText').checked = false;
+                  render();
+                "
+                data-i18n-ph="ph_title"
+              />
+              <input
+                type="text"
+                id="sub"
+                value=""
+                oninput="
+                  document.getElementById('autoText').checked = false;
+                  render();
+                "
+                data-i18n-ph="ph_sub"
+              />
+              <div class="row2">
+                <label
+                  ><span data-i18n="pos_title_l"></span
+                  ><select id="titlePos" onchange="render()">
+                    <option value="auto" data-i18n="pos_auto"></option>
+                    <option value="tl" data-i18n="pos_tl"></option>
+                    <option value="tc" data-i18n="pos_tc"></option>
+                    <option value="tr" data-i18n="pos_tr"></option>
+                    <option value="bl" data-i18n="pos_bl"></option>
+                    <option value="bc" data-i18n="pos_bc"></option>
+                    <option value="br" data-i18n="pos_br"></option></select
+                ></label>
+                <label
+                  ><span data-i18n="pos_sub_l"></span
+                  ><select id="subPos" onchange="render()">
+                    <option value="under" data-i18n="pos_under"></option>
+                    <option value="tl" data-i18n="pos_tl"></option>
+                    <option value="tc" data-i18n="pos_tc"></option>
+                    <option value="tr" data-i18n="pos_tr"></option>
+                    <option value="bl" data-i18n="pos_bl"></option>
+                    <option value="bc" data-i18n="pos_bc"></option>
+                    <option value="br" data-i18n="pos_br"></option></select
+                ></label>
               </div>
-              <p class="note" data-i18n="partner_note"></p>
-            </details>
-          </div>
-        </section>
+            </div>
+          </section>
+          <section class="sec" data-sec="pageel">
+            <h2 onclick="toggleSec('pageel')"><span class="chev"></span><span data-i18n="sec_pageel"></span></h2>
+            <div class="body">
+              <label class="ck"
+                ><input type="checkbox" id="legend" checked onchange="render()" /> <span data-i18n="show_legend"></span
+              ></label>
+              <label class="ck"
+                ><input type="checkbox" id="showLogo" checked onchange="render()" /> <span data-i18n="show_logo"></span
+              ></label>
+              <select id="frameSel" onchange="render()">
+                <option value="auto" data-i18n="frame_auto"></option>
+                <option value="on" data-i18n="frame_on"></option>
+                <option value="off" data-i18n="frame_off"></option>
+              </select>
+            </div>
+          </section>
+          <section class="sec" data-sec="footer">
+            <h2 onclick="toggleSec('footer')">
+              <span class="chev"></span><span data-i18n="sec_footer"></span><span class="sum" id="partnerCount"></span>
+            </h2>
+            <div class="body">
+              <label class="ck"
+                ><input type="checkbox" id="showFooter" checked onchange="render()" />
+                <span data-i18n="show_footer"></span
+              ></label>
+              <input
+                type="text"
+                id="footerLabel"
+                value=""
+                oninput="
+                  this.dataset.auto = '0';
+                  render();
+                "
+                data-i18n-ph="ph_footer"
+              />
+              <div id="partners"></div>
+              <details>
+                <summary data-i18n="add_partner"></summary>
+                <input type="text" id="pName" data-i18n-ph="ph_name" />
+                <input type="url" id="pLink" data-i18n-ph="ph_link" />
+                <div class="row">
+                  <button class="chip" onclick="document.getElementById('pFile').click()">
+                    <span data-i18n="pick_logo_p"></span>
+                  </button>
+                  <input
+                    type="file"
+                    id="pFile"
+                    accept="image/*"
+                    hidden
+                    onchange="
+                      pickPartnerLogo(this.files[0]);
+                      this.value = '';
+                    "
+                  />
+                  <span id="pFileName" class="note"></span>
+                  <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
+                </div>
+                <p class="note" data-i18n="partner_note"></p>
+              </details>
+            </div>
+          </section>
+        </div>
       </aside>
       <div class="stage">
         <div id="wrap">
           <svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg>
           <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
         </div>
+        <div id="looks" class="looks"></div>
       </div>
     </main>
     <div id="tip"></div>

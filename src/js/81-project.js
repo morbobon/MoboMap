@@ -86,7 +86,8 @@ function loadProject(p, quiet) {
   S.groups = (p.groups || []).map((g) => {
     const n = newGroup(g.name || t('group'), g.hl || ['fill'], g.color || D.highlight[0]);
     (g.kommuner || []).forEach((c) => {
-      if (byName[c]) n.sel.add(c);
+      const code = byName[String(c).toLowerCase()] || byName[c];
+      if (code) n.sel.add(code);
     });
     return n;
   });

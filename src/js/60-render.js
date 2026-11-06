@@ -1,4 +1,6 @@
-function render() {
+// target: an SVG element to draw into instead of the page (look thumbnails) – no other side effects then
+function render(target) {
+  const links = window._links;
   setLayout(S.layout);
   fxLayout();
   const D = DS[S.ds],
@@ -597,6 +599,12 @@ function render() {
     out += '</g>';
   }
   out += fxContentTop(ink, ds.accent);
+  if (target) {
+    target.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    target.innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
+    window._links = links;
+    return;
+  }
   document.getElementById('svg').innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
   const wrap = document.getElementById('wrap');
   wrap.style.background = FXL.active ? S.fx.surface : bg;
@@ -607,4 +615,5 @@ function render() {
       ? t('text_auto')
       : t('text_custom');
   document.getElementById('count').textContent = t('count').replace('{n}', selAll.size).replace('{g}', groups.length);
+  afterRender();
 }

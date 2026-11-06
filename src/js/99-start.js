@@ -1,5 +1,6 @@
 // Boot: design systems, language, then the default project (src/default-project.json).
 applySections();
+setTab(localStorage.getItem('mobomap.tab') || 'map');
 loadDS();
 S.ds = DSORDER.find((i) => !DS[i].private) || DSORDER[0];
 applyUiMode();

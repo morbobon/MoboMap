@@ -4,6 +4,7 @@
 
 Single-file, offline-capable generator for stylised maps with highlighted units, in your own design system. Start from **the world (176 countries)** and drill down via **Focus** into any country's **regions/states/provinces** (Natural Earth admin-1, ~240 countries) – or **Denmark's 98 municipalities** in full detail.
 
+- **Workspace** – an icon rail with four tabs (**Map** · **Highlight** · **Look** · **Page**), a **looks strip** under the map with live thumbnails of the current map in every look (24 presets plus your own saved looks; a look sets style, effects and frame, never the profile), one **Export** menu, and **undo/redo** (Ctrl+Z / Ctrl+Y).
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
 - **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, **topographic (real elevation)**, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
@@ -155,6 +156,8 @@ src/js/NN-*.js             the app, concatenated in name order:
   44-far                     far-away parts: detection, inset boxes, in place / hidden
   50-flags, 51-pixel, 52-neighbours, 53-auto-text   style helpers and automatic title/subtitle
   54-relief                  terrain relief (elevation bands, depth tints, legend)
+  55-fx                      effects, picture frames and presets (the map as a sheet in a scene)
+  56-workspace               tabs, export menu, looks strip with thumbnails, undo/redo
   60-render                  render(): builds the SVG
   70-ui                      side panel, focus/drill-down, groups, map events
   80-export, 81-project      PNG/JPG/PDF export, project save/open
