@@ -438,6 +438,32 @@ function render() {
     });
   }
   // signaturforklaring
+  // Title/subtitle text and positions (computed before the legend, which moves up to make room).
+  // Positions: t/b (top/bottom) + l/c/r. Title "auto" follows the map style; subtitle "under" sits below the title.
+  if (document.getElementById('autoText').checked) {
+    const a = autoText();
+    document.getElementById('title').value = a.title;
+    document.getElementById('sub').value = a.sub;
+  }
+  const title = document.getElementById('title').value,
+    sub = document.getElementById('sub').value;
+  const showText = document.getElementById('showText').checked;
+  const hcol = sp.bg ? sp.heading || ink : dark ? ds.headingOnDark : ds.heading;
+  const ts = Math.round(W * 0.038);
+  let tp = document.getElementById('titlePos').value;
+  if (tp === 'auto') tp = 't' + (sp.titleAlign || 'left')[0];
+  let sPos = document.getElementById('subPos').value;
+  if (sPos === tp || !title) sPos = 'under';
+  const hx = (h) => (h === 'c' ? W / 2 : h === 'r' ? W - PAD.l + 12 : PAD.l - 12);
+  const anc = (h) => (h === 'c' ? 'middle' : h === 'r' ? 'end' : 'start');
+  const top = Math.round(ts * 2),
+    bot = H - FOOT - Math.round(H * 0.035);
+  const ty = tp[0] === 't' ? top : sPos === 'under' && sub ? bot - 24 : bot;
+  const textTop = {}; // top edge of bottom-placed text per side
+  if (showText) {
+    if (title && tp[0] === 'b') textTop[tp[1]] = ty - ts * 0.8;
+    if (sub && sPos !== 'under' && sPos[0] === 'b') textTop[sPos[1]] = Math.min(textTop[sPos[1]] ?? H, bot - 14);
+  }
   if (document.getElementById('legend').checked) {
     const items = [];
     const gs = groups.filter((g) => g.sel.size);
@@ -466,9 +492,11 @@ function render() {
       if (src) items.push({ src: true, label: src });
     }
     if (items.length) {
+      const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
       let y = H - FOOT - 14 - items.length * 18;
+      if (textTop[side] != null) y -= Math.max(0, H - FOOT - 2 - textTop[side]);
       const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
-      const x = margin.l.length ? (margin.r.length ? (W - lw) / 2 : W - PAD.r + 20 - lw) : PAD.l - 20;
+      const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw : PAD.l - 20;
       out += `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
       items.forEach((o) => {
         if (o.head)
@@ -482,24 +510,17 @@ function render() {
     }
   }
   out += '</g>';
-  // tekst & logo
-  if (document.getElementById('autoText').checked) {
-    const a = autoText();
-    document.getElementById('title').value = a.title;
-    document.getElementById('sub').value = a.sub;
-  }
-  const title = document.getElementById('title').value,
-    sub = document.getElementById('sub').value;
-  const hcol = sp.bg ? sp.heading || ink : dark ? ds.headingOnDark : ds.heading;
-  const ts = Math.round(W * 0.038);
   out += '<g pointer-events="none">';
-  if (document.getElementById('showText').checked) {
-    const ta = sp.titleAlign || 'left';
-    const tx = ta === 'center' ? W / 2 : ta === 'right' ? W - PAD.l + 12 : PAD.l - 12;
-    const anc = ta === 'center' ? 'middle' : ta === 'right' ? 'end' : 'start';
+  if (showText) {
     const t = sp.titleCaps ? title.toUpperCase() : title;
     const ls = sp.titleCaps ? 8 : -1;
-    out += `<text x="${tx}" y="${Math.round(ts * 2)}" text-anchor="${anc}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}">${esc(t)}</text><text x="${tx + (ta === 'left' ? 2 : 0)}" y="${Math.round(ts * 2 + 24)}" text-anchor="${anc}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9">${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`;
+    if (title)
+      out += `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}">${esc(t)}</text>`;
+    if (sub) {
+      const sh = sPos === 'under' ? tp[1] : sPos[1];
+      const sy = sPos === 'under' ? ty + 24 : sPos[0] === 't' ? top : bot;
+      out += `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9">${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`;
+    }
   }
   if (document.getElementById('showLogo').checked) {
     const L = D.company.logo;

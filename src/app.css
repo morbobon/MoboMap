@@ -587,3 +587,15 @@ header small {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.row2 label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--mute);
+}

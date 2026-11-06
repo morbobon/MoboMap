@@ -20,6 +20,8 @@ function projectState() {
     groups: S.groups.map((g) => ({ name: g.name, color: g.color, hl: [...g.hl], kommuner: [...g.sel] })),
     title: document.getElementById('title').value,
     sub: document.getElementById('sub').value,
+    titlePos: document.getElementById('titlePos').value,
+    subPos: document.getElementById('subPos').value,
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
     checks: Object.fromEntries(CK.map((k) => [k, document.getElementById(k).checked])),
@@ -50,6 +52,8 @@ function loadProject(p) {
   const D = DS[S.ds];
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
+  document.getElementById('titlePos').value = p.titlePos || 'auto';
+  document.getElementById('subPos').value = p.subPos || 'under';
   S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : DEFAULT_PROJ) : DEFAULT_PROJ;
   S.focus = p.focus || '';
   S.focusHide = !!p.focusHide;

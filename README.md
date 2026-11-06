@@ -18,7 +18,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
   
   Statistics use fixed classes with sequential colour ramps (red = burden, blue = development), a grey "No data" class and a source line with the data year in the legend.
 - **Projections**: Miller (default for the world), Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée.
-- **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend.
+- **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend. **Automatic title/subtitle** from the focus, the selection and the "Colour by" attribute; title and subtitle can each be placed top/bottom × left/centre/right.
 - **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
 - **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
 - **13 design systems** built in – default **Aurora (dark)**, plus Sunset, Ocean, Mono / brutalist, Pastel, Nordic minimal, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.

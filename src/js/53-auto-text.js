@@ -26,5 +26,7 @@ function autoText() {
       .map(nm);
     sub = tot + ' ' + t(MAPS[S.map].unitKey) + ': ' + nms.slice(0, 3).join(', ') + ' +' + (tot - 3);
   } else if (gs.length > 1) sub = gs.map((g) => g.name + ': ' + g.sel.size).join(' · ');
+  const AT = attrDef();
+  if (AT) sub = sub ? sub + ' · ' + t(AT.n) : t(AT.n);
   return { title: place, sub };
 }
