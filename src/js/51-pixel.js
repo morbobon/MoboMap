@@ -12,10 +12,10 @@ function pixelCells(det, colorOf) {
       .map((k) => {
         const p = new Path2D(kp(k, det));
         const cs = [
-          P(k.b[0], k.b[1], isBH(k)),
-          P(k.b[2], k.b[3], isBH(k)),
-          P(k.b[0], k.b[3], isBH(k)),
-          P(k.b[2], k.b[1], isBH(k)),
+          P(k.b[0], k.b[1], insOf(k)),
+          P(k.b[2], k.b[3], insOf(k)),
+          P(k.b[0], k.b[3], insOf(k)),
+          P(k.b[2], k.b[1], insOf(k)),
         ];
         return {
           k,

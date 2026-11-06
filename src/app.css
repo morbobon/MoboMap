@@ -599,3 +599,16 @@ header small {
   font-size: 11px;
   color: var(--mute);
 }
+#zoomReset {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+}
+#wrap.zoomed #zoomReset {
+  display: block;
+}
+#wrap.panning,
+#wrap.panning .k {
+  cursor: grabbing;
+}

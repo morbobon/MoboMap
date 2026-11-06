@@ -49,6 +49,9 @@ function ui() {
         .join('')
     : `<option>${esc(t('projection'))}: UTM 32N</option>`;
   ps.disabled = !GEO.geo;
+  const far = document.getElementById('farSel');
+  far.style.display = farParts(S.country ? countryData(S.country) : DATA.world) ? '' : 'none';
+  far.value = S.far;
   if (GEO.geo) ps.value = S.proj;
   const fsel = document.getElementById('focusSel2');
   const cmp = (a, b) => a[1].localeCompare(b[1], S.lang);
@@ -273,6 +276,7 @@ function setFocus(v) {
   if (v === 'world') return setMap('world');
   if (v.startsWith('c:')) return setMap(v.slice(2));
   S.focus = v;
+  S.zoom = { k: 1, x: 0, y: 0 };
   LC = null;
   ui();
   render();
@@ -326,6 +330,76 @@ svg.addEventListener('click', (e) => {
   ui();
   render();
 });
+// ---- wheel zoom (around the cursor) and drag pan; "Reset zoom" or a new focus/country resets ----
+function svgPoint(e) {
+  const r = svg.getBoundingClientRect();
+  if (!r.width || !r.height) return [W / 2, H / 2];
+  return [((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H];
+}
+let zoomRaf = 0;
+function zoomChanged() {
+  const z = S.zoom;
+  document.getElementById('wrap').classList.toggle('zoomed', z.k !== 1 || !!z.x || !!z.y);
+  if (!zoomRaf)
+    zoomRaf = requestAnimationFrame(() => {
+      zoomRaf = 0;
+      render();
+    });
+}
+function resetZoom() {
+  S.zoom = { k: 1, x: 0, y: 0 };
+  zoomChanged();
+}
+svg.addEventListener(
+  'wheel',
+  (e) => {
+    e.preventDefault();
+    const [sx, sy] = svgPoint(e);
+    const z = S.zoom;
+    let k2 = Math.min(40, Math.max(0.5, z.k * Math.exp(-e.deltaY * 0.0015)));
+    if (Math.abs(k2 - 1) < 0.03) k2 = 1;
+    // keep the point under the cursor in place: screen = unzoomed * k + offset
+    const bx = (sx - z.x) / z.k,
+      by = (sy - z.y) / z.k;
+    S.zoom = { k: k2, x: sx - bx * k2, y: sy - by * k2 };
+    zoomChanged();
+  },
+  { passive: false },
+);
+let drag = null,
+  dragged = false;
+svg.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  drag = { p: svgPoint(e), z: Object.assign({}, S.zoom) };
+  dragged = false;
+});
+window.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const [x, y] = svgPoint(e);
+  const dx = x - drag.p[0],
+    dy = y - drag.p[1];
+  if (!dragged && Math.hypot(dx, dy) < 6) return;
+  dragged = true;
+  tip.style.display = 'none';
+  document.getElementById('wrap').classList.add('panning');
+  S.zoom = { k: drag.z.k, x: drag.z.x + dx, y: drag.z.y + dy };
+  zoomChanged();
+});
+window.addEventListener('pointerup', () => {
+  drag = null;
+  document.getElementById('wrap').classList.remove('panning');
+});
+// a drag is not a click (capture phase: runs before the selection handler)
+svg.addEventListener(
+  'click',
+  (e) => {
+    if (dragged) {
+      e.stopImmediatePropagation();
+      dragged = false;
+    }
+  },
+  true,
+);
 svg.addEventListener('mousemove', (e) => {
   const p = e.target.closest('.k');
   if (!p) {

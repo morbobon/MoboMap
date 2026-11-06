@@ -79,7 +79,10 @@ function countryData(iso) {
   };
   const units = c.u
     .map((u) => {
-      const d = decRings(u[7]).filter(near);
+      // far rings are dropped, unless the whole unit is far and not tiny (Hawaii, Canaries …: insets)
+      const all = decRings(u[7]);
+      let d = all.filter(near);
+      if (!d.length && areaR(all) > 0.05) d = all;
       const b = bboxR(d);
       return {
         c: u[0],
@@ -97,7 +100,14 @@ function countryData(iso) {
     .filter((u) => u.d.length);
   const groups = Object.keys(c.g).length ? Object.assign({}, c.g) : { _: c.n };
   if (units.some((u) => u.r === '_') && !groups._) groups._ = c.n;
-  const land = decRings(c.l).filter(near);
+  const keepFar = units.filter((u) => !u.d.some(near));
+  const land = decRings(c.l).filter((r) => {
+    if (near(r)) return true;
+    const b = bboxR([r]);
+    return keepFar.some(
+      (u) => b[0] >= u.b[0] - 0.01 && b[2] <= u.b[2] + 0.01 && b[1] >= u.b[1] - 0.01 && b[3] <= u.b[3] + 0.01,
+    );
+  });
   const lb = bboxR(land);
   const wu = DATA.world.units.find((u) => u.c === iso);
   return (ADMC[iso] = {
@@ -157,8 +167,10 @@ function setData(id) {
       GEO = g;
     }
   }
+  GEO = applyFar(GEO);
   I = GEO.inset;
   S.focus = '';
+  S.zoom = { k: 1, x: 0, y: 0 };
   LC = null;
   for (const k in cache) delete cache[k];
   M = computeMain();

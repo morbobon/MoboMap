@@ -7,6 +7,9 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
 - **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, **topographic (real elevation)**, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
+- **Far-away parts** – Alaska and Hawaii, the Canary Islands, Madeira and the Azores, Svalbard, French overseas regions, Bornholm …: shown in **inset boxes** (each in its own equal-area projection, placed in the emptiest corner), in place, or hidden (main part only). Detected automatically from distance to the main landmass and share of the area.
+- **Zoom and pan** – mouse wheel zooms around the cursor, drag to pan; "Reset zoom" or a new focus resets. Exports and saved projects keep the zoom.
+- **Frame** – the thin frame around the page follows the map style or can be switched on/off for any style; the legend stays inside it.
 - **Highlight groups** – several groups at once, each with its own colour and modes (solid, hatched, dots, tint, glow, outline, raised, pin, label, callout, dim others).
 - **Colour by** – 28 attributes in six categories, or turn any of them into highlight groups with one click:
   - *Geography*: continent, UN region, subregion, hemisphere, area, first letter
@@ -149,6 +152,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   41-projections             world projections + local equal-area
   42-viewport                focus/framing, layout, map -> screen
   43-attributes              "Colour by" attributes and "→ groups"
+  44-far                     far-away parts: detection, inset boxes, in place / hidden
   50-flags, 51-pixel, 52-neighbours, 53-auto-text   style helpers and automatic title/subtitle
   54-relief                  terrain relief (elevation bands, depth tints, legend)
   60-render                  render(): builds the SVG

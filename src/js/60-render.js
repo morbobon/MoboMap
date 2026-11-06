@@ -133,7 +133,9 @@ function render() {
   }
   if (sp.concrete) out += `<rect width="${W}" height="${H}" fill="#fff" filter="url(#concrete)"/>`;
   if (sp.waves) out += `<rect width="${W}" height="${H}" fill="url(#waves)"/>`;
-  if (sp.frame)
+  const fsel = document.getElementById('frameSel').value;
+  const frame = fsel === 'on' || (fsel !== 'off' && !!sp.frame);
+  if (frame)
     out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink}" stroke-opacity=".6" stroke-width="1.5"/>`;
   const relief = reliefOn(sp);
   if (relief) out += reliefSea(sp, bg, dark);
@@ -144,7 +146,7 @@ function render() {
       out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;
     out += '</g>';
   }
-  const allPath = landPath(det) + (I ? kp(GEO.units.find(isBH), det) : '');
+  const allPath = landPath(det) + (GEO.xland || []).map((k) => kp(k, det)).join('');
   // neighbouring countries as grey context (country views)
   if (S.map !== 'world' && document.getElementById('showNeighbours').checked && !S.focusHide) {
     const nb = neighboursPath();
@@ -152,8 +154,7 @@ function render() {
       out += `<path d="${nb}" fill="${mix(bg, dark ? '#ffffff' : '#000000', dark ? 0.1 : 0.09)}" stroke="${bg}" stroke-width="0.8" pointer-events="none"/>`;
   }
   // inset box (Bornholm), drawn over the neighbours so its frame stays clean
-  if (I) {
-    const R = bhRect();
+  for (const R of insetRects()) {
     out += `<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="${bg}" fill-opacity=".92" stroke="${st === 'neon' ? stroke : ink}" stroke-opacity=".45" stroke-width="1" ${st === 'blueprint' ? 'stroke-dasharray="4 3"' : ''}/>`;
   }
   if (sp.flag && S.map !== 'world') {
@@ -296,10 +297,10 @@ function render() {
     GEO.units.forEach((k, i) => {
       if (selAll.has(k.c)) return;
       const cs = [
-        P(k.b[0], k.b[1], isBH(k)),
-        P(k.b[2], k.b[3], isBH(k)),
-        P(k.b[0], k.b[3], isBH(k)),
-        P(k.b[2], k.b[1], isBH(k)),
+        P(k.b[0], k.b[1], insOf(k)),
+        P(k.b[2], k.b[3], insOf(k)),
+        P(k.b[0], k.b[3], insOf(k)),
+        P(k.b[2], k.b[1], insOf(k)),
       ];
       const x0 = Math.min(...cs.map((c) => c[0])),
         x1 = Math.max(...cs.map((c) => c[0])),
@@ -503,7 +504,7 @@ function render() {
     if (relief) items.push(...reliefLegend(sp));
     if (items.length) {
       const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
-      let y = H - FOOT - 14 - items.length * 18;
+      let y = H - FOOT - (frame && !FOOT ? 34 : 14) - items.length * 18;
       if (textTop[side] != null) y -= Math.max(0, H - FOOT - 2 - textTop[side]);
       const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
       const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw : PAD.l - 20;

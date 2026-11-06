@@ -21,6 +21,9 @@ function projectState() {
     proj: S.proj,
     focus: S.focus,
     focusHide: !!S.focusHide,
+    far: S.far,
+    zoom: S.zoom,
+    frame: document.getElementById('frameSel').value,
     lang: S.lang,
     designSystem: S.ds,
     designSystemData: D.source === 'builtin' ? null : currentDSExport(),
@@ -62,6 +65,7 @@ function loadProject(p, quiet) {
   if (!DS[p.designSystem]) toast(t('ts_ds_missing').replace('{id}', p.designSystem) + ' ' + loc(DS[DSORDER[0]].name));
   S.ds = DS[p.designSystem] ? p.designSystem : DSORDER[0];
   const D = DS[S.ds];
+  S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
   document.getElementById('titlePos').value = p.titlePos || 'auto';
@@ -69,6 +73,8 @@ function loadProject(p, quiet) {
   S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : DEFAULT_PROJ) : DEFAULT_PROJ;
   S.focus = p.focus || '';
   S.focusHide = !!p.focusHide;
+  if (p.zoom && p.zoom.k > 0) S.zoom = { k: +p.zoom.k, x: +p.zoom.x || 0, y: +p.zoom.y || 0 };
+  document.getElementById('frameSel').value = ['on', 'off'].includes(p.frame) ? p.frame : 'auto';
   document.getElementById('focusHide').checked = S.focusHide;
   if (p.lang) setLang(p.lang, true);
   S.layout = LAYOUTS.some((l) => l.id === p.layout) ? p.layout : 'land';

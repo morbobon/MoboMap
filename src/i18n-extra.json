@@ -214,7 +214,14 @@
   "pos_br": "Bottom right",
   "show_relief": "Terrain relief (elevation)",
   "elevation": "Elevation",
-  "elev_source": "Elevation: ETOPO1 (NOAA)"
+  "elev_source": "Elevation: ETOPO1 (NOAA)",
+  "far_inset": "Far-away parts: insets",
+  "far_show": "Far-away parts: in place",
+  "far_hide": "Far-away parts: hidden (main part only)",
+  "frame_auto": "Frame: as the map style",
+  "frame_on": "Frame: on",
+  "frame_off": "Frame: off",
+  "zoom_reset": "Reset zoom"
  },
  "da": {
   "yes": "Ja",
@@ -431,7 +438,14 @@
   "pos_br": "Nederst til højre",
   "show_relief": "Terræn (højdekurver)",
   "elevation": "Højde over havet",
-  "elev_source": "Højde: ETOPO1 (NOAA)"
+  "elev_source": "Højde: ETOPO1 (NOAA)",
+  "far_inset": "Fjerne dele: indsatte kort",
+  "far_show": "Fjerne dele: på deres plads",
+  "far_hide": "Fjerne dele: skjult (kun hoveddelen)",
+  "frame_auto": "Ramme: som kortstilen",
+  "frame_on": "Ramme: til",
+  "frame_off": "Ramme: fra",
+  "zoom_reset": "Nulstil zoom"
  },
  "de": {
   "yes": "Ja",
@@ -648,7 +662,14 @@
   "pos_br": "Unten rechts",
   "show_relief": "Geländerelief (Höhen)",
   "elevation": "Höhe",
-  "elev_source": "Höhe: ETOPO1 (NOAA)"
+  "elev_source": "Höhe: ETOPO1 (NOAA)",
+  "far_inset": "Entfernte Teile: Nebenkarten",
+  "far_show": "Entfernte Teile: an Ort und Stelle",
+  "far_hide": "Entfernte Teile: ausgeblendet (nur Hauptteil)",
+  "frame_auto": "Rahmen: wie der Kartenstil",
+  "frame_on": "Rahmen: an",
+  "frame_off": "Rahmen: aus",
+  "zoom_reset": "Zoom zurücksetzen"
  },
  "fr": {
   "yes": "Oui",
@@ -865,7 +886,14 @@
   "pos_br": "En bas à droite",
   "show_relief": "Relief du terrain (altitude)",
   "elevation": "Altitude",
-  "elev_source": "Altitude : ETOPO1 (NOAA)"
+  "elev_source": "Altitude : ETOPO1 (NOAA)",
+  "far_inset": "Parties éloignées : cartons",
+  "far_show": "Parties éloignées : à leur place",
+  "far_hide": "Parties éloignées : masquées (partie principale)",
+  "frame_auto": "Cadre : selon le style",
+  "frame_on": "Cadre : oui",
+  "frame_off": "Cadre : non",
+  "zoom_reset": "Réinitialiser le zoom"
  },
  "es": {
   "yes": "Sí",
@@ -1082,7 +1110,14 @@
   "pos_br": "Abajo a la derecha",
   "show_relief": "Relieve del terreno (altitud)",
   "elevation": "Altitud",
-  "elev_source": "Altitud: ETOPO1 (NOAA)"
+  "elev_source": "Altitud: ETOPO1 (NOAA)",
+  "far_inset": "Partes lejanas: recuadros",
+  "far_show": "Partes lejanas: en su lugar",
+  "far_hide": "Partes lejanas: ocultas (solo la parte principal)",
+  "frame_auto": "Marco: según el estilo",
+  "frame_on": "Marco: sí",
+  "frame_off": "Marco: no",
+  "zoom_reset": "Restablecer zoom"
  },
  "sv": {
   "yes": "Ja",
@@ -1299,7 +1334,14 @@
   "pos_br": "Nere till höger",
   "show_relief": "Terrängrelief (höjd)",
   "elevation": "Höjd",
-  "elev_source": "Höjd: ETOPO1 (NOAA)"
+  "elev_source": "Höjd: ETOPO1 (NOAA)",
+  "far_inset": "Avlägsna delar: infällda kartor",
+  "far_show": "Avlägsna delar: på plats",
+  "far_hide": "Avlägsna delar: dolda (bara huvuddelen)",
+  "frame_auto": "Ram: som kartstilen",
+  "frame_on": "Ram: på",
+  "frame_off": "Ram: av",
+  "zoom_reset": "Återställ zoom"
  },
  "no": {
   "yes": "Ja",
@@ -1516,7 +1558,14 @@
   "pos_br": "Nederst til høyre",
   "show_relief": "Terrengrelieff (høyde)",
   "elevation": "Høyde",
-  "elev_source": "Høyde: ETOPO1 (NOAA)"
+  "elev_source": "Høyde: ETOPO1 (NOAA)",
+  "far_inset": "Fjerne deler: innfelte kart",
+  "far_show": "Fjerne deler: på plass",
+  "far_hide": "Fjerne deler: skjult (bare hoveddelen)",
+  "frame_auto": "Ramme: som kartstilen",
+  "frame_on": "Ramme: på",
+  "frame_off": "Ramme: av",
+  "zoom_reset": "Tilbakestill zoom"
  },
  "fi": {
   "yes": "Kyllä",
@@ -1733,7 +1782,14 @@
   "pos_br": "Alhaalla oikealla",
   "show_relief": "Maaston korkeus",
   "elevation": "Korkeus",
-  "elev_source": "Korkeus: ETOPO1 (NOAA)"
+  "elev_source": "Korkeus: ETOPO1 (NOAA)",
+  "far_inset": "Kaukaiset osat: sivukartat",
+  "far_show": "Kaukaiset osat: paikallaan",
+  "far_hide": "Kaukaiset osat: piilotettu (vain pääosa)",
+  "frame_auto": "Kehys: karttatyylin mukaan",
+  "frame_on": "Kehys: päällä",
+  "frame_off": "Kehys: pois",
+  "zoom_reset": "Palauta zoomaus"
  },
  "nl": {
   "yes": "Ja",
@@ -1950,7 +2006,14 @@
   "pos_br": "Rechtsonder",
   "show_relief": "Terreinreliëf (hoogte)",
   "elevation": "Hoogte",
-  "elev_source": "Hoogte: ETOPO1 (NOAA)"
+  "elev_source": "Hoogte: ETOPO1 (NOAA)",
+  "far_inset": "Verre delen: inzetkaarten",
+  "far_show": "Verre delen: op hun plaats",
+  "far_hide": "Verre delen: verborgen (alleen het hoofddeel)",
+  "frame_auto": "Kader: zoals de kaartstijl",
+  "frame_on": "Kader: aan",
+  "frame_off": "Kader: uit",
+  "zoom_reset": "Zoom herstellen"
  },
  "it": {
   "yes": "Sì",
@@ -2167,6 +2230,13 @@
   "pos_br": "In basso a destra",
   "show_relief": "Rilievo del terreno (altitudine)",
   "elevation": "Altitudine",
-  "elev_source": "Altitudine: ETOPO1 (NOAA)"
+  "elev_source": "Altitudine: ETOPO1 (NOAA)",
+  "far_inset": "Parti lontane: riquadri",
+  "far_show": "Parti lontane: al loro posto",
+  "far_hide": "Parti lontane: nascoste (solo parte principale)",
+  "frame_auto": "Cornice: come lo stile",
+  "frame_on": "Cornice: sì",
+  "frame_off": "Cornice: no",
+  "zoom_reset": "Reimposta zoom"
  }
 }

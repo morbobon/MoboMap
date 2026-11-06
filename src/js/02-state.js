@@ -8,6 +8,8 @@ const S = {
   attr: 'none',
   proj: DEFAULT_PROJ,
   focus: '', // zoom target inside the dataset: a group code or a unit code
+  zoom: { k: 1, x: 0, y: 0 }, // wheel zoom / drag pan on top of the framing (screen units)
+  far: 'inset', // far-away parts (Alaska, Bornholm …): 'inset' | 'show' | 'hide'
   focusHide: false, // hide units outside the focus
   worldProj: DEFAULT_PROJ, // remembered world projection while viewing a country
   lang: 'en',

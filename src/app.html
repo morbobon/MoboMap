@@ -82,6 +82,11 @@
                 render();
               "
             ></select>
+            <select id="farSel" onchange="setFar(this.value)">
+              <option value="inset" data-i18n="far_inset"></option>
+              <option value="show" data-i18n="far_show"></option>
+              <option value="hide" data-i18n="far_hide"></option>
+            </select>
           </div>
         </section>
         <section class="sec" data-sec="groups">
@@ -194,6 +199,11 @@
               ><input type="checkbox" id="showNeighbours" checked onchange="render()" />
               <span data-i18n="show_neighbours"></span
             ></label>
+            <select id="frameSel" onchange="render()">
+              <option value="auto" data-i18n="frame_auto"></option>
+              <option value="on" data-i18n="frame_on"></option>
+              <option value="off" data-i18n="frame_off"></option>
+            </select>
             <label class="ck"
               ><input type="checkbox" id="relief" onchange="render()" /> <span data-i18n="show_relief"></span
             ></label>
@@ -316,7 +326,10 @@
         </section>
       </aside>
       <div class="stage">
-        <div id="wrap"><svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <div id="wrap">
+          <svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg>
+          <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+        </div>
       </div>
     </main>
     <div id="tip"></div>

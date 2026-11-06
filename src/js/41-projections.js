@@ -77,28 +77,24 @@ const PROJS = {
   local: {
     n: 'Local',
     local: 1,
-    f: (l, p) => {
-      const C = localCenter(),
-        l0 = C[0],
-        p0 = C[1];
-      let dl = l - l0;
-      dl = ((((dl + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
-      const k = Math.sqrt(
-        2 / Math.max(1e-9, 1 + Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(dl)),
-      );
-      return [
-        k * Math.cos(p) * Math.sin(dl),
-        k * (Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(dl)),
-      ];
-    },
+    f: (l, p) => laeaAt(localCenter(), l, p),
   },
   equirect: { n: 'Plate carrée', f: (l, p) => [l, p] },
   miller: { n: 'Miller', f: (l, p) => [l, 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * p))] },
 };
+// Lambert azimuthal equal-area centred on C = [lon0, lat0] (radians)
+function laeaAt(C, l, p) {
+  const l0 = C[0],
+    p0 = C[1];
+  let dl = l - l0;
+  dl = ((((dl + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
+  const k = Math.sqrt(2 / Math.max(1e-9, 1 + Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(dl)));
+  return [k * Math.cos(p) * Math.sin(dl), k * (Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(dl))];
+}
 let LC = null;
 function localCenter() {
   if (LC) return LC;
-  const fu = (typeof focusUnits === 'function' && focusUnits()) || GEO.units;
+  const fu = (typeof focusUnits === 'function' && focusUnits()) || GEO.units.filter((k) => !isBH(k));
   let sx = 0,
     sy = 0,
     sz = 0,

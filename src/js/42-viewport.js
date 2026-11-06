@@ -10,7 +10,7 @@ const inFocus = (k) => {
   return !f || f.includes(k);
 };
 function computeMain() {
-  const key = 'main|' + (S.country || 'world') + '|' + S.proj + '|' + S.focus;
+  const key = 'main|' + (S.country || 'world') + '|' + S.proj + '|' + S.focus + '|' + S.far;
   if (cache[key]) return cache[key];
   LC = null;
   const fu = focusUnits();
@@ -43,6 +43,7 @@ function computeMain() {
           if (y > b[3]) b[3] = y;
         }
     }
+    if (!fu && GEO.insets) b = layoutInsets(b);
     if (fu) {
       const px = (b[2] - b[0]) * 0.08,
         py = (b[3] - b[1]) * 0.08;
@@ -67,6 +68,12 @@ function setLayout(id) {
   sc = Math.min((W - PAD.l - PAD.r) / mw, (H - PAD.t - PAD.b) / mh);
   ox = PAD.l + (W - PAD.l - PAD.r - mw * sc) / 2 - M[0] * sc;
   oy = PAD.t + (H - PAD.t - PAD.b - mh * sc) / 2 - M[1] * sc;
+  const z = S.zoom;
+  if (z.k !== 1 || z.x || z.y) {
+    sc *= z.k;
+    ox = ox * z.k + z.x;
+    oy = oy * z.k + z.y;
+  }
   for (const k in cache) if (!k.startsWith('main|')) delete cache[k];
   const svg = document.getElementById('svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -74,21 +81,25 @@ function setLayout(id) {
   wrap.style.aspectRatio = W + '/' + H;
   wrap.style.width = `min(100%,calc((100vh - 110px) * ${(W / H).toFixed(4)}))`;
 }
-const P = (x, y, bh) => {
-  if (bh && I) {
-    x += I.dx;
-    y += I.dy;
+// ins: the inset a point belongs to (insOf) – Bornholm is shifted, adm1 insets have their own projection
+const P = (x, y, ins) => {
+  if (ins && ins.dx != null) {
+    x += ins.dx;
+    y += ins.dy;
+  } else if (ins) {
+    const [a, b] = insPrj(ins, x, y);
+    return [(ins.ox + a * ins.s) * sc + ox, (ins.oy + b * ins.s) * sc + oy];
   }
   if (GEO.geo) {
     [x, y] = prj(x, y);
   }
   return [x * sc + ox, y * sc + oy];
 };
-function pathOf(rings, bh) {
+function pathOf(rings, ins) {
   let s = '';
   for (const r of rings) {
     for (let i = 0; i < r.length; i += 2) {
-      const [x, y] = P(r[i], r[i + 1], bh);
+      const [x, y] = P(r[i], r[i + 1], ins);
       s += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
     }
     s += 'Z';
@@ -105,13 +116,13 @@ function pathLines(ls) {
   }
   return s;
 }
-const isBH = (k) => !!I && k.c === I.unit;
+const isBH = (k) => !!insOf(k);
 function kp(k, det) {
   const key = k.c + (det ? 'd' : 's');
-  return cache[key] || (cache[key] = pathOf(det ? k.d : k.s, isBH(k)));
+  return cache[key] || (cache[key] = pathOf(det ? k.d : k.s, insOf(k)));
 }
 function kc(k) {
-  return P(k.p[0], k.p[1], isBH(k));
+  return P(k.p[0], k.p[1], insOf(k));
 }
 function landPath(det) {
   return cache['land' + det] || (cache['land' + det] = pathOf(det ? GEO.land.d : GEO.land.s, false));
