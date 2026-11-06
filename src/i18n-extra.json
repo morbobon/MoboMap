@@ -152,7 +152,10 @@
   "sea_atlantic": "Atlantic Ocean",
   "sea_pacific": "Pacific Ocean",
   "sea_indian": "Indian Ocean",
-  "sea_arctic": "Arctic Ocean"
+  "sea_arctic": "Arctic Ocean",
+  "tip_ctrl_open": "Ctrl+click: open regions",
+  "tip_ctrl_zoom": "Ctrl+click: zoom in",
+  "tip_ctrl_out": "Ctrl+click: zoom out"
  },
  "da": {
   "yes": "Ja",
@@ -307,7 +310,10 @@
   "sea_atlantic": "Atlanterhavet",
   "sea_pacific": "Stillehavet",
   "sea_indian": "Det Indiske Ocean",
-  "sea_arctic": "Det Arktiske Ocean"
+  "sea_arctic": "Det Arktiske Ocean",
+  "tip_ctrl_open": "Ctrl+klik: åbn regioner",
+  "tip_ctrl_zoom": "Ctrl+klik: zoom ind",
+  "tip_ctrl_out": "Ctrl+klik: zoom ud"
  },
  "de": {
   "yes": "Ja",
@@ -462,7 +468,10 @@
   "sea_atlantic": "Atlantischer Ozean",
   "sea_pacific": "Pazifischer Ozean",
   "sea_indian": "Indischer Ozean",
-  "sea_arctic": "Arktischer Ozean"
+  "sea_arctic": "Arktischer Ozean",
+  "tip_ctrl_open": "Strg+Klick: Regionen öffnen",
+  "tip_ctrl_zoom": "Strg+Klick: hineinzoomen",
+  "tip_ctrl_out": "Strg+Klick: herauszoomen"
  },
  "fr": {
   "yes": "Oui",
@@ -617,7 +626,10 @@
   "sea_atlantic": "Océan Atlantique",
   "sea_pacific": "Océan Pacifique",
   "sea_indian": "Océan Indien",
-  "sea_arctic": "Océan Arctique"
+  "sea_arctic": "Océan Arctique",
+  "tip_ctrl_open": "Ctrl+clic : ouvrir les régions",
+  "tip_ctrl_zoom": "Ctrl+clic : zoomer",
+  "tip_ctrl_out": "Ctrl+clic : dézoomer"
  },
  "es": {
   "yes": "Sí",
@@ -772,7 +784,10 @@
   "sea_atlantic": "Océano Atlántico",
   "sea_pacific": "Océano Pacífico",
   "sea_indian": "Océano Índico",
-  "sea_arctic": "Océano Ártico"
+  "sea_arctic": "Océano Ártico",
+  "tip_ctrl_open": "Ctrl+clic: abrir regiones",
+  "tip_ctrl_zoom": "Ctrl+clic: acercar",
+  "tip_ctrl_out": "Ctrl+clic: alejar"
  },
  "sv": {
   "yes": "Ja",
@@ -927,7 +942,10 @@
   "sea_atlantic": "Atlanten",
   "sea_pacific": "Stilla havet",
   "sea_indian": "Indiska oceanen",
-  "sea_arctic": "Norra ishavet"
+  "sea_arctic": "Norra ishavet",
+  "tip_ctrl_open": "Ctrl+klick: öppna regioner",
+  "tip_ctrl_zoom": "Ctrl+klick: zooma in",
+  "tip_ctrl_out": "Ctrl+klick: zooma ut"
  },
  "no": {
   "yes": "Ja",
@@ -1082,7 +1100,10 @@
   "sea_atlantic": "Atlanterhavet",
   "sea_pacific": "Stillehavet",
   "sea_indian": "Det indiske hav",
-  "sea_arctic": "Polhavet"
+  "sea_arctic": "Polhavet",
+  "tip_ctrl_open": "Ctrl+klikk: åpne regioner",
+  "tip_ctrl_zoom": "Ctrl+klikk: zoom inn",
+  "tip_ctrl_out": "Ctrl+klikk: zoom ut"
  },
  "fi": {
   "yes": "Kyllä",
@@ -1237,7 +1258,10 @@
   "sea_atlantic": "Atlantin valtameri",
   "sea_pacific": "Tyyni valtameri",
   "sea_indian": "Intian valtameri",
-  "sea_arctic": "Pohjoinen jäämeri"
+  "sea_arctic": "Pohjoinen jäämeri",
+  "tip_ctrl_open": "Ctrl+napsautus: avaa alueet",
+  "tip_ctrl_zoom": "Ctrl+napsautus: lähennä",
+  "tip_ctrl_out": "Ctrl+napsautus: loitonna"
  },
  "nl": {
   "yes": "Ja",
@@ -1392,7 +1416,10 @@
   "sea_atlantic": "Atlantische Oceaan",
   "sea_pacific": "Grote Oceaan",
   "sea_indian": "Indische Oceaan",
-  "sea_arctic": "Noordelijke IJszee"
+  "sea_arctic": "Noordelijke IJszee",
+  "tip_ctrl_open": "Ctrl+klik: regio's openen",
+  "tip_ctrl_zoom": "Ctrl+klik: inzoomen",
+  "tip_ctrl_out": "Ctrl+klik: uitzoomen"
  },
  "it": {
   "yes": "Sì",
@@ -1547,6 +1574,9 @@
   "sea_atlantic": "Oceano Atlantico",
   "sea_pacific": "Oceano Pacifico",
   "sea_indian": "Oceano Indiano",
-  "sea_arctic": "Oceano Artico"
+  "sea_arctic": "Oceano Artico",
+  "tip_ctrl_open": "Ctrl+clic: apri regioni",
+  "tip_ctrl_zoom": "Ctrl+clic: ingrandisci",
+  "tip_ctrl_out": "Ctrl+clic: riduci"
  }
 }

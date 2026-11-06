@@ -261,8 +261,22 @@ function toast(m) {
 }
 const svg = document.getElementById('svg'),
   tip = document.getElementById('tip');
+// Ctrl/Cmd+click = navigate instead of select:
+//   world view: open the country's regions (or zoom to it if no detail exists)
+//   country view: zoom to the clicked unit; on empty sea step out (unit -> whole country -> world)
+const hasDetail = (iso) => iso === 'DNK' || !!DATA.adm1[iso];
+function focusClick(c) {
+  if (!c) return setFocus(S.focus ? '' : S.country ? 'world' : '');
+  if (S.map === 'world') return setFocus(hasDetail(c) ? 'c:' + c : c);
+  setFocus(S.focus === c ? '' : c);
+}
 svg.addEventListener('click', (e) => {
   const p = e.target.closest('.k');
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    tip.style.display = 'none';
+    return focusClick(p && p.dataset.c);
+  }
   if (!p) return;
   const c = p.dataset.c;
   const g = S.groups[S.active];
@@ -283,7 +297,9 @@ svg.addEventListener('mousemove', (e) => {
   }
   const k = GEO.units.find((k) => k.c === p.dataset.c);
   const gi = groupOf(k.c);
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups[S.active].name) + '"'}`;
+  const nav =
+    S.map === 'world' && hasDetail(k.c) ? 'tip_ctrl_open' : S.focus === k.c ? 'tip_ctrl_out' : 'tip_ctrl_zoom';
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups[S.active].name) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
   tip.style.display = 'block';
   tip.style.left = e.clientX + 14 + 'px';
   tip.style.top = e.clientY - 10 + 'px';
