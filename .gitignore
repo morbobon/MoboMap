@@ -15,3 +15,8 @@ Thumbs.db
 
 # large geodata sources (downloaded by tools/prepare-*.mjs)
 assets/geo/source-admin1.geojson
+
+# local Claude Code / editor settings
+.claude/
+.vscode/
+.idea/
