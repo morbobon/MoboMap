@@ -1,0 +1,33 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "world",
+  "country": "",
+  "attr": "none",
+  "proj": "robinson",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "topo",
+  "active": 0,
+  "groups": [],
+  "title": "World",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": false,
+    "showNeighbours": false
+  },
+  "example": {
+    "caption": "**Topographic** – real elevation (ETOPO1), Robinson"
+  }
+}

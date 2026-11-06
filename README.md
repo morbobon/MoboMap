@@ -26,14 +26,18 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 
 ## Examples
 
+Rendered from the saved projects in [docs/examples](docs/examples) by `npm run examples` (also part of `npm run release`) – open any of them in the app with **Open project**.
+
+<!-- examples:start -->
 | | |
 |---|---|
-| ![Topographic world map with elevation tints](docs/examples/world-topographic.jpg) | ![Neon world map](docs/examples/world-neon.jpg) |
-| **Topographic** – real elevation (ETOPO1), Robinson | **Neon** – Tech / dark profile |
-| ![World population, stone relief](docs/examples/world-population-stone.jpg) | ![Life expectancy by country](docs/examples/world-life-expectancy.jpg) |
-| **Stone relief** – colour by population | **Regions** – life expectancy (Our World in Data) |
-| ![Denmark, typographic](docs/examples/denmark-typographic.jpg) | ![China by region, 3D block](docs/examples/china-regions-3d.jpg) |
-| **Typographic** – Denmark's 98 municipalities | **3D block** – China, colour by region |
+| ![Topographic – real elevation (ETOPO1), Robinson](docs/examples/01-world-topographic.jpg) | ![Neon – Tech / dark profile](docs/examples/02-world-neon.jpg) |
+| **Topographic** – real elevation (ETOPO1), Robinson · [project](docs/examples/01-world-topographic.mobomap.json) | **Neon** – Tech / dark profile · [project](docs/examples/02-world-neon.mobomap.json) |
+| ![Stone relief – colour by population](docs/examples/03-world-population-stone.jpg) | ![Regions – life expectancy (Our World in Data)](docs/examples/04-world-life-expectancy.jpg) |
+| **Stone relief** – colour by population · [project](docs/examples/03-world-population-stone.mobomap.json) | **Regions** – life expectancy (Our World in Data) · [project](docs/examples/04-world-life-expectancy.mobomap.json) |
+| ![Typographic – Denmark's 98 municipalities](docs/examples/05-denmark-typographic.jpg) | ![3D block – China, colour by region](docs/examples/06-china-regions-3d.jpg) |
+| **Typographic** – Denmark's 98 municipalities · [project](docs/examples/05-denmark-typographic.mobomap.json) | **3D block** – China, colour by region · [project](docs/examples/06-china-regions-3d.mobomap.json) |
+<!-- examples:end -->
 
 Everything ships as one `index.html` (~4.4 MB) that works from `file://` without a server.
 
@@ -44,7 +48,8 @@ npm install
 npm run build        # -> index.html
 npm run check        # build + syntax check + i18n coverage (all languages, unused keys) + unused declarations
 npm run format       # Prettier on src/ and tools/
-npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public variant)
+npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public variant); also re-renders the examples
+npm run examples     # README example images from docs/examples/*.mobomap.json (uses installed Chrome/Edge)
 node tools/serve.mjs . 8787   # optional local server for development
 ```
 
@@ -152,7 +157,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   99-start                   boot
 src/i18n.json, i18n-extra.json   UI strings per language
 src/default-project.json   start-up state (a saved project)
-docs/examples/             README images
+docs/examples/             example projects (.mobomap.json, with a caption) and their rendered images
 designsystems/             public profiles (committed) · designsystems/private/ (gitignored)
 assets/geo/                source and simplified geodata · assets/fonts/ · assets/jspdf.umd.min.js
 tools/prepare-geo.mjs      mapshaper pipeline (simplify, dissolve, inner lines, centroids)
@@ -160,7 +165,8 @@ tools/prepare-admin1.mjs   downloads NE 10m admin-1 (40 MB, gitignored) and writ
 tools/prepare-elevation.mjs  downloads ETOPO1 (0.25°, gitignored cache) and writes assets/geo/elevation.json
 tools/build.mjs            inlines everything into index.html (--public skips private profiles, --out=path)
 tools/check.mjs            npm run check
-tools/release.mjs          builds release/*.zip (full and public)
+tools/release.mjs          builds release/*.zip (full and public) and runs tools/examples.mjs (--no-examples skips it)
+tools/examples.mjs         renders docs/examples/*.jpg from the example projects and rewrites the README gallery
 ```
 
 Map styles are a config table (`SP` in `src/js/30-map-styles.js`): colours, texture filter, labels, title alignment – a new look is usually one entry plus its i18n keys `st_<id>` and `st_<id>_d`.

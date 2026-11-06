@@ -2,6 +2,7 @@
 //   MoboMap-<version>-<date>.zip         – all profiles in designsystems/ (incl. private/)
 //   MoboMap-<version>-<date>-public.zip  – without designsystems/private/
 // Each zip contains index.html, README.txt and designsystems.example.js.
+// Also re-renders the README example images (tools/examples.mjs) unless --no-examples is given.
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -65,6 +66,14 @@ function pack(name, publicOnly) {
   console.log(path.relative('.', zip), (fs.statSync(zip).size / 1024).toFixed(0) + ' KB');
 }
 
-execFileSync('node', ['tools/build.mjs'], { stdio: 'inherit' }); // index.html i roden (dev)
+execFileSync('node', ['tools/build.mjs'], { stdio: 'inherit' }); // index.html in the repo root (dev)
+// README example images + gallery (needs Chrome or Edge); skip with --no-examples
+if (!process.argv.includes('--no-examples')) {
+  try {
+    execFileSync('node', ['tools/examples.mjs'], { stdio: 'inherit' });
+  } catch {
+    console.warn('examples: not rendered (see the error above) – release continues');
+  }
+}
 pack(`MoboMap-${v}-${d}`, false);
 pack(`MoboMap-${v}-${d}-public`, true);

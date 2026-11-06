@@ -1,0 +1,34 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "world",
+  "country": "",
+  "attr": "pop",
+  "proj": "miller",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "mono",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "stone",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "auto",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": false,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "example": {
+    "caption": "**Stone relief** – colour by population"
+  }
+}
