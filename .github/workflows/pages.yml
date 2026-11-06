@@ -1,6 +1,7 @@
-# Builds the public single-file app (no private design systems) and publishes it to GitHub Pages.
-# One-time setup in the repo: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
-name: Deploy demo to GitHub Pages
+# Builds the public single-file app (no private design systems) and publishes it on the gh-pages branch.
+# One-time setup in the repo: Settings -> Pages -> Build and deployment -> Source: "Deploy from a branch",
+# Branch: gh-pages, folder: / (root).
+name: Publish demo (gh-pages)
 
 on:
   push:
@@ -8,16 +9,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,16 +28,12 @@ jobs:
         run: node tools/build.mjs --public --out=_site/index.html
       - name: Check the build
         run: node tools/check.mjs
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Push to gh-pages
+        run: |
+          cd _site
+          touch .nojekyll
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Publish ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages

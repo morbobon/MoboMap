@@ -452,8 +452,8 @@ html = html
     }
     return JSON.stringify(a);
   });
-fs.mkdirSync(path.dirname(path.join(root, OUT)), { recursive: true });
-fs.writeFileSync(path.join(root, OUT), html);
+fs.mkdirSync(path.dirname(path.resolve(root, OUT)), { recursive: true });
+fs.writeFileSync(path.resolve(root, OUT), html);
 console.log(
   OUT,
   (html.length / 1024).toFixed(0) + ' KB',
