@@ -20,3 +20,6 @@ assets/geo/source-admin1.geojson
 .claude/
 .vscode/
 .idea/
+
+# GitHub Pages build output (CI)
+_site/

@@ -1,5 +1,7 @@
 # MoboMap – Map Design Studio
 
+**Live demo: https://morbobon.github.io/MoboMap/** (public build, redeployed on every push to `main`)
+
 Single-file, offline-capable generator for stylised maps with highlighted units, in your own design system. Start from **the world (176 countries)** and drill down via **Focus** into any country's **regions/states/provinces** (Natural Earth admin-1, ~240 countries) – or **Denmark's 98 municipalities** in full detail.
 
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
