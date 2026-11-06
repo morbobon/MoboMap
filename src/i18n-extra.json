@@ -113,7 +113,9 @@
   "st_pixel_d": "Land as a grid of tiles",
   "st_stone": "Stone relief",
   "st_stone_d": "Carved stone with bevel and shadow",
-  "show_neighbours": "Show neighbouring countries"
+  "show_neighbours": "Show neighbouring countries",
+  "and": "and",
+  "auto_text": "Auto: follow focus and selection"
  },
  "da": {
   "yes": "Ja",
@@ -229,7 +231,9 @@
   "st_pixel_d": "Landet som et gitter af fliser",
   "st_stone": "Stenrelief",
   "st_stone_d": "Udhugget sten med fas og skygge",
-  "show_neighbours": "Vis nabolande"
+  "show_neighbours": "Vis nabolande",
+  "and": "og",
+  "auto_text": "Auto: følg fokus og markering"
  },
  "de": {
   "yes": "Ja",
@@ -345,7 +349,9 @@
   "st_pixel_d": "Land als Kachelraster",
   "st_stone": "Steinrelief",
   "st_stone_d": "Gemeißelter Stein mit Fase und Schatten",
-  "show_neighbours": "Nachbarländer zeigen"
+  "show_neighbours": "Nachbarländer zeigen",
+  "and": "und",
+  "auto_text": "Auto: Fokus und Auswahl folgen"
  },
  "fr": {
   "yes": "Oui",
@@ -461,7 +467,9 @@
   "st_pixel_d": "Le pays en grille de carreaux",
   "st_stone": "Relief en pierre",
   "st_stone_d": "Pierre taillée avec biseau et ombre",
-  "show_neighbours": "Afficher les pays voisins"
+  "show_neighbours": "Afficher les pays voisins",
+  "and": "et",
+  "auto_text": "Auto : suivre le focus et la sélection"
  },
  "es": {
   "yes": "Sí",
@@ -577,7 +585,9 @@
   "st_pixel_d": "El país como cuadrícula de baldosas",
   "st_stone": "Relieve en piedra",
   "st_stone_d": "Piedra tallada con bisel y sombra",
-  "show_neighbours": "Mostrar países vecinos"
+  "show_neighbours": "Mostrar países vecinos",
+  "and": "y",
+  "auto_text": "Auto: seguir enfoque y selección"
  },
  "sv": {
   "yes": "Ja",
@@ -693,7 +703,9 @@
   "st_pixel_d": "Landet som ett rutnät av plattor",
   "st_stone": "Stenrelief",
   "st_stone_d": "Huggen sten med fas och skugga",
-  "show_neighbours": "Visa grannländer"
+  "show_neighbours": "Visa grannländer",
+  "and": "och",
+  "auto_text": "Auto: följ fokus och markering"
  },
  "no": {
   "yes": "Ja",
@@ -809,7 +821,9 @@
   "st_pixel_d": "Landet som et rutenett av fliser",
   "st_stone": "Steinrelieff",
   "st_stone_d": "Hogd stein med fas og skygge",
-  "show_neighbours": "Vis naboland"
+  "show_neighbours": "Vis naboland",
+  "and": "og",
+  "auto_text": "Auto: følg fokus og markering"
  },
  "fi": {
   "yes": "Kyllä",
@@ -925,7 +939,9 @@
   "st_pixel_d": "Maa laattaruudukkona",
   "st_stone": "Kivireliefi",
   "st_stone_d": "Veistetty kivi viisteellä ja varjolla",
-  "show_neighbours": "Näytä naapurimaat"
+  "show_neighbours": "Näytä naapurimaat",
+  "and": "ja",
+  "auto_text": "Automaattinen: seuraa kohdistusta ja valintaa"
  },
  "nl": {
   "yes": "Ja",
@@ -1041,7 +1057,9 @@
   "st_pixel_d": "Het land als tegelraster",
   "st_stone": "Steenreliëf",
   "st_stone_d": "Gebeiteld steen met afschuining en schaduw",
-  "show_neighbours": "Buurlanden tonen"
+  "show_neighbours": "Buurlanden tonen",
+  "and": "en",
+  "auto_text": "Auto: focus en selectie volgen"
  },
  "it": {
   "yes": "Sì",
@@ -1157,6 +1175,8 @@
   "st_pixel_d": "Il paese come griglia di tessere",
   "st_stone": "Rilievo in pietra",
   "st_stone_d": "Pietra scolpita con smusso e ombra",
-  "show_neighbours": "Mostra paesi confinanti"
+  "show_neighbours": "Mostra paesi confinanti",
+  "and": "e",
+  "auto_text": "Auto: segui focus e selezione"
  }
 }

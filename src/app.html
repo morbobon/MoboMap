@@ -150,8 +150,9 @@ code{font-family:'IBM Plex Mono',monospace;font-size:10.5px}
   <section>
     <h2 data-i18n="sec_text">6. Tekst på kortet</h2>
     <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="showText" checked onchange="render()"> <span data-i18n="show_title">Vis overskrift og undertekst</span></label>
-    <input type="text" id="title" value="Vi er her" oninput="render()" data-i18n-ph="ph_title" placeholder="Overskrift">
-    <input type="text" id="sub" value="Danmark" oninput="render()" data-i18n-ph="ph_sub" placeholder="Undertekst" style="margin-top:6px">
+    <label class="ck" style="margin:0 0 8px"><input type="checkbox" id="autoText" checked onchange="render()"> <span data-i18n="auto_text">Auto: følg fokus og markering</span></label>
+    <input type="text" id="title" value="" oninput="document.getElementById('autoText').checked=false;render()" data-i18n-ph="ph_title" placeholder="Overskrift">
+    <input type="text" id="sub" value="" oninput="document.getElementById('autoText').checked=false;render()" data-i18n-ph="ph_sub" placeholder="Undertekst" style="margin-top:6px">
     <label class="ck"><input type="checkbox" id="showLogo" checked onchange="render()"> <span data-i18n="show_logo">Vis virksomhedslogo (højre side)</span></label>
   </section>
   <section>
@@ -481,6 +482,14 @@ const NBR={};function nbRings(u){if(NBR[u.c])return NBR[u.c];const a=DATA.adm1[u
 function neighboursPath(){const key='nb|'+S.country;if(cache[key]!=null)return cache[key];const b=S.map==='dk'?[188,32.2,195.2,35.5]:GEO.main;const m=Math.max(10,(b[2]-b[0])*1.2,(b[3]-b[1])*1.2);const win=[b[0]-m,b[1]-m,b[2]+m,b[3]+m];
  let d='';for(const u of DATA.world.units){if(u.c===(S.country||'DNK'))continue;if(u.b[2]<win[0]||u.b[0]>win[2]||u.b[3]<win[1]||u.b[1]>win[3])continue;for(const r of nbRings(u)){const rb=bboxR([r]);if(rb[2]<win[0]||rb[0]>win[2]||rb[3]<win[1]||rb[1]>win[3])continue;for(let i=0;i<r.length;i+=2){const cx=Math.min(win[2],Math.max(win[0],r[i])),cy=Math.min(win[3],Math.max(win[1],r[i+1]));const[x,y]=worldPt(cx,cy);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}d+='Z'}}
  return cache[key]=d}
+// ---------- Automatisk tekst (titel = fokus, undertitel = markering) ----------
+function listNames(arr){if(arr.length<=1)return arr.join('');return arr.slice(0,-1).join(', ')+' '+t('and')+' '+arr[arr.length-1]}
+function autoText(){const place=S.focus?(GEO.groups[S.focus]||nm(GEO.units.find(k=>k.c===S.focus)||{n:''})):(S.country?countryName(S.country):t('world'));
+ const gs=S.groups.filter(g=>g.sel.size);const tot=gs.reduce((n,g)=>n+g.sel.size,0);let sub='';
+ if(tot&&tot<=4){sub=listNames(gs.flatMap(g=>[...g.sel]).map(c=>GEO.units.find(k=>k.c===c)).filter(Boolean).map(nm))}
+ else if(gs.length===1){const nms=[...gs[0].sel].map(c=>GEO.units.find(k=>k.c===c)).filter(Boolean).map(nm);sub=tot+' '+t(MAPS[S.map].unitKey)+': '+nms.slice(0,3).join(', ')+' +'+(tot-3)}
+ else if(gs.length>1)sub=gs.map(g=>g.name+': '+g.sel.size).join(' · ');
+ return{title:place,sub}}
 // ---------- Render ----------
 function render(){
  setLayout(S.layout);
@@ -632,6 +641,7 @@ function render(){
   items.forEach(o=>{out+=`<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x+20}" y="${y+11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;y+=18})}}
  out+='</g>';
  // tekst & logo
+ if(document.getElementById('autoText').checked){const a=autoText();document.getElementById('title').value=a.title;document.getElementById('sub').value=a.sub}
  const title=document.getElementById('title').value,sub=document.getElementById('sub').value;
  const hcol=sp.bg?(sp.heading||ink):(dark?ds.headingOnDark:ds.heading);const ts=Math.round(W*0.038);
  out+='<g pointer-events="none">';
@@ -703,7 +713,7 @@ function ui(){
  document.getElementById('partners').innerHTML=S.partners.map((p,i)=>`<div class="partner">${p.logo&&p.logo.src?`<img src="${p.logo.src}" alt="">`:'<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(tekst)</span>'}<span>${esc(p.name)}${p.link?` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--tyr)">link</a>`:''}</span><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`).join('')||'<p class="note" style="margin:0">'+esc(t('no_partners'))+'</p>';
  document.getElementById('partnerCount').textContent=S.partners.length+' '+t('partners');
 }
-function setDS(v){S.ds=v;const D=DS[v];const d=D.defaults;if(d){if(d.title!=null)document.getElementById('title').value=d.title;if(d.sub!=null)document.getElementById('sub').value=d.sub}
+function setDS(v){S.ds=v;const D=DS[v];const d=D.defaults;if(d&&!document.getElementById('autoText').checked){if(d.title!=null)document.getElementById('title').value=d.title;if(d.sub!=null)document.getElementById('sub').value=d.sub}
  S.partners=D.partners.map(p=>({name:p.name,link:p.link,logo:Object.assign({},p.logo)}));document.getElementById('footerLabel').value=D.footer.label||'';
  ui();render()}
 function toggleHL(i,id){const g=S.groups[i];if(g.hl.has(id)){if(g.hl.size>1)g.hl.delete(id);else return toast(t('ts_min_one'))}else{g.hl.add(id);const ex=['fill','hatch','dots','tint'];if(ex.includes(id))ex.filter(x=>x!==id).forEach(x=>g.hl.delete(x))}ui();render()}
