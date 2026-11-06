@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Danmarkskort – Design Studio</title>
+<title>MoboMap – Design Studio</title>
 <script>/*__JSPDF__*/</script>
 <!-- Valgfri: designsystems.js i samme mappe (window.DESIGN_SYSTEMS = [...]). Ignoreres hvis den mangler. -->
 <script src="designsystems.js" onerror="void 0"></script>
@@ -195,7 +195,7 @@ const LANGN={en:'English',da:'Dansk',de:'Deutsch',fr:'Français',es:'Español',s
 const T=/*__I18N__*/{};
 function t(k){return (T[S.lang]&&T[S.lang][k])||T.en[k]||k}
 function setLang(l,silent){if(!T[l])l='en';S.lang=l;localStorage.setItem('mobomap.lang',l);document.documentElement.lang=l;
- document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh)});
+ document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});document.title=t('app_title');document.querySelectorAll('[data-i18n-ph]').forEach(e=>{e.placeholder=t(e.dataset.i18nPh)});
  if(!silent){ui();render()}}
 // ---------- Layouts ----------
 const LAYOUTS=[
@@ -750,7 +750,7 @@ async function renderCanvas(scale){const el=document.getElementById('svg').clone
  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);return c}
 async function exportMap(fmt){
  toast(t('ts_generating')+' '+fmt.toUpperCase()+' …');
- const c=await renderCanvas(3);const name='danmarkskort-'+S.ds+'-'+S.style+'-'+S.layout;
+ const c=await renderCanvas(3);const slug=v=>String(v).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const name=['mobomap',slug(S.country?countryName(S.country):'world'),S.focus?slug(GEO.groups[S.focus]||S.focus):'',S.style,S.layout].filter(Boolean).join('-');
  if(fmt==='png')dl(c.toDataURL('image/png'),name+'.png');
  else if(fmt==='jpg')dl(c.toDataURL('image/jpeg',0.93),name+'.jpg');
  else{const{jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:W>=H?'landscape':'portrait',unit:'mm',format:'a4'});const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();const r=Math.min(pw/W,ph/H);const x0=(pw-W*r)/2,y0=(ph-H*r)/2;
@@ -771,7 +771,7 @@ function projectState(){const D=DS[S.ds];return {format:'mobomap-project',versio
  groups:S.groups.map(g=>({name:g.name,color:g.color,hl:[...g.hl],kommuner:[...g.sel]})),
  title:document.getElementById('title').value,sub:document.getElementById('sub').value,footerLabel:document.getElementById('footerLabel').value,
  partners:S.partners,checks:Object.fromEntries(CK.map(k=>[k,document.getElementById(k).checked]))}}
-function saveProject(){const p=projectState();const name=(document.getElementById('title').value||'danmarkskort').toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-|-$/g,'');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(p,null,2)),(name||'projekt')+'.mobomap.json');toast(t('ts_proj_saved'))}
+function saveProject(){const p=projectState();const name=(document.getElementById('title').value||'mobomap').toLowerCase().replace(/[^a-z0-9æøå]+/g,'-').replace(/^-|-$/g,'');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(p,null,2)),(name||'projekt')+'.mobomap.json');toast(t('ts_proj_saved'))}
 function loadProject(p){if(!p||p.format!=='mobomap-project')throw new Error(t('ts_not_project'));
  if(p.designSystemData){const r=addDS(p.designSystemData,'user');if(r){saveUserDS()}}
  if(!DS[p.designSystem])toast(t('ts_ds_missing').replace('{id}',p.designSystem)+' '+DS[DSORDER[0]].name);

@@ -10,20 +10,22 @@ const d = new Date().toISOString().slice(0, 10);
 const v = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
 fs.mkdirSync('release', { recursive: true });
 
-const readme = `MoboMap – Danmarkskort Design Studio (v${v}, ${d})
+const readme = `MoboMap – Map Design Studio (v${v}, ${d})
 
-Åbn index.html i en browser (Chrome/Edge/Firefox). Filen er selvstændig og virker offline.
+Open index.html in a browser (Chrome/Edge/Firefox). The file is self-contained and works offline.
 
-Egne designsystemer/virksomhedsprofiler:
-- Importér en .json i appen (afsnit 1), eller
-- læg designsystems.js ved siden af index.html (se designsystems.example.js) – den indlæses automatisk.
+Own design systems / company profiles:
+- Import a .json in the app (section 1), or
+- place designsystems.js next to index.html (see designsystems.example.js) – it loads automatically.
 
-Projekter gemmes/åbnes som .mobomap.json via knapperne øverst.
-Eksport: PNG, JPG, PDF (A4) med klikbare partner-/firmalinks i PDF.
+Projects are saved/opened as .mobomap.json with the buttons at the top.
+Export: PNG, JPG, PDF (A4) with clickable partner/company links in the PDF.
+
+https://github.com/morbobon/MoboMap
 `;
 
-const example = `// Omdøb til designsystems.js og læg filen ved siden af index.html.
-// Logoer skal være data-URI'er (brug "Vælg logo" i appens editor og "Eksportér JSON" for at få dem).
+const example = `// Rename to designsystems.js and place it next to index.html.
+// Logos must be data URIs (use "Choose logo" in the app's editor and "Export JSON" to get them).
 window.DESIGN_SYSTEMS = [
   {
     "id": "mitfirma",
