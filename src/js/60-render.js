@@ -66,12 +66,15 @@ function render() {
   const ATC = AT ? attrCats(AT) : [];
   const unsel = GEO.units.filter((k) => !selAll.has(k.c));
   const onCol = (c) => (light(c) ? '#1b1b1b' : '#ffffff');
+  // Blur/shadow filters use a fixed region covering the whole artboard (plus a margin for the emboss
+  // translate). A bbox-relative region clips the blur to a visible box around small units.
+  const FR = `filterUnits="userSpaceOnUse" x="-50" y="-50" width="${W + 100}" height="${H + 100}"`;
   let defs = `<defs>
-  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <filter id="emboss" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="${dark ? 0.7 : 0.4}"/><feDropShadow dx="-1" dy="-1" stdDeviation="0.6" flood-color="#fff" flood-opacity="0.5"/></filter>
-  <filter id="paper" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.22"/></filter>
-  <filter id="neonf" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <filter id="longshadow" x="-50%" y="-50%" width="250%" height="250%">${[...Array(14)].map((_, i) => `<feOffset in="SourceAlpha" dx="${(i + 1) * 3}" dy="${(i + 1) * 3}" result="o${i}"/>`).join('')}<feMerge>${[...Array(14)].map((_, i) => `<feMergeNode in="o${i}"/>`).join('')}</feMerge><feColorMatrix type="matrix" values="0 0 0 0 0.1 0 0 0 0 0.2 0 0 0 0 0.3 0 0 0 0.35 0"/><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="glow" ${FR}><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="emboss" ${FR}><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="${dark ? 0.7 : 0.4}"/><feDropShadow dx="-1" dy="-1" stdDeviation="0.6" flood-color="#fff" flood-opacity="0.5"/></filter>
+  <filter id="paper" ${FR}><feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.22"/></filter>
+  <filter id="neonf" ${FR}><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="longshadow" ${FR}>${[...Array(14)].map((_, i) => `<feOffset in="SourceAlpha" dx="${(i + 1) * 3}" dy="${(i + 1) * 3}" result="o${i}"/>`).join('')}<feMerge>${[...Array(14)].map((_, i) => `<feMergeNode in="o${i}"/>`).join('')}</feMerge><feColorMatrix type="matrix" values="0 0 0 0 0.1 0 0 0 0 0.2 0 0 0 0 0.3 0 0 0 0.35 0"/><feGaussianBlur stdDeviation="2"/></filter>
   <pattern id="dotsBase" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="${bg}"/><circle cx="3.5" cy="3.5" r="2.3" fill="${land === 'none' ? stroke : land}"/></pattern>
   <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#9fd3ff" stroke-opacity=".25" stroke-width=".7"/><path d="M10 0V50M20 0V50M30 0V50M40 0V50M0 10H50M0 20H50M0 30H50M0 40H50" stroke="#9fd3ff" stroke-opacity=".1" stroke-width=".4"/></pattern>
   <linearGradient id="glassg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
@@ -89,11 +92,11 @@ function render() {
   <pattern id="dCheck" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><rect width="4" height="4" fill="#111"/><rect x="4" y="4" width="4" height="4" fill="#111"/></pattern>
   <pattern id="waves" width="40" height="24" patternUnits="userSpaceOnUse"><path d="M0 12Q5 6 10 12T20 12M22 20Q27 14 32 20T42 20" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/></pattern>
   <radialGradient id="midbg" cx=".45" cy=".45" r=".75"><stop offset="0" stop-color="${sp.bgGradient ? sp.bgGradient[0] : bg}"/><stop offset="1" stop-color="${sp.bgGradient ? sp.bgGradient[1] : bg}"/></radialGradient>
-  <filter id="landglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="landglow" ${FR}><feGaussianBlur stdDeviation="10"/></filter>
   <filter id="stonef" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.3  0 0 0 0 0.3  0 0 0 0 0.28  0 0 0 0.35 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="multiply"/></filter>
   <filter id="concrete" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="4" result="n"/><feColorMatrix in="n" type="saturate" values="0" result="g"/><feComponentTransfer in="g"><feFuncA type="linear" slope="0" intercept="0.22"/></feComponentTransfer></filter>
-  <filter id="sticker" x="-10%" y="-10%" width="120%" height="125%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000" flood-opacity="0.25"/></filter>
-  <filter id="pxshadow" x="-5%" y="-5%" width="115%" height="115%"><feDropShadow dx="2" dy="3" stdDeviation="1.5" flood-color="#000" flood-opacity="0.3"/></filter>
+  <filter id="sticker" ${FR}><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000" flood-opacity="0.25"/></filter>
+  <filter id="pxshadow" ${FR}><feDropShadow dx="2" dy="3" stdDeviation="1.5" flood-color="#000" flood-opacity="0.3"/></filter>
   ${
     sp.flag && S.map === 'world'
       ? GEO.units
