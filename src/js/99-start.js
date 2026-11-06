@@ -2,6 +2,7 @@
 applySections();
 loadDS();
 S.ds = DSORDER.find((i) => !DS[i].private) || DSORDER[0];
+applyUiMode();
 setLang(localStorage.getItem('mobomap.lang') || 'en', true);
 setData('world');
 S.groups = [

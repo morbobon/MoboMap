@@ -180,7 +180,7 @@ function render() {
     if (sp.flag) return S.map === 'world' ? (FLAGS[k.c] ? `url(#fl_${k.c})` : mix(land, '#888888', 0.3)) : land;
     if (st === 'halftone') return 'url(#dotsBase)';
     if (st === 'blueprint') return '#1d4a73';
-    if (AT && !sp.patterns && !sp.text) return attrColor(AT, Math.max(0, ATC.indexOf(AT.f(k))), ATC.length, land);
+    if (AT && !sp.patterns && !sp.text) return attrColor(AT, AT.f(k), ATC, land);
     if (st === 'shades') {
       const i = (parseInt(k.c) * 7) % 5;
       return [land, landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12)][i];
@@ -456,22 +456,24 @@ function render() {
           label: g.name + ' (' + g.sel.size + ')',
         });
       });
-    if (AT && !sp.patterns && !sp.text)
-      ATC.forEach((v, i) =>
-        items.push({
-          sw: attrColor(AT, i, ATC.length, land),
-          stroke: ink,
-          sw2: 0.4,
-          label: v,
-        }),
-      );
+    if (AT && !sp.patterns && !sp.text) {
+      items.push({ head: true, label: t(AT.n) });
+      ATC.forEach((v) => items.push({ sw: attrColor(AT, v, ATC, land), stroke: ink, sw2: 0.4, label: v }));
+      const src = attrSource(AT);
+      if (src) items.push({ src: true, label: src });
+    }
     if (items.length) {
       let y = H - FOOT - 14 - items.length * 18;
-      const lw = Math.max(...items.map((o) => o.label.length)) * 6.2 + 50;
+      const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
       const x = margin.l.length ? (margin.r.length ? (W - lw) / 2 : W - PAD.r + 20 - lw) : PAD.l - 20;
       out += `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
       items.forEach((o) => {
-        out += `<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;
+        if (o.head)
+          out += `<text x="${x}" y="${y + 11}" font-family="'${lf}'" font-size="11" font-weight="700" fill="${ink}">${esc(o.label)}</text>`;
+        else if (o.src)
+          out += `<text x="${x}" y="${y + 10}" font-family="'${lf}'" font-size="9" fill="${ink}" opacity=".65">${esc(o.label)}</text>`;
+        else
+          out += `<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;
         y += 18;
       });
     }

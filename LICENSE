@@ -27,6 +27,8 @@ Third-party content bundled in builds:
 - Municipality boundaries: DAGI (Danish Agency for Data Supply and Infrastructure),
   via github.com/magnuslarsen/geoJSON-Danish-municipalities – open public data.
 - Country boundaries and populated places: Natural Earth (naturalearthdata.com) – public domain.
+- Country statistics: Our World in Data (ourworldindata.org) – CC BY 4.0, with data from UCDP, V-Dem,
+  World Bank, FAO, WHO, UN WPP, UNDP, ITU, Global Carbon Project, Ember and the Energy Institute.
 - Fonts: Arvo, Work Sans, Roboto Slab, Space Grotesk, DM Serif Display, IBM Plex Mono –
   SIL Open Font License 1.1 (Google Fonts).
 - jsPDF – MIT License, (c) 2010-2021 James Hall and contributors.

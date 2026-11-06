@@ -1,0 +1,63 @@
+{
+  "id": "pastel",
+  "name": {
+    "en": "Pastel",
+    "da": "Pastel",
+    "de": "Pastell",
+    "fr": "Pastel",
+    "es": "Pastel",
+    "sv": "Pastell",
+    "no": "Pastell",
+    "fi": "Pastelli",
+    "nl": "Pastel",
+    "it": "Pastello"
+  },
+  "fonts": {
+    "heading": "DM Serif Display",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#FBF7FF",
+    "land": "#A8B5E0",
+    "landAlt": "#B9C4E8",
+    "stroke": "#FFFFFF",
+    "ink": "#4B4A67",
+    "primary": "#4B4A67",
+    "accent": "#FF8FB1",
+    "accent2": "#7DD3C0",
+    "heading": "#4B4A67",
+    "headingOnDark": "#FF8FB1"
+  },
+  "highlight": [
+    "#FF8FB1",
+    "#7DD3C0",
+    "#FFD380",
+    "#B79CED",
+    "#4B4A67"
+  ],
+  "swatches": [
+    "#A8B5E0",
+    "#FF8FB1",
+    "#7DD3C0",
+    "#FFD380",
+    "#B79CED"
+  ],
+  "company": {
+    "name": "",
+    "link": "",
+    "logo": {
+      "text": "",
+      "sub": ""
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "line",
+      "opacity": 0.4,
+      "width": 1,
+      "align": "left"
+    }
+  }
+}

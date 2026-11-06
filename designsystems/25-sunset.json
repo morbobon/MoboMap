@@ -1,0 +1,62 @@
+{
+  "id": "sunset",
+  "name": {
+    "en": "Sunset",
+    "da": "Solnedgang",
+    "de": "Sonnenuntergang",
+    "fr": "Coucher de soleil",
+    "es": "Atardecer",
+    "sv": "Solnedgång",
+    "no": "Solnedgang",
+    "fi": "Auringonlasku",
+    "nl": "Zonsondergang",
+    "it": "Tramonto"
+  },
+  "fonts": {
+    "heading": "DM Serif Display",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#FFF4EC",
+    "land": "#3D2C5E",
+    "landAlt": "#4A3871",
+    "stroke": "#FFF4EC",
+    "ink": "#3D2C5E",
+    "primary": "#3D2C5E",
+    "accent": "#FF7A59",
+    "accent2": "#FFB347",
+    "heading": "#3D2C5E",
+    "headingOnDark": "#FF7A59"
+  },
+  "highlight": [
+    "#FF7A59",
+    "#FFB347",
+    "#E84A8A",
+    "#FFD9C2",
+    "#FFFFFF"
+  ],
+  "swatches": [
+    "#3D2C5E",
+    "#FF7A59",
+    "#FFB347",
+    "#E84A8A"
+  ],
+  "company": {
+    "name": "",
+    "link": "",
+    "logo": {
+      "text": "",
+      "sub": ""
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "line",
+      "opacity": 0.5,
+      "width": 1,
+      "align": "left"
+    }
+  }
+}

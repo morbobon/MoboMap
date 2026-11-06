@@ -1,0 +1,67 @@
+{
+  "id": "aurora",
+  "name": {
+    "en": "Aurora (dark)",
+    "da": "Aurora (mørk)",
+    "de": "Aurora (dunkel)",
+    "fr": "Aurore (sombre)",
+    "es": "Aurora (oscuro)",
+    "sv": "Aurora (mörk)",
+    "no": "Aurora (mørk)",
+    "fi": "Revontuli (tumma)",
+    "nl": "Aurora (donker)",
+    "it": "Aurora (scuro)"
+  },
+  "fonts": {
+    "heading": "Space Grotesk",
+    "body": "Space Grotesk"
+  },
+  "colors": {
+    "bg": "#0B1026",
+    "land": "#1E2B4F",
+    "landAlt": "#25355F",
+    "stroke": "#0B1026",
+    "ink": "#E6ECFF",
+    "primary": "#0B1026",
+    "accent": "#4FF0C8",
+    "accent2": "#B57CFF",
+    "heading": "#E6ECFF",
+    "headingOnDark": "#4FF0C8",
+    "dark": true
+  },
+  "highlight": [
+    "#4FF0C8",
+    "#B57CFF",
+    "#FF6EC7",
+    "#FFD166",
+    "#7CC4FF",
+    "#FFFFFF"
+  ],
+  "swatches": [
+    "#0B1026",
+    "#1E2B4F",
+    "#4FF0C8",
+    "#B57CFF",
+    "#FF6EC7"
+  ],
+  "company": {
+    "name": "",
+    "link": "",
+    "logo": {
+      "text": "",
+      "sub": ""
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "bar",
+      "color": "#4FF0C8",
+      "opacity": 0.9,
+      "height": 4,
+      "width": 0.12,
+      "align": "left"
+    }
+  }
+}

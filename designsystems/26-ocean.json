@@ -1,0 +1,63 @@
+{
+  "id": "ocean",
+  "name": {
+    "en": "Ocean",
+    "da": "Hav",
+    "de": "Ozean",
+    "fr": "Océan",
+    "es": "Océano",
+    "sv": "Hav",
+    "no": "Hav",
+    "fi": "Valtameri",
+    "nl": "Oceaan",
+    "it": "Oceano"
+  },
+  "fonts": {
+    "heading": "Roboto Slab",
+    "body": "Work Sans"
+  },
+  "colors": {
+    "bg": "#EAF6FA",
+    "land": "#0E4C6B",
+    "landAlt": "#145E82",
+    "stroke": "#EAF6FA",
+    "ink": "#0B3A52",
+    "primary": "#0E4C6B",
+    "accent": "#F77F00",
+    "accent2": "#00B4D8",
+    "heading": "#0B3A52",
+    "headingOnDark": "#00B4D8"
+  },
+  "highlight": [
+    "#F77F00",
+    "#00B4D8",
+    "#FCBF49",
+    "#E63946",
+    "#FFFFFF"
+  ],
+  "swatches": [
+    "#0E4C6B",
+    "#00B4D8",
+    "#F77F00",
+    "#FCBF49"
+  ],
+  "company": {
+    "name": "",
+    "link": "",
+    "logo": {
+      "text": "",
+      "sub": ""
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "bar",
+      "opacity": 0.8,
+      "height": 4,
+      "width": 0.15,
+      "align": "left"
+    }
+  }
+}

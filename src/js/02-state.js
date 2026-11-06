@@ -1,13 +1,15 @@
+// Default world projection (Miller: familiar shape, less polar inflation than Mercator)
+const DEFAULT_PROJ = 'miller';
 // Application state. Everything the UI edits lives here (plus the DOM checkboxes listed in CK).
 const S = {
   ds: null,
   map: 'world', // dataset kind: 'world' | 'dk' (Danish municipalities) | 'adm1' (regions of any country)
   country: '', // ISO3 code of the country in view, '' = world
   attr: 'none',
-  proj: 'robinson',
+  proj: DEFAULT_PROJ,
   focus: '', // zoom target inside the dataset: a group code or a unit code
   focusHide: false, // hide units outside the focus
-  worldProj: 'robinson', // remembered world projection while viewing a country
+  worldProj: DEFAULT_PROJ, // remembered world projection while viewing a country
   lang: 'en',
   layout: 'land',
   style: 'flat',

@@ -50,7 +50,7 @@ function loadProject(p) {
   const D = DS[S.ds];
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
-  S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : 'robinson') : 'robinson';
+  S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : DEFAULT_PROJ) : DEFAULT_PROJ;
   S.focus = p.focus || '';
   S.focusHide = !!p.focusHide;
   document.getElementById('focusHide').checked = S.focusHide;

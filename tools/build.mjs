@@ -219,6 +219,12 @@ world.main = bboxOf(world.units.flatMap((k) => k.d));
 world.inset = null;
 world.lists = { eu: extra.eu, nato: extra.nato, g20: extra.g20, nordic: extra.nordic };
 dk.lists = { fyn: extra.dk_fyn, storkbh: extra.dk_storkbh };
+// Country statistics (Our World in Data, see tools/prepare-stats.mjs): unit.st = { indicator: value }
+{
+  const stats = readJSON('geo/world-stats.json');
+  for (const u of world.units) u.st = stats.values[u.c] || {};
+  world.statsMeta = stats.meta;
+}
 // Major cities per country (Natural Earth 50m populated places): capital first, then up to 8 by population
 {
   const places = readJSON('geo/source-places.geojson').features.map((f) => f.properties);

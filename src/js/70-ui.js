@@ -23,9 +23,18 @@ function ui() {
   document.getElementById('dsName').textContent = loc(D.name);
   document.getElementById('dsName').title = loc(D.note) || (D.source === 'user' ? t('grp_user') : '');
   document.getElementById('dsDel').style.display = D.source === 'user' ? '' : 'none';
+  // "Colour by": attributes grouped by category (Geography, Economy, Society, Health, Politics, Environment)
+  const attrs = ATTRS[S.map] || [];
   document.getElementById('attrSel').innerHTML =
     `<option value="none">${esc(t('colour_by'))}: ${esc(t('none'))}</option>` +
-    (ATTRS[S.map] || []).map((a) => `<option value="${a.id}">${esc(t('colour_by'))}: ${esc(t(a.n))}</option>`).join('');
+    ATTR_CATS.map((c) => {
+      const list = attrs.filter((a) => a.cat === c);
+      return list.length
+        ? `<optgroup label="${esc(t('cat_' + c))}">` +
+            list.map((a) => `<option value="${a.id}">${esc(t(a.n))}</option>`).join('') +
+            '</optgroup>'
+        : '';
+    }).join('');
   document.getElementById('attrSel').value = S.attr;
   document.getElementById('mapInfo').textContent =
     (S.country ? countryName(S.country) + ' · ' : '') + GEO.units.length + ' ' + t(MAPS[S.map].unitKey);
@@ -224,7 +233,7 @@ function setMap(id) {
     S.map === 'world'
       ? S.worldProj && !PROJS[S.worldProj].local
         ? S.worldProj
-        : 'robinson'
+        : DEFAULT_PROJ
       : GEO.geo
         ? 'local'
         : S.proj;
@@ -373,3 +382,25 @@ function toggleSec(id) {
     .map((s) => s.dataset.sec);
   localStorage.setItem(SEC_KEY, JSON.stringify(open));
 }
+
+// ---- UI light/dark mode: 'auto' follows the operating system; the choice is remembered ----
+const UI_MODES = ['auto', 'light', 'dark'];
+const UI_ICONS = { auto: '◐', light: '☀', dark: '☾' };
+const sysDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+function uiMode() {
+  const m = localStorage.getItem('mobomap.ui');
+  return UI_MODES.includes(m) ? m : 'auto';
+}
+function applyUiMode() {
+  const m = uiMode();
+  const dark = m === 'dark' || (m === 'auto' && sysDark && sysDark.matches);
+  document.documentElement.dataset.ui = dark ? 'dark' : 'light';
+  const b = document.getElementById('uiMode');
+  b.textContent = UI_ICONS[m];
+  b.title = t('ui_mode') + ': ' + t('ui_' + m);
+}
+function cycleUiMode() {
+  localStorage.setItem('mobomap.ui', UI_MODES[(UI_MODES.indexOf(uiMode()) + 1) % UI_MODES.length]);
+  applyUiMode();
+}
+if (sysDark) sysDark.addEventListener('change', applyUiMode);

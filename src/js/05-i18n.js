@@ -29,6 +29,7 @@ function setLang(l, silent) {
     e.textContent = t(e.dataset.i18n);
   });
   document.title = t('app_title');
+  if (typeof applyUiMode === 'function' && document.getElementById('uiMode')) applyUiMode();
   document.querySelectorAll('[data-i18n-ph]').forEach((e) => {
     e.placeholder = t(e.dataset.i18nPh);
   });

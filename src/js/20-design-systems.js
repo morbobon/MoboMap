@@ -251,5 +251,6 @@ function applyTheme() {
   r.setProperty('--on-accent2', light(c.accent2) ? '#111111' : '#ffffff');
   r.setProperty('--fh', "'" + d.fonts.heading + "'");
   r.setProperty('--fb', "'" + d.fonts.body + "'");
-  r.setProperty('--ink', light(c.primary) ? '#222' : mix(c.primary, '#000', 0.3));
+  // text colour of the light UI, tinted by the profile (dark UI mode uses its own, see app.css)
+  r.setProperty('--ink-brand', light(c.primary) ? '#222' : mix(c.primary, '#000', 0.3));
 }

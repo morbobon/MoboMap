@@ -6,13 +6,22 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, topographic, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
 - **Highlight groups** – several groups at once, each with its own colour and modes (solid, hatched, dots, tint, glow, outline, raised, pin, label, callout, dim others).
-- **Attributes** – colour every unit by region, continent, UN region, economy, income group, population, GDP per capita, majority religion, EU/NATO/G20/Nordic membership, hemisphere, area … or turn an attribute into highlight groups with one click.
-- **Projections**: Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée, Miller.
+- **Colour by** – 28 attributes in six categories, or turn any of them into highlight groups with one click:
+  - *Geography*: continent, UN region, subregion, hemisphere, area, first letter
+  - *Economy*: income group, economy class, GDP per capita, extreme poverty (< $3/day)
+  - *Society*: population, life expectancy, Human Development Index, median age, children per woman, internet users, access to electricity, majority religion
+  - *Health*: obesity (adults), hunger (undernourishment)
+  - *Conflict & politics*: war zones (conflict deaths), political regime, EU / NATO / G20 / Nordic
+  - *Environment*: CO₂ per person, renewable electricity
+  
+  Statistics use fixed classes with sequential colour ramps (red = burden, blue = development), a grey "No data" class and a source line with the data year in the legend.
+- **Projections**: Miller (default for the world), Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée.
 - **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend.
 - **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
-- **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian.
+- **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
+- **13 design systems** built in – default **Aurora (dark)**, plus Sunset, Ocean, Mono / brutalist, Pastel, Nordic minimal, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.
 
-Everything ships as one `index.html` (~3.7 MB) that works from `file://` without a server.
+Everything ships as one `index.html` (~3.8 MB) that works from `file://` without a server.
 
 ## Quick start
 
@@ -25,7 +34,7 @@ npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public vari
 node tools/serve.mjs . 8787   # optional local server for development
 ```
 
-Open `index.html` in a browser. It starts on the world map in English (the language choice is remembered). To prepare geodata from scratch (only needed if the source files change): `npm run geo`.
+Open `index.html` in a browser. It starts on the world map in English with the Aurora profile (language, light/dark mode and open panel sections are remembered). To prepare geodata from scratch (only needed if the source files change): `npm run geo`. To refresh the statistics from Our World in Data: `npm run stats`.
 
 ## Design systems
 
@@ -83,6 +92,23 @@ Omitted fields are derived (`landAlt`, `accent2`, `dark`, `heading` …). `logo.
 Denmark uses its municipalities instead of its 5 admin-1 regions. Adding finer detail (admin-2) for another country follows the same pattern: a dataset in `tools/build.mjs` and a branch in `countryData()`.
 
 World attributes come from Natural Earth (continent, UN region, subregion, economy, income group, population, GDP). Membership lists (EU, NATO, G20, Nordic) and the majority-religion table live in `assets/geo/world-extra.json`; the religion table is an approximation and not authoritative.
+
+Country statistics come from [Our World in Data](https://ourworldindata.org) (CC BY 4.0) via `tools/prepare-stats.mjs`, which keeps each country's latest value since 2015 in `assets/geo/world-stats.json` (~35 KB):
+
+| Statistic | Source (via OWID) | Typical year |
+|---|---|---|
+| War zones – deaths in armed conflicts | UCDP (latest complete year) | 2025 |
+| Political regime | V-Dem / Regimes of the World | 2025 |
+| Extreme poverty (< $3/day, 2021 PPP) | World Bank PIP | 2023 |
+| Hunger – prevalence of undernourishment | FAO | 2023 |
+| Obesity – adults, BMI ≥ 30 | WHO | 2024 |
+| Life expectancy, median age, children per woman | UN World Population Prospects | 2023 |
+| Human Development Index (UNDP tiers) | UNDP | 2023 |
+| Internet users, access to electricity | ITU / World Bank | 2024 |
+| CO₂ per person | Global Carbon Project | 2024 |
+| Renewable share of electricity | Ember / Energy Institute | 2025 |
+
+Classes are fixed per statistic (see `stat(...)` in `src/js/43-attributes.js`); countries without data are shown as "No data".
 
 Adding a dataset: a `dataset({...})` call in `tools/build.mjs`, a branch in `countryData()` (`src/js/40-datasets.js`) and, optionally, extra attributes in `ATTRS` (`src/js/43-attributes.js`).
 

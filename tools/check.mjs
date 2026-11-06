@@ -62,6 +62,8 @@ for (const id of idList('STYLES')) required.add('st_' + id).add('st_' + id + '_d
 for (const id of idList('HLS')) required.add('hl_' + id).add('hl_' + id + '_t');
 for (const id of idList('LAYOUTS')) required.add('lay_' + id);
 for (const id of idList('REL')) required.add('rel_' + id);
+for (const id of idList('ATTR_CATS')) required.add('cat_' + id);
+for (const id of idList('UI_MODES')) required.add('ui_' + id);
 const missingEn = [...required].filter((k) => !en.has(k));
 if (missingEn.length) err('keys used but missing in en: ' + missingEn.join(', '));
 else ok(`all ${required.size} referenced keys exist in en`);

@@ -25,6 +25,8 @@
         </h1>
       </div>
       <div class="btns">
+        <select id="ds" class="hdr" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
+        <button id="uiMode" class="hdr" onclick="cycleUiMode()"></button>
         <select
           id="langSel"
           onchange="setLang(this.value)"
@@ -194,7 +196,6 @@
             <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
           </h2>
           <div class="body">
-            <select id="ds" onchange="setDS(this.value)"></select>
             <div class="row" id="dsSw"></div>
             <details id="manage">
               <summary data-i18n="manage_profiles"></summary>

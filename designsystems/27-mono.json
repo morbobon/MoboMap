@@ -1,0 +1,64 @@
+{
+  "id": "mono",
+  "name": {
+    "en": "Mono / brutalist",
+    "da": "Mono / brutalistisk",
+    "de": "Mono / brutalistisch",
+    "fr": "Mono / brutaliste",
+    "es": "Mono / brutalista",
+    "sv": "Mono / brutalistisk",
+    "no": "Mono / brutalistisk",
+    "fi": "Mono / brutalistinen",
+    "nl": "Mono / brutalistisch",
+    "it": "Mono / brutalista"
+  },
+  "fonts": {
+    "heading": "Space Grotesk",
+    "body": "IBM Plex Mono"
+  },
+  "colors": {
+    "bg": "#F2F2F2",
+    "land": "#111111",
+    "landAlt": "#222222",
+    "stroke": "#F2F2F2",
+    "ink": "#111111",
+    "primary": "#111111",
+    "accent": "#FF3B30",
+    "accent2": "#0047FF",
+    "heading": "#111111",
+    "headingOnDark": "#FF3B30"
+  },
+  "highlight": [
+    "#FF3B30",
+    "#0047FF",
+    "#00C853",
+    "#FFFFFF",
+    "#888888"
+  ],
+  "swatches": [
+    "#111111",
+    "#F2F2F2",
+    "#FF3B30",
+    "#0047FF"
+  ],
+  "company": {
+    "name": "",
+    "link": "",
+    "logo": {
+      "text": "",
+      "sub": ""
+    }
+  },
+  "partners": [],
+  "footer": {
+    "label": "",
+    "divider": {
+      "style": "bar",
+      "color": "#111111",
+      "opacity": 1,
+      "height": 8,
+      "width": 1,
+      "align": "left"
+    }
+  }
+}
