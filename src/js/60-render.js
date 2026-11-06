@@ -559,5 +559,10 @@ function render() {
   const wrap = document.getElementById('wrap');
   wrap.style.background = bg;
   wrap.style.setProperty('--hl', (groups[S.active] || groups[0] || { color: ds.accent }).color);
+  document.getElementById('textInfo').textContent = !document.getElementById('showText').checked
+    ? t('off')
+    : document.getElementById('autoText').checked
+      ? t('text_auto')
+      : t('text_custom');
   document.getElementById('count').textContent = t('count').replace('{n}', selAll.size).replace('{g}', groups.length);
 }

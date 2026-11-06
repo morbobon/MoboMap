@@ -64,7 +64,6 @@ function loadProject(p) {
     });
     return n;
   });
-  if (!S.groups.length) S.groups = [newGroup(t('group') + ' 1', ['fill'], D.highlight[0])];
   S.active = Math.min(p.active || 0, S.groups.length - 1);
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',

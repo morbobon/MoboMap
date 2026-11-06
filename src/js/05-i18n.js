@@ -32,6 +32,9 @@ function setLang(l, silent) {
   document.querySelectorAll('[data-i18n-ph]').forEach((e) => {
     e.placeholder = t(e.dataset.i18nPh);
   });
+  document.querySelectorAll('[data-i18n-title]').forEach((e) => {
+    e.title = t(e.dataset.i18nTitle);
+  });
   // profile texts that the user has not edited follow the language
   const fl = document.getElementById('footerLabel');
   if (fl && fl.dataset.auto !== '0' && S.ds && DS[S.ds]) fl.value = loc(DS[S.ds].footer.label);

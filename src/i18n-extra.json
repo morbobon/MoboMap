@@ -155,7 +155,15 @@
   "sea_arctic": "Arctic Ocean",
   "tip_ctrl_open": "Ctrl+click: open regions",
   "tip_ctrl_zoom": "Ctrl+click: zoom in",
-  "tip_ctrl_out": "Ctrl+click: zoom out"
+  "tip_ctrl_out": "Ctrl+click: zoom out",
+  "sec_display": "Display",
+  "manage_profiles": "Manage profiles",
+  "add_region": "Add a region to the active group…",
+  "new_group_short": "new group",
+  "no_groups": "No highlight groups – click the map or add one.",
+  "text_auto": "Auto",
+  "text_custom": "Custom",
+  "off": "Off"
  },
  "da": {
   "yes": "Ja",
@@ -313,7 +321,15 @@
   "sea_arctic": "Det Arktiske Ocean",
   "tip_ctrl_open": "Ctrl+klik: åbn regioner",
   "tip_ctrl_zoom": "Ctrl+klik: zoom ind",
-  "tip_ctrl_out": "Ctrl+klik: zoom ud"
+  "tip_ctrl_out": "Ctrl+klik: zoom ud",
+  "sec_display": "Visning",
+  "manage_profiles": "Administrér profiler",
+  "add_region": "Tilføj en region til den aktive gruppe…",
+  "new_group_short": "ny gruppe",
+  "no_groups": "Ingen markeringsgrupper – klik på kortet eller tilføj en.",
+  "text_auto": "Auto",
+  "text_custom": "Egen",
+  "off": "Fra"
  },
  "de": {
   "yes": "Ja",
@@ -471,7 +487,15 @@
   "sea_arctic": "Arktischer Ozean",
   "tip_ctrl_open": "Strg+Klick: Regionen öffnen",
   "tip_ctrl_zoom": "Strg+Klick: hineinzoomen",
-  "tip_ctrl_out": "Strg+Klick: herauszoomen"
+  "tip_ctrl_out": "Strg+Klick: herauszoomen",
+  "sec_display": "Anzeige",
+  "manage_profiles": "Profile verwalten",
+  "add_region": "Region zur aktiven Gruppe hinzufügen…",
+  "new_group_short": "neue Gruppe",
+  "no_groups": "Keine Markierungsgruppen – Karte anklicken oder eine hinzufügen.",
+  "text_auto": "Auto",
+  "text_custom": "Eigener",
+  "off": "Aus"
  },
  "fr": {
   "yes": "Oui",
@@ -629,7 +653,15 @@
   "sea_arctic": "Océan Arctique",
   "tip_ctrl_open": "Ctrl+clic : ouvrir les régions",
   "tip_ctrl_zoom": "Ctrl+clic : zoomer",
-  "tip_ctrl_out": "Ctrl+clic : dézoomer"
+  "tip_ctrl_out": "Ctrl+clic : dézoomer",
+  "sec_display": "Affichage",
+  "manage_profiles": "Gérer les profils",
+  "add_region": "Ajouter une région au groupe actif…",
+  "new_group_short": "nouveau groupe",
+  "no_groups": "Aucun groupe – cliquez sur la carte ou ajoutez-en un.",
+  "text_auto": "Auto",
+  "text_custom": "Personnalisé",
+  "off": "Désactivé"
  },
  "es": {
   "yes": "Sí",
@@ -787,7 +819,15 @@
   "sea_arctic": "Océano Ártico",
   "tip_ctrl_open": "Ctrl+clic: abrir regiones",
   "tip_ctrl_zoom": "Ctrl+clic: acercar",
-  "tip_ctrl_out": "Ctrl+clic: alejar"
+  "tip_ctrl_out": "Ctrl+clic: alejar",
+  "sec_display": "Visualización",
+  "manage_profiles": "Gestionar perfiles",
+  "add_region": "Añadir una región al grupo activo…",
+  "new_group_short": "nuevo grupo",
+  "no_groups": "Sin grupos – haz clic en el mapa o añade uno.",
+  "text_auto": "Auto",
+  "text_custom": "Propio",
+  "off": "Desactivado"
  },
  "sv": {
   "yes": "Ja",
@@ -945,7 +985,15 @@
   "sea_arctic": "Norra ishavet",
   "tip_ctrl_open": "Ctrl+klick: öppna regioner",
   "tip_ctrl_zoom": "Ctrl+klick: zooma in",
-  "tip_ctrl_out": "Ctrl+klick: zooma ut"
+  "tip_ctrl_out": "Ctrl+klick: zooma ut",
+  "sec_display": "Visning",
+  "manage_profiles": "Hantera profiler",
+  "add_region": "Lägg till en region i den aktiva gruppen…",
+  "new_group_short": "ny grupp",
+  "no_groups": "Inga markeringsgrupper – klicka på kartan eller lägg till en.",
+  "text_auto": "Auto",
+  "text_custom": "Egen",
+  "off": "Av"
  },
  "no": {
   "yes": "Ja",
@@ -1103,7 +1151,15 @@
   "sea_arctic": "Polhavet",
   "tip_ctrl_open": "Ctrl+klikk: åpne regioner",
   "tip_ctrl_zoom": "Ctrl+klikk: zoom inn",
-  "tip_ctrl_out": "Ctrl+klikk: zoom ut"
+  "tip_ctrl_out": "Ctrl+klikk: zoom ut",
+  "sec_display": "Visning",
+  "manage_profiles": "Administrer profiler",
+  "add_region": "Legg til en region i den aktive gruppen…",
+  "new_group_short": "ny gruppe",
+  "no_groups": "Ingen markeringsgrupper – klikk på kartet eller legg til en.",
+  "text_auto": "Auto",
+  "text_custom": "Egen",
+  "off": "Av"
  },
  "fi": {
   "yes": "Kyllä",
@@ -1261,7 +1317,15 @@
   "sea_arctic": "Pohjoinen jäämeri",
   "tip_ctrl_open": "Ctrl+napsautus: avaa alueet",
   "tip_ctrl_zoom": "Ctrl+napsautus: lähennä",
-  "tip_ctrl_out": "Ctrl+napsautus: loitonna"
+  "tip_ctrl_out": "Ctrl+napsautus: loitonna",
+  "sec_display": "Näyttö",
+  "manage_profiles": "Hallitse profiileja",
+  "add_region": "Lisää alue aktiiviseen ryhmään…",
+  "new_group_short": "uusi ryhmä",
+  "no_groups": "Ei korostusryhmiä – napsauta karttaa tai lisää ryhmä.",
+  "text_auto": "Automaattinen",
+  "text_custom": "Oma",
+  "off": "Pois"
  },
  "nl": {
   "yes": "Ja",
@@ -1419,7 +1483,15 @@
   "sea_arctic": "Noordelijke IJszee",
   "tip_ctrl_open": "Ctrl+klik: regio's openen",
   "tip_ctrl_zoom": "Ctrl+klik: inzoomen",
-  "tip_ctrl_out": "Ctrl+klik: uitzoomen"
+  "tip_ctrl_out": "Ctrl+klik: uitzoomen",
+  "sec_display": "Weergave",
+  "manage_profiles": "Profielen beheren",
+  "add_region": "Regio toevoegen aan de actieve groep…",
+  "new_group_short": "nieuwe groep",
+  "no_groups": "Geen markeergroepen – klik op de kaart of voeg er een toe.",
+  "text_auto": "Auto",
+  "text_custom": "Eigen",
+  "off": "Uit"
  },
  "it": {
   "yes": "Sì",
@@ -1577,6 +1649,14 @@
   "sea_arctic": "Oceano Artico",
   "tip_ctrl_open": "Ctrl+clic: apri regioni",
   "tip_ctrl_zoom": "Ctrl+clic: ingrandisci",
-  "tip_ctrl_out": "Ctrl+clic: riduci"
+  "tip_ctrl_out": "Ctrl+clic: riduci",
+  "sec_display": "Visualizzazione",
+  "manage_profiles": "Gestisci profili",
+  "add_region": "Aggiungi una regione al gruppo attivo…",
+  "new_group_short": "nuovo gruppo",
+  "no_groups": "Nessun gruppo – fai clic sulla mappa o aggiungine uno.",
+  "text_auto": "Auto",
+  "text_custom": "Personalizzato",
+  "off": "Off"
  }
 }

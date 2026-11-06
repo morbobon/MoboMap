@@ -400,3 +400,131 @@ code {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10.5px;
 }
+
+/* ---- collapsible side panel ---- */
+aside {
+  padding: 8px 12px 30px;
+}
+.sec {
+  border-bottom: 1px solid var(--line);
+  margin: 0;
+}
+.sec > h2 {
+  cursor: pointer;
+  user-select: none;
+  padding: 10px 2px;
+  margin: 0;
+  gap: 6px;
+  justify-content: flex-start;
+}
+.sec > h2:hover {
+  color: var(--accent2);
+}
+.sec .chev {
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.sec:not(.closed) .chev {
+  transform: rotate(90deg);
+}
+.sec .sum {
+  margin-left: auto;
+  font-family: var(--fb), 'Work Sans';
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--mute);
+  text-transform: none;
+  letter-spacing: 0;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sec .sum.sel {
+  color: var(--on-accent);
+}
+.sec .help {
+  font-weight: 400;
+  color: var(--mute);
+  cursor: help;
+  text-transform: none;
+}
+.sec .body {
+  padding: 0 2px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sec.closed .body {
+  display: none;
+}
+.sec .body > .ck {
+  margin-top: 0;
+}
+.sec select.strong {
+  font-weight: 600;
+}
+.sec details > summary {
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--mute);
+  margin: 2px 0;
+}
+.sec details[open] > summary {
+  margin-bottom: 6px;
+}
+.sec details > * + * {
+  margin-top: 6px;
+}
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.grid3 .tile {
+  padding: 6px 7px;
+}
+.grid3 .tile b {
+  font-size: 11px;
+  font-weight: 600;
+}
+.grp.compact {
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.grp.compact .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #0002;
+  flex-shrink: 0;
+}
+.grp.compact .nm {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.grp.compact .x {
+  padding: 1px 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+.groups-empty {
+  font-size: 12px;
+  color: var(--mute);
+  padding: 4px 2px;
+}

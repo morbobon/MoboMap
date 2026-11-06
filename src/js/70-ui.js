@@ -20,7 +20,8 @@ function ui() {
     (D.company.link
       ? ` <a href="${esc(D.company.link)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent2)">${esc(loc(D.company.name))} ↗</a>`
       : '');
-  document.getElementById('dsName').textContent = loc(D.note) || (D.source === 'user' ? t('grp_user') : '');
+  document.getElementById('dsName').textContent = loc(D.name);
+  document.getElementById('dsName').title = loc(D.note) || (D.source === 'user' ? t('grp_user') : '');
   document.getElementById('dsDel').style.display = D.source === 'user' ? '' : 'none';
   document.getElementById('attrSel').innerHTML =
     `<option value="none">${esc(t('colour_by'))}: ${esc(t('none'))}</option>` +
@@ -70,11 +71,12 @@ function ui() {
   }
   fsel.innerHTML = h;
   fsel.value = S.focus;
-  document.getElementById('regionPresets').innerHTML = Object.entries(GEO.groups)
-    .map(
-      ([r, n]) => `<button class="chip" onclick="presetRegionActive('${r}')">${esc(n)} ${esc(t('to_active'))}</button>`,
-    )
-    .join('');
+  const presets = Object.entries(GEO.groups).filter(([r]) => r !== '_');
+  const rp = document.getElementById('regionPresets');
+  rp.style.display = presets.length > 1 ? '' : 'none';
+  rp.innerHTML =
+    `<option value="">${esc(t('add_region'))}</option>` +
+    presets.map(([r, n]) => `<option value="${esc(r)}">${esc(n)}</option>`).join('');
   document.getElementById('langSel').innerHTML = Object.keys(T)
     .map((l) => `<option value="${l}">${LANGN[l]}</option>`)
     .join('');
@@ -83,28 +85,35 @@ function ui() {
     (l) =>
       `<button class="tile ${S.layout === l.id ? 'on' : ''}" onclick="S.layout='${l.id}';ui();render()"><b>${t('lay_' + l.id)}</b><i>${l.d}</i></button>`,
   ).join('');
-  document.getElementById('layoutInfo').textContent = W + '×' + H;
+  // section summaries (visible when a section is collapsed)
+  document.getElementById('layoutInfo').textContent = t('lay_' + S.layout) + ' · ' + W + '×' + H;
+  document.getElementById('styleNo').textContent = t('st_' + S.style);
   document.getElementById('styles').innerHTML = STYLES.map(
-    (s, i) =>
-      `<button class="tile ${S.style === s.id ? 'on' : ''}" onclick="S.style='${s.id}';ui();render()"><b>${i + 1}. ${esc(t('st_' + s.id))}</b><i>${esc(t('st_' + s.id + '_d'))}</i></button>`,
+    (s) =>
+      `<button class="tile ${S.style === s.id ? 'on' : ''}" title="${esc(t('st_' + s.id + '_d'))}" onclick="S.style='${s.id}';ui();render()"><b>${esc(t('st_' + s.id))}</b></button>`,
   ).join('');
-  document.getElementById('styleNo').textContent =
-    '#' + (STYLES.findIndex((s) => s.id === S.style) + 1) + ' / ' + STYLES.length;
   const cols = D.highlight;
-  document.getElementById('groups').innerHTML = S.groups
-    .map(
-      (
-        g,
-        i,
-      ) => `<div class="grp ${S.active === i ? 'active' : ''}" onclick="if(S.active!==${i}){S.active=${i};ui();render()}">
-  <div class="hd"><input type="radio" name="act" ${S.active === i ? 'checked' : ''} title="${esc(t('active_group'))}"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${S.groups.length > 1 ? `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>` : ''}</div>
+  // Groups: the active one fully expanded, the others as one compact line; none at all is allowed
+  const swatch = (g) =>
+    g.hl.has('hatch')
+      ? `repeating-linear-gradient(45deg,${g.color} 0 3px,transparent 3px 6px)`
+      : g.hl.has('fill') || g.hl.has('tint') || g.hl.has('dots')
+        ? g.color
+        : 'transparent';
+  const removeBtn = (i) =>
+    `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>`;
+  const fullCard = (g, i) => `<div class="grp active">
+  <div class="hd"><input type="radio" name="act" checked title="${esc(t('active_group'))}"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>
   <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
   <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
- </div>`,
-    )
-    .join('');
+ </div>`;
+  const compact = (g, i) =>
+    `<div class="grp compact" title="${esc(t('active_group'))}" onclick="S.active=${i};ui();render()"><span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
+  document.getElementById('groups').innerHTML = S.groups.length
+    ? S.groups.map((g, i) => (i === S.active ? fullCard(g, i) : compact(g, i))).join('')
+    : `<div class="groups-empty">${esc(t('no_groups'))}</div>`;
   S.groups.forEach((g) => {
     if (!g.color) g.color = cols[Math.min(S.groups.indexOf(g), cols.length - 1)];
   });
@@ -219,16 +228,27 @@ function setMap(id) {
       : GEO.geo
         ? 'local'
         : S.proj;
-  const D = DS[S.ds];
-  const tmpl = S.groups.length
-    ? S.groups
-    : [
-        { name: t('g_fill'), hl: new Set(['fill', 'glow']), color: D.highlight[0] },
-        { name: t('g_hatch'), hl: new Set(['hatch']), color: D.highlight[1] || D.highlight[0] },
-      ];
-  S.groups = tmpl.map((g) => newGroup(g.name, [...g.hl], g.color));
-  if (!S.groups.length) S.groups = [newGroup(t('g_fill'), ['fill'], D.highlight[0])];
-  MAPS[S.map].defaults.forEach((c) => S.groups[0].sel.add(c));
+  // keep the user's groups (names, colours, modes – possibly none) but clear selections: unit codes differ per map
+  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color));
+  // example selection only the first time a map is opened in this session
+  const key = S.country || 'world';
+  if (!S.visited.has(key) && S.groups.length) MAPS[S.map].defaults.forEach((c) => S.groups[0].sel.add(c));
+  S.visited.add(key);
+  S.active = Math.min(S.active, Math.max(0, S.groups.length - 1));
+  ui();
+  render();
+}
+// The active group, created on demand when there are none (so a click or preset is never lost)
+function activeGroup() {
+  if (!S.groups.length) {
+    const D = DS[S.ds];
+    S.groups.push(newGroup(t('group') + ' 1', ['fill'], D.highlight[0]));
+    S.active = 0;
+  }
+  return S.groups[Math.min(S.active, S.groups.length - 1)];
+}
+function clearGroups() {
+  S.groups = [];
   S.active = 0;
   ui();
   render();
@@ -242,7 +262,8 @@ function setFocus(v) {
   render();
 }
 function presetRegionActive(r) {
-  const g = S.groups[S.active];
+  if (!r) return;
+  const g = activeGroup();
   const list = GEO.units.filter((k) => k.r === r).map((k) => k.c);
   list.forEach((c) => {
     S.groups.forEach((o) => o.sel.delete(c));
@@ -279,7 +300,7 @@ svg.addEventListener('click', (e) => {
   }
   if (!p) return;
   const c = p.dataset.c;
-  const g = S.groups[S.active];
+  const g = activeGroup();
   if (g.sel.has(c)) g.sel.delete(c);
   else {
     S.groups.forEach((o) => o.sel.delete(c));
@@ -299,7 +320,7 @@ svg.addEventListener('mousemove', (e) => {
   const gi = groupOf(k.c);
   const nav =
     S.map === 'world' && hasDetail(k.c) ? 'tip_ctrl_open' : S.focus === k.c ? 'tip_ctrl_out' : 'tip_ctrl_zoom';
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups[S.active].name) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
   tip.style.display = 'block';
   tip.style.left = e.clientX + 14 + 'px';
   tip.style.top = e.clientY - 10 + 'px';
@@ -329,3 +350,26 @@ svg.addEventListener('mouseleave', () => {
 svg.addEventListener('mouseover', (e) => {
   hoverLine(e.target.closest('.k'));
 });
+
+// ---- collapsible panel sections (open/closed remembered per browser) ----
+const SEC_KEY = 'mobomap.sections';
+const SEC_DEFAULT_OPEN = ['map', 'groups'];
+function secState() {
+  try {
+    return JSON.parse(localStorage.getItem(SEC_KEY)) || null;
+  } catch (e) {
+    return null;
+  }
+}
+function applySections() {
+  const open = secState() || SEC_DEFAULT_OPEN;
+  document.querySelectorAll('.sec').forEach((s) => s.classList.toggle('closed', !open.includes(s.dataset.sec)));
+}
+function toggleSec(id) {
+  const el = document.querySelector(`.sec[data-sec="${id}"]`);
+  el.classList.toggle('closed');
+  const open = [...document.querySelectorAll('.sec')]
+    .filter((s) => !s.classList.contains('closed'))
+    .map((s) => s.dataset.sec);
+  localStorage.setItem(SEC_KEY, JSON.stringify(open));
+}
