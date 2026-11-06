@@ -399,7 +399,8 @@ function fxWrap(content, bg, ink, accent) {
   let sheet = rect(P, `fill="${bg}"`);
   const cf = /<filter id="fxcontent"/.test(fxDefs()) ? ' filter="url(#fxcontent)"' : '';
   // the content – a zoomed map included – never leaves the sheet
-  sheet += `<clipPath id="fxclip">${rect(P)}</clipPath><g clip-path="url(#fxclip)"><g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g></g>`;
+  const clip = L.active || S.zoom.k !== 1 || S.zoom.x || S.zoom.y;
+  sheet += `${clip ? `<clipPath id="fxclip">${rect(P)}</clipPath><g clip-path="url(#fxclip)">` : '<g>'}<g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g></g>`;
   const R = fxRng(S.fx.seed);
   const pw = px1 - px0,
     ph = py1 - py0;

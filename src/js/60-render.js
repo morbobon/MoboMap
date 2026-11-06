@@ -197,16 +197,6 @@ function render(target) {
     out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink0}" stroke-opacity=".6" stroke-width="1.5"/>`;
   const relief = reliefOn(sp);
   if (relief) out += reliefSea(sp, bg, dark);
-  if (sp.sea) {
-    const sea =
-      S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
-        ? []
-        : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
-    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
-    for (const [fx, fy, t] of sea)
-      out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;
-    out += '</g>';
-  }
   const allPath = landPath(det) + (GEO.xland || []).map((k) => kp(k, det)).join('');
   // neighbouring countries as grey context (country views)
   if (S.map !== 'world' && document.getElementById('showNeighbours').checked && !S.focusHide) {
@@ -352,11 +342,16 @@ function render(target) {
     st === 'regions' ? land : isHex(land) ? land : bg,
     st === 'regions' ? mix(land, bg, 0.75) : bg,
   ].filter(isHex);
-  const regCol = guard
-    ? readable([ds.dark ? ink : '#355a78', ink, '#222222', '#ffffff'], regBgs.length ? regBgs : [bg], 3, 0.9)
-    : ds.dark
-      ? ink
-      : '#355a78';
+  const regOrig = ds.dark ? ink : '#355a78';
+  const regWorst = (c, op) => Math.min(...(regBgs.length ? regBgs : [bg]).map((b) => contrast(mix(c, b, 1 - op), b)));
+  const regOk = !guard || regWorst(regOrig, 0.65) >= 3;
+  const regCol = regOk
+    ? regOrig
+    : readable([regOrig, ink, '#222222', '#ffffff'], regBgs.length ? regBgs : [bg], 3, 0.9);
+  const rlOrig = ds.dark ? ink : '#4a6a85';
+  const rlCol =
+    !guard || regWorst(rlOrig, 0.8) >= 2 ? rlOrig : readable([rlOrig, ink, '#222222', '#ffffff'], regBgs, 2, 0.8);
+  const rlCasing = guard && regWorst(rlCol, 0.8) < 2;
   if (sp.regionLines) {
     const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
     out += `<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`;
@@ -407,10 +402,22 @@ function render(target) {
     }
     out += '</g>';
   }
+  if (sp.sea) {
+    const sea =
+      S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
+        ? []
+        : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
+    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
+    for (const [fx, fy, t] of sea)
+      out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;
+    out += '</g>';
+  }
   if (st === 'atlas' || st === 'regions') {
     const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
-    out += `<path d="${rl}" fill="none" stroke="${guard ? readable([ds.dark ? ink : '#4a6a85', ink, '#222222', '#ffffff'], regBgs, 1.8) : ds.dark ? ink : '#4a6a85'}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
-    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity="${guard ? 0.9 : 0.65}" fill="${regCol}" ${guard ? `stroke="${light(regCol) ? '#000000' : '#ffffff'}" stroke-opacity=".6" stroke-width="2.4" paint-order="stroke"` : ''}>`;
+    if (rlCasing)
+      out += `<path d="${rl}" fill="none" stroke="${light(rlCol) ? '#000000' : '#ffffff'}" stroke-opacity=".45" stroke-width="2.6" pointer-events="none"/>`;
+    out += `<path d="${rl}" fill="none" stroke="${rlCol}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;
+    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity="${regOk ? 0.65 : 0.9}" fill="${regCol}" ${!regOk ? `stroke="${light(regCol) ? '#000000' : '#ffffff'}" stroke-opacity=".6" stroke-width="2.4" paint-order="stroke"` : ''}>`;
     for (const r in REGC) {
       if (S.focus) break;
       const [x, y] = P(REGC[r][0], REGC[r][1]);
@@ -511,16 +518,20 @@ function render(target) {
                 ? [land, mix(land, bg, 0.75)]
                 : land;
   if (guard) labelFill = readable([labelFill, '#222222', '#ffffff'], labelBg, 3, 0.9);
+  // what a unit label can sit on, besides its own fill: other style fills, the page, highlights, outlines
+  const labelOn = [...(Array.isArray(labelBg) ? labelBg : [labelBg])];
+  if (st === 'shades') labelOn.push(landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12));
+  if (st === 'patchwork') labelOn.push(...PATCH);
+  if (st === 'regions') labelOn.push(mix(land, bg, 0.75));
+  if (isHex(bg)) labelOn.push(bg);
+  for (const g of groups)
+    if (g.sel.size && (g.hl.has('fill') || g.hl.has('outline'))) {
+      labelOn.push(g.color);
+      if (g.hl.has('outline') || contrast(g.color, isHex(land) ? land : bg) < 1.4) labelOn.push(onCol(g.color));
+    }
+  const labelWorst = Math.min(...labelOn.filter(isHex).map((b) => contrast(mix(labelFill, b, 0.1), b)));
   const labelHalo =
-    guard &&
-    (sp.flag ||
-      sp.patterns ||
-      sp.network ||
-      !!AT ||
-      ['patchwork', 'shades', 'halftone', 'glass', 'slate', 'regions', 'blueprint'].includes(st) ||
-      (isHex(bg) && contrast(labelFill, bg) < 3) ||
-      groups.some((g) => g.sel.size && g.hl.has('fill') && contrast(labelFill, g.color) < 3) ||
-      reliefOn(sp))
+    guard && (sp.flag || sp.patterns || sp.network || !!AT || reliefOn(sp) || st === 'blueprint' || labelWorst < 3)
       ? `stroke="${light(labelFill) ? '#000000' : '#ffffff'}" stroke-opacity=".7" stroke-width="2.4" paint-order="stroke"`
       : '';
   // navne, pins, labels, callouts
@@ -650,7 +661,7 @@ function render(target) {
     if (sub) {
       const sh = sPos === 'under' ? tp[1] : sPos[1];
       const sy = sPos === 'under' ? ty + 24 : sPos[0] === 't' ? top : bot;
-      out += `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9">${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`;
+      out += `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''}>${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`;
     }
   }
   if (document.getElementById('showLogo').checked) {
@@ -665,7 +676,12 @@ function render(target) {
         L.box === 'always' ||
         (L.box === 'auto' && !uniformDark) ||
         // a box-less logo (white lettering on dark profiles) gets its box back where the page is too light for it
-        (guard && L.box === 'auto' && ds.dark && isHex(bg) && contrast('#ffffff', bg) < 3);
+        (guard &&
+          L.box === 'auto' &&
+          ds.dark &&
+          textBgs
+            .filter(isHex)
+            .some((b) => contrast('#ffffff', b) < 4.5 || contrast(ds.headingOnDark || ds.accent, b) < 3));
       if (!box)
         out += `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`;
       else
