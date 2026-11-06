@@ -4,7 +4,7 @@
   "private": true,
   "description": "Single-file map design studio – world countries with drill-down to regions, custom design systems, 24 styles, highlight groups, attributes, projections, PNG/JPG/PDF export, 10 UI languages.",
   "scripts": {
-    "geo": "node tools/prepare-geo.mjs",
+    "geo": "node tools/prepare-geo.mjs && node tools/prepare-admin1.mjs",
     "build": "node tools/build.mjs",
     "release": "node tools/release.mjs"
   },

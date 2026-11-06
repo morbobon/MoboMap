@@ -118,7 +118,38 @@ dk.lists = { fyn: extra.dk_fyn, storkbh: extra.dk_storkbh };
 world.sea = [[0.2, 0.45, 'Atlantic Ocean'], [0.8, 0.5, 'Pacific Ocean'], [0.62, 0.7, 'Indian Ocean'], [0.5, 0.06, 'Arctic Ocean']];
 world.alias = { uk: 'GBR', 'united kingdom': 'GBR', britain: 'GBR', england: 'GBR', us: 'USA', usa: 'USA', 'united states': 'USA', america: 'USA', holland: 'NLD', czechia: 'CZE', 'south korea': 'KOR', 'north korea': 'PRK', russia: 'RUS', 'ivory coast': 'CIV', 'dr congo': 'COD', congo: 'COG', burma: 'MMR', eswatini: 'SWZ', swaziland: 'SWZ', macedonia: 'MKD', bosnia: 'BIH', uae: 'ARE', emirates: 'ARE', palestine: 'PSX', 'east timor': 'TLS', 'timor-leste': 'TLS' };
 
-const data = { dk, world };
+// ---------- Admin-1 for alle lande (kompakt): koordinater som heltal i 0,01° (x=lon+180, y=90-lat), delta-kodet ----------
+const adm1 = {};
+{
+  const A1 = 'geo/admin1.json';
+  if (fs.existsSync(A(A1))) {
+    const src = readJSON(A1);
+    const q = ([lon, lat]) => [Math.round((lon + 180) * 100), Math.round((90 - lat) * 100)];
+    const enc = (rings) => rings.map((r) => {
+      const out = []; let px = 0, py = 0;
+      for (const c of r) { const [x, y] = q(c); if (out.length && x === px && y === py) continue; out.push(out.length ? (x - px) + ',' + (y - py) : x + ',' + y); px = x; py = y; }
+      return out.join(',');
+    }).filter((s) => s.split(',').length >= 6).join(';');
+    const ringsOfGeo = (g) => polys(g).flatMap((p) => p);
+    const linesOfGeo = (gs) => gs.flatMap(lines);
+    const wn = Object.fromEntries(world.units.map((u) => [u.c, u.n]));
+    for (const [iso, c] of Object.entries(src)) {
+      const groups = {}; let gi = 0; const gkey = {};
+      for (const u of c.units) { const g = u.p.grp; if (g && !(g in gkey)) { gkey[g] = 'g' + (gi++); groups[gkey[g]] = g; } }
+      adm1[iso] = {
+        n: wn[iso] || c.units[0].p.name, g: groups,
+        u: c.units.map((u) => {
+          const p = u.p, names = {};
+          for (const l of ['de', 'fr', 'es', 'sv', 'nl', 'it']) { const v = p['name_' + l]; if (v && v !== (p.name_en || p.name)) names[l] = v; }
+          const cc = u.c ? q(u.c) : null;
+          return [p.adm1_code, p.name_en || p.name, Object.keys(names).length ? names : 0, p.grp ? gkey[p.grp] : 0, p.type_en || '', cc ? cc[0] : 0, cc ? cc[1] : 0, enc(ringsOfGeo(u.g))];
+        }),
+        l: enc(ringsOfGeo(c.land)), r: c.rlines.length ? enc(linesOfGeo(c.rlines)) : '',
+      };
+    }
+  }
+}
+const data = { dk, world, adm1 };
 
 // ---------- Fonte ----------
 const b64 = (p) => fs.readFileSync(A(p)).toString('base64');

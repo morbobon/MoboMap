@@ -1,17 +1,18 @@
 # MoboMap – Map Design Studio
 
-Single-file, offline-capable generator for stylised maps with highlighted units – **Denmark (98 municipalities)** or **the world (176 countries)** – in your own design system.
+Single-file, offline-capable generator for stylised maps with highlighted units, in your own design system. Start from **the world (176 countries)** and drill down via **Focus** into any country's **regions/states/provinces** (Natural Earth admin-1, ~240 countries) – or **Denmark's 98 municipalities** in full detail.
 
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
-- **24 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, topographic, doodle, typographic, vintage, word map, midnight …
+- **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, topographic, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
+- **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
 - **Highlight groups** – several groups at once, each with its own colour and modes (solid, hatched, dots, tint, glow, outline, raised, pin, label, callout, dim others).
 - **Attributes** – colour every unit by region, continent, UN region, economy, income group, population, GDP per capita, majority religion, EU/NATO/G20/Nordic membership, hemisphere, area … or turn an attribute into highlight groups with one click.
-- **Projections** for the world map: Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée, Miller.
-- **Focus** on one country or region (major cities shown), **layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend.
+- **Projections**: Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée, Miller.
+- **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos, legend.
 - **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
 - **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian.
 
-Everything ships as one `index.html` (~1.8 MB) that works from `file://` without a server.
+Everything ships as one `index.html` (~3.7 MB) that works from `file://` without a server.
 
 ## Quick start
 
@@ -73,6 +74,9 @@ Omitted fields are derived (`landAlt`, `accent2`, `dark`, `heading` …). `logo.
 |---|---|---|---|
 | Denmark | 98 municipalities, 5 regions, Bornholm inset | DAGI via [geoJSON-Danish-municipalities](https://github.com/magnuslarsen/geoJSON-Danish-municipalities) | UTM 32N, projected at build time |
 | World | 176 countries, 6 continents, major cities | [Natural Earth](https://www.naturalearthdata.com/) 110m countries, 50m populated places | lon/lat, projected at runtime |
+| Any country | its admin-1 units (states, regions, provinces …), grouped by NE `region` where available | Natural Earth 10m admin-1, simplified to ~3.5 km (`tools/prepare-admin1.mjs`) | 0.01° integers, delta-encoded, decoded on demand |
+
+Denmark uses its municipalities instead of its 5 admin-1 regions. Adding finer detail (admin-2) for another country follows the same pattern: a dataset in `tools/build.mjs` and a branch in `countryData()`.
 
 World attributes come from Natural Earth (continent, UN region, subregion, economy, income group, population, GDP). Membership lists (EU, NATO, G20, Nordic) and the majority-religion table live in `assets/geo/world-extra.json`; the religion table is an approximation and not authoritative.
 
@@ -86,6 +90,7 @@ src/i18n.json         UI strings per language (+ i18n-extra.json: styles, attrib
 designsystems/        public profiles (committed) · designsystems/private/ (gitignored)
 assets/geo/           source and simplified geodata · assets/fonts/ · assets/jspdf.umd.min.js
 tools/prepare-geo.mjs mapshaper pipeline (simplify, dissolve, inner lines, centroids)
+tools/prepare-admin1.mjs downloads NE 10m admin-1 (40 MB, gitignored) and writes assets/geo/admin1.json
 tools/build.mjs       inlines everything into index.html (--public skips private profiles, --out=path)
 tools/release.mjs     builds release/*.zip (full and public)
 ```
