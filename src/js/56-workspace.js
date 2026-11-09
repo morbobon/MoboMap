@@ -248,12 +248,20 @@ function afterRender() {
 
 // ---- hide the side panel / looks strip, fullscreen (map only) ----
 const CHROME_KEY = 'mobomap.chrome';
+let CHROME_LINK = null; // layout from a shared link (hp / hs), until the visitor toggles something
 function chromeState() {
+  if (CHROME_LINK) return Object.assign({}, CHROME_LINK);
   try {
     return JSON.parse(localStorage.getItem(CHROME_KEY) || '{}');
   } catch {
     return {};
   }
+}
+// ?hp=1 hides the side panel, ?hs=1 the looks strip, ?full=1 shows only the map
+function chromeFromUrl(search) {
+  const q = new URLSearchParams(search || '');
+  if (q.has('hp') || q.has('hs')) CHROME_LINK = { panel: q.get('hp') === '1', strip: q.get('hs') === '1' };
+  if (q.get('full') === '1') document.body.classList.add('fs');
 }
 function applyChrome() {
   const c = chromeState(),
@@ -262,11 +270,14 @@ function applyChrome() {
   b.classList.toggle('no-strip', !!c.strip);
   document.getElementById('panelBtn').classList.toggle('on', !c.panel);
   document.getElementById('stripBtn').classList.toggle('on', !c.strip);
+  // (not during start-up: the address bar is written once the project is loaded)
+  if (typeof syncUrl === 'function' && HIST.list.length) syncUrl();
 }
 // what: 'panel' | 'strip' – the stored value is "hidden"
 function toggleChrome(what) {
   const c = chromeState();
   c[what] = !c[what];
+  CHROME_LINK = null;
   localStorage.setItem(CHROME_KEY, JSON.stringify(c));
   applyChrome();
   render();
@@ -281,12 +292,14 @@ function toggleFullscreen() {
     const el = document.documentElement;
     if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
   }
+  syncUrl();
   render();
 }
 document.addEventListener('fullscreenchange', () => {
   // leaving the browser's fullscreen (Esc) also leaves the map-only view
   if (!document.fullscreenElement && document.body.classList.contains('fs')) {
     document.body.classList.remove('fs');
+    syncUrl();
     render();
   }
 });

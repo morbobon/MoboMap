@@ -920,3 +920,68 @@ header .btns {
     max-width: 150px;
   }
 }
+
+/* hide/show toggles on the menus themselves */
+.stage {
+  position: relative;
+}
+.rail .railhide {
+  margin-top: auto;
+  margin-bottom: 10px;
+  font-size: 18px;
+  opacity: 0.6;
+}
+.looksbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  align-self: stretch;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.looksbar .looks {
+  flex: 1;
+  min-width: 0;
+}
+.striphide,
+.showpanel,
+.showstrip {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1;
+  padding: 6px 8px;
+  opacity: 0.75;
+}
+.striphide:hover,
+.showpanel:hover,
+.showstrip:hover,
+.rail .railhide:hover {
+  opacity: 1;
+}
+.showpanel,
+.showstrip {
+  position: absolute;
+  display: none;
+  z-index: 5;
+}
+.showpanel {
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.showstrip {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+body.no-panel:not(.fs) .showpanel,
+body.no-strip:not(.fs) .showstrip {
+  display: block;
+}
+body.no-strip .looksbar,
+body.fs .looksbar {
+  display: none;
+}

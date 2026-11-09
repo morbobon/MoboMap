@@ -39,6 +39,11 @@ function shareParams() {
   put('sp', p.subPos, d.subPos || 'under');
   put('far', p.far, d.far || 'inset');
   if (p.dsColours) q.set('dsc', '1');
+  // menu layout of this view
+  const b = document.body;
+  if (b.classList.contains('no-panel')) q.set('hp', '1');
+  if (b.classList.contains('no-strip')) q.set('hs', '1');
+  if (b.classList.contains('fs')) q.set('full', '1');
   const dsFooter = DS[p.designSystem] ? loc(DS[p.designSystem].footer.label) : '';
   if (p.footerLabel && p.footerLabel !== dsFooter) q.set('ft', p.footerLabel);
   if (p.fx.preset && (p.fx.preset === 'random' || FX_PRESETS[p.fx.preset])) q.set('pr', p.fx.preset);

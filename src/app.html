@@ -69,6 +69,7 @@
         </button>
         <button data-tab="look" onclick="setTab('look')"><b>✦</b><span data-i18n="tab_look"></span></button>
         <button data-tab="page" onclick="setTab('page')"><b>▭</b><span data-i18n="tab_page"></span></button>
+        <button class="railhide" onclick="toggleChrome('panel')" data-i18n-title="toggle_panel">«</button>
       </nav>
       <aside>
         <div class="tab" data-tab="map">
@@ -445,7 +446,12 @@
           <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
           <button id="fsExit" class="chip" onclick="toggleFullscreen()" data-i18n="fs_exit"></button>
         </div>
-        <div id="looks" class="looks"></div>
+        <div class="looksbar">
+          <div id="looks" class="looks"></div>
+          <button class="striphide" onclick="toggleChrome('strip')" data-i18n-title="toggle_strip">︾</button>
+        </div>
+        <button class="showpanel" onclick="toggleChrome('panel')" data-i18n-title="toggle_panel">»</button>
+        <button class="showstrip" onclick="toggleChrome('strip')" data-i18n-title="toggle_strip">︽</button>
       </div>
     </main>
     <div id="tip"></div>
