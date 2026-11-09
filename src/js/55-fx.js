@@ -357,15 +357,18 @@ const fxToArt = (x, y) => [x * FXL.s + FXL.tx, y * FXL.s + FXL.ty];
 function fxUnder(allPath, ink) {
   let o = '';
   if (fxOn('rhumb')) {
-    const r = fxRng(S.fx.seed + 7);
-    const centres = [compassPos(), [W * (0.25 + r() * 0.2), H * (0.3 + r() * 0.3)]];
+    // hubs at real places (like the compass-rose hubs of old sea charts): they follow projection, zoom and pan
+    const centres = rhumbHubs().map(([lon, lat]) => worldPt(lon + 180, 90 - lat));
+    const L = (W + H) * 3;
     o += `<g stroke="${ink}" stroke-opacity="${fxOp('rhumb', 0.22)}" stroke-width=".6" pointer-events="none">`;
-    for (const [cx, cy] of centres)
+    for (const [cx, cy] of centres) {
+      if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
       for (let i = 0; i < 32; i++) {
-        const a = (i * Math.PI) / 16,
-          L = W + H;
+        const a = (i * Math.PI) / 16;
         o += `<line x1="${cx.toFixed(1)}" y1="${cy.toFixed(1)}" x2="${(cx + Math.cos(a) * L).toFixed(1)}" y2="${(cy + Math.sin(a) * L).toFixed(1)}" ${i % 4 ? 'stroke-dasharray="4 3"' : ''}/>`;
       }
+      o += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="none" stroke-dasharray="none"/>`;
+    }
     o += '</g>';
   }
   if (fxOn('shadow')) {
@@ -1023,4 +1026,39 @@ function edgeShade(q, d, op, L) {
   if (L.x < -0.05) s += r([q[0], q[1], q[0] + d, q[3]], 'fxshadeL', op * -L.x);
   if (L.x > 0.05) s += r([q[2] - d, q[1], q[2], q[3]], 'fxshadeR', op * L.x);
   return `<g pointer-events="none">${s}</g>`;
+}
+
+// Rhumb-line hubs as [longitude, latitude]: open sea on the world map, the waters around Denmark,
+// otherwise the middle of the country (or focus) and a point just south of its south-west part.
+function rhumbHubs() {
+  if (S.map === 'world' && !S.focus)
+    return [
+      [-38, 30],
+      [72, -14],
+      [-150, 6],
+    ];
+  if (S.map === 'dk')
+    return [
+      [11.5, 56.95],
+      [6.7, 56.2],
+    ];
+  const fu = focusUnits();
+  let b = [Infinity, Infinity, -Infinity, -Infinity];
+  if (!fu && GEO.main) b = GEO.main.slice();
+  else
+    for (const k of fu || GEO.units)
+      if (k.b[2] - k.b[0] < 180) {
+        b[0] = Math.min(b[0], k.b[0]);
+        b[1] = Math.min(b[1], k.b[1]);
+        b[2] = Math.max(b[2], k.b[2]);
+        b[3] = Math.max(b[3], k.b[3]);
+      }
+  if (!Number.isFinite(b[0])) return [];
+  const w = b[2] - b[0],
+    h = b[3] - b[1];
+  // data coordinates are x = lon + 180, y = 90 - lat
+  return [
+    [(b[0] + b[2]) / 2 - 180, 90 - (b[1] + b[3]) / 2],
+    [b[0] + w * 0.15 - 180, 90 - (b[3] + h * 0.06)],
+  ];
 }
