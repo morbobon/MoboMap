@@ -9,7 +9,7 @@ function setTab(id) {
   document.querySelectorAll('aside .tab').forEach((p) => p.classList.toggle('on', p.dataset.tab === id));
   document.querySelector('aside').scrollTop = 0;
   // the highlight groups open as far as the room allows: measure now that the tab is visible
-  if (id === 'highlight' && typeof ui === 'function' && S.groups) ui();
+  if (id === 'highlight' && window.MOBOMAP_READY) ui(); // not during start-up: profiles and map are not loaded yet
 }
 
 // ---- export menu ----

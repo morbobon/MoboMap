@@ -21,3 +21,4 @@ try {
 } catch (e) {
   toast(t('ts_link_bad') + ': ' + e.message);
 }
+window.MOBOMAP_READY = true; // start-up done (setTab may redraw from now on)
