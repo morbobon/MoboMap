@@ -517,3 +517,112 @@ function cycleUiMode() {
   applyUiMode();
 }
 if (sysDark) sysDark.addEventListener('change', applyUiMode);
+
+// ---- drag texts (title, subtitle, legend, logo, callout and label pills); double-click puts one back ----
+let textDrag = null;
+svg.addEventListener(
+  'pointerdown',
+  (e) => {
+    const g = e.target.closest && e.target.closest('.drg');
+    if (!g || e.button !== 0) return;
+    e.stopImmediatePropagation(); // not a map pan
+    e.preventDefault();
+    const key = g.dataset.drag;
+    const base = ((S.drag || {})[key] || [0, 0]).slice();
+    let box = null;
+    try {
+      // the group's children without its own offset
+      const hit = g.querySelector(':scope > .drg-hit');
+      if (hit) hit.remove();
+      const bb = g.getBBox();
+      box = [bb.x, bb.y, bb.x + bb.width, bb.y + bb.height];
+    } catch {
+      /* not rendered */
+    }
+    textDrag = { key, p: svgPoint(e), base, box, moved: false };
+    document.getElementById('wrap').classList.add('dragging');
+  },
+  true,
+);
+window.addEventListener('pointermove', (e) => {
+  if (!textDrag) return;
+  const [x, y] = svgPoint(e);
+  const dx = x - textDrag.p[0],
+    dy = y - textDrag.p[1];
+  if (!textDrag.moved && Math.hypot(dx, dy) < 3) return;
+  textDrag.moved = true;
+  let ox = textDrag.base[0] + dx,
+    oy = textDrag.base[1] + dy;
+  // page elements snap to the page's left / centre / right and top / middle / bottom (Ctrl: free)
+  SNAP_GUIDES = null;
+  if (SNAP_KEYS.includes(textDrag.key) && snapOn() && !e.ctrlKey && !e.metaKey && textDrag.box) {
+    const [bx0, by0, bx1, by1] = textDrag.box;
+    const mx = PAD.l - 12,
+      my = 22,
+      T = 16;
+    const xs = [
+      [mx, bx0],
+      [W / 2, (bx0 + bx1) / 2],
+      [W - mx, bx1],
+    ];
+    const ys = [
+      [my, by0],
+      [(H - FOOT) / 2, (by0 + by1) / 2],
+      [H - FOOT - my, by1],
+    ];
+    const best = (list, o) =>
+      list.map(([target, edge]) => [target, target - edge]).sort((a, b) => Math.abs(a[1] - o) - Math.abs(b[1] - o))[0];
+    const bxS = best(xs, ox),
+      byS = best(ys, oy);
+    SNAP_GUIDES = {};
+    if (Math.abs(bxS[1] - ox) < T) ((ox = bxS[1]), (SNAP_GUIDES.x = bxS[0]));
+    if (Math.abs(byS[1] - oy) < T) ((oy = byS[1]), (SNAP_GUIDES.y = byS[0]));
+  }
+  // at least part of the element stays on the page, so it can always be grabbed again
+  if (textDrag.box) {
+    const [bx0, by0, bx1, by1] = textDrag.box,
+      keep = 24;
+    ox = Math.min(W - keep - bx0, Math.max(keep - bx1, ox));
+    oy = Math.min(H - keep - by0, Math.max(keep - by1, oy));
+  }
+  S.drag = Object.assign({}, S.drag, { [textDrag.key]: [ox, oy] });
+  tip.style.display = 'none';
+  zoomChanged(); // re-render on the next frame
+});
+window.addEventListener('pointerup', () => {
+  if (!textDrag) return;
+  if (SNAP_GUIDES) {
+    SNAP_GUIDES = null;
+    zoomChanged();
+  }
+  // one undo step per drag
+  if (textDrag.moved) {
+    clearTimeout(HIST.timer);
+    HIST.timer = setTimeout(() => {
+      HIST.timer = 0;
+      pushHistory();
+    }, 60);
+  }
+  if (textDrag.moved) dragged = true; // the click that follows is not a selection
+  textDrag = null;
+  document.getElementById('wrap').classList.remove('dragging');
+});
+svg.addEventListener('dblclick', (e) => {
+  const g = e.target.closest && e.target.closest('.drg');
+  if (!g || !S.drag || !S.drag[g.dataset.drag]) return;
+  const d = Object.assign({}, S.drag);
+  delete d[g.dataset.drag];
+  S.drag = d;
+  render();
+});
+function resetDrag() {
+  S.drag = {};
+  render();
+}
+// snapping: page elements only; on by default, the checkbox in the Page tab turns it off, Ctrl overrides
+const SNAP_KEYS = ['title', 'sub', 'legend', 'logo'];
+let SNAP_GUIDES = null;
+const snapOn = () => localStorage.getItem('mobomap.snap') !== '0';
+function setSnap(on) {
+  localStorage.setItem('mobomap.snap', on ? '1' : '0');
+}

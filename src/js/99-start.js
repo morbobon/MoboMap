@@ -3,6 +3,7 @@ applySections();
 setTab(localStorage.getItem('mobomap.tab') || 'map');
 chromeFromUrl(location.search);
 applyChrome();
+document.getElementById('snapCk').checked = snapOn();
 loadDS();
 S.ds = DSORDER.find((i) => !DS[i].private) || DSORDER[0];
 applyUiMode();

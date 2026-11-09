@@ -39,6 +39,9 @@ function shareParams() {
   put('sp', p.subPos, d.subPos || 'under');
   put('far', p.far, d.far || 'inset');
   if (p.dsColours) q.set('dsc', '1');
+  // dragged texts: key~dx~dy, separated by '.'
+  const drg = Object.entries(p.drag || {}).filter(([, v]) => v[0] || v[1]);
+  if (drg.length) q.set('dg', drg.map(([k, v]) => k + '~' + Math.round(v[0]) + '~' + Math.round(v[1])).join('.'));
   // menu layout of this view
   const b = document.body;
   if (b.classList.contains('no-panel')) q.set('hp', '1');
@@ -125,6 +128,7 @@ function projectFromUrl(search) {
     'lw',
     'ft',
     'pr',
+    'dg',
   ];
   if (!known.some((k) => q.has(k))) return null;
   const p = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
@@ -182,6 +186,13 @@ function projectFromUrl(search) {
   if (q.has('tp') && posOk(g('tp'), 'auto')) p.titlePos = g('tp');
   if (q.has('sp') && posOk(g('sp'), 'under')) p.subPos = g('sp');
   if (q.has('ft')) p.footerLabel = g('ft');
+  if (q.has('dg')) {
+    p.drag = {};
+    for (const part of g('dg').split('.')) {
+      const [k, x, y] = part.split('~');
+      if (k && num(x) != null && num(y) != null) p.drag[k] = [num(x), num(y)];
+    }
+  }
   if (q.has('far')) p.far = g('far');
   if (q.has('dsc')) p.dsColours = g('dsc') === '1';
   if (q.has('gd')) p.guard = g('gd') !== '0';

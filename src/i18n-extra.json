@@ -424,7 +424,12 @@
   "st_chalk_d": "Chalk lines and caps on dark slate green",
   "ts_storage_full": "Not saved: the browser storage is full (try a smaller logo)",
   "st_ice": "Ice",
-  "st_ice_d": "Pale icy blues with cool grey-blue borders"
+  "st_ice_d": "Pale icy blues with cool grey-blue borders",
+  "drag_reset": "Reset text positions",
+  "drag_reset_t": "Put every dragged text, legend and logo back in its place",
+  "drag_hint": "Drag title, legend, logo and labels on the map; double-click puts one back.",
+  "snap": "Snap to page positions (hold Ctrl to place freely)",
+  "about_src": "source & commercial licence"
  },
  "da": {
   "yes": "Ja",
@@ -851,7 +856,12 @@
   "st_chalk_d": "Kridtstreger og versaler på mørk skifergrøn",
   "ts_storage_full": "Ikke gemt: browserens lager er fuldt (prøv et mindre logo)",
   "st_ice": "Is",
-  "st_ice_d": "Blege isblå toner med kølige gråblå grænser"
+  "st_ice_d": "Blege isblå toner med kølige gråblå grænser",
+  "drag_reset": "Nulstil tekstplaceringer",
+  "drag_reset_t": "Sæt alle flyttede tekster, signaturforklaring og logo tilbage",
+  "drag_hint": "Træk titel, signatur, logo og navne på kortet; dobbeltklik sætter tilbage.",
+  "snap": "Fastgør til sidepositioner (hold Ctrl for frit)",
+  "about_src": "kildekode og kommerciel licens"
  },
  "de": {
   "yes": "Ja",
@@ -1278,7 +1288,12 @@
   "st_chalk_d": "Kreidelinien und Versalien auf dunklem Schiefergrün",
   "ts_storage_full": "Nicht gespeichert: Browserspeicher voll (kleineres Logo versuchen)",
   "st_ice": "Eis",
-  "st_ice_d": "Blasse Eisblautöne mit kühlen graublauen Grenzen"
+  "st_ice_d": "Blasse Eisblautöne mit kühlen graublauen Grenzen",
+  "drag_reset": "Textpositionen zurücksetzen",
+  "drag_reset_t": "Alle verschobenen Texte, Legende und Logo zurücksetzen",
+  "drag_hint": "Titel, Legende, Logo und Beschriftungen auf der Karte ziehen; Doppelklick setzt zurück.",
+  "snap": "An Seitenpositionen einrasten (Strg für frei)",
+  "about_src": "Quellcode & kommerzielle Lizenz"
  },
  "fr": {
   "yes": "Oui",
@@ -1705,7 +1720,12 @@
   "st_chalk_d": "Traits de craie et capitales sur vert ardoise",
   "ts_storage_full": "Non enregistré : stockage du navigateur plein (essayez un logo plus petit)",
   "st_ice": "Glace",
-  "st_ice_d": "Bleus glacés pâles, frontières gris-bleu froides"
+  "st_ice_d": "Bleus glacés pâles, frontières gris-bleu froides",
+  "drag_reset": "Réinitialiser les positions",
+  "drag_reset_t": "Remettre en place tous les textes, la légende et le logo déplacés",
+  "drag_hint": "Faites glisser titre, légende, logo et étiquettes ; double-clic pour remettre.",
+  "snap": "Aimanter aux positions de la page (Ctrl : libre)",
+  "about_src": "code source et licence commerciale"
  },
  "es": {
   "yes": "Sí",
@@ -2132,7 +2152,12 @@
   "st_chalk_d": "Trazos de tiza y mayúsculas sobre verde pizarra",
   "ts_storage_full": "No guardado: el almacenamiento del navegador está lleno (prueba un logo más pequeño)",
   "st_ice": "Hielo",
-  "st_ice_d": "Azules helados pálidos con fronteras gris azuladas"
+  "st_ice_d": "Azules helados pálidos con fronteras gris azuladas",
+  "drag_reset": "Restablecer posiciones",
+  "drag_reset_t": "Devolver a su sitio todos los textos, la leyenda y el logo movidos",
+  "drag_hint": "Arrastra título, leyenda, logo y etiquetas; doble clic para devolver.",
+  "snap": "Ajustar a posiciones de la página (Ctrl: libre)",
+  "about_src": "código fuente y licencia comercial"
  },
  "sv": {
   "yes": "Ja",
@@ -2559,7 +2584,12 @@
   "st_chalk_d": "Kritlinjer och versaler på mörk skiffergrön",
   "ts_storage_full": "Inte sparad: webbläsarens lagring är full (prova en mindre logotyp)",
   "st_ice": "Is",
-  "st_ice_d": "Bleka isblå toner med svala gråblå gränser"
+  "st_ice_d": "Bleka isblå toner med svala gråblå gränser",
+  "drag_reset": "Återställ textplaceringar",
+  "drag_reset_t": "Flytta tillbaka alla flyttade texter, teckenförklaring och logotyp",
+  "drag_hint": "Dra rubrik, teckenförklaring, logotyp och etiketter; dubbelklicka för att återställa.",
+  "snap": "Fäst mot sidpositioner (håll Ctrl för fritt)",
+  "about_src": "källkod och kommersiell licens"
  },
  "no": {
   "yes": "Ja",
@@ -2986,7 +3016,12 @@
   "st_chalk_d": "Kritt-linjer og versaler på mørk skifergrønn",
   "ts_storage_full": "Ikke lagret: nettleserens lagring er full (prøv en mindre logo)",
   "st_ice": "Is",
-  "st_ice_d": "Bleke isblå toner med kjølige gråblå grenser"
+  "st_ice_d": "Bleke isblå toner med kjølige gråblå grenser",
+  "drag_reset": "Tilbakestill tekstplasseringer",
+  "drag_reset_t": "Sett alle flyttede tekster, tegnforklaring og logo tilbake",
+  "drag_hint": "Dra tittel, tegnforklaring, logo og navn; dobbeltklikk setter tilbake.",
+  "snap": "Fest til sideposisjoner (hold Ctrl for fritt)",
+  "about_src": "kildekode og kommersiell lisens"
  },
  "fi": {
   "yes": "Kyllä",
@@ -3413,7 +3448,12 @@
   "st_chalk_d": "Liituviivat ja versaalit tummalla liuskevihreällä",
   "ts_storage_full": "Ei tallennettu: selaimen tallennustila on täynnä (kokeile pienempää logoa)",
   "st_ice": "Jää",
-  "st_ice_d": "Vaaleat jäänsiniset sävyt, viileät harmaansiniset rajat"
+  "st_ice_d": "Vaaleat jäänsiniset sävyt, viileät harmaansiniset rajat",
+  "drag_reset": "Palauta tekstien sijainnit",
+  "drag_reset_t": "Palauta kaikki siirretyt tekstit, selite ja logo",
+  "drag_hint": "Vedä otsikkoa, selitettä, logoa ja nimiä; kaksoisnapsautus palauttaa.",
+  "snap": "Kiinnitä sivun kohtiin (Ctrl: vapaasti)",
+  "about_src": "lähdekoodi ja kaupallinen lisenssi"
  },
  "nl": {
   "yes": "Ja",
@@ -3840,7 +3880,12 @@
   "st_chalk_d": "Krijtlijnen en kapitalen op donker leigroen",
   "ts_storage_full": "Niet opgeslagen: browseropslag vol (probeer een kleiner logo)",
   "st_ice": "IJs",
-  "st_ice_d": "Bleke ijsblauwe tinten met koele grijsblauwe grenzen"
+  "st_ice_d": "Bleke ijsblauwe tinten met koele grijsblauwe grenzen",
+  "drag_reset": "Tekstposities herstellen",
+  "drag_reset_t": "Alle verplaatste teksten, legenda en logo terugzetten",
+  "drag_hint": "Sleep titel, legenda, logo en labels; dubbelklik zet terug.",
+  "snap": "Uitlijnen op paginaposities (Ctrl: vrij)",
+  "about_src": "broncode & commerciële licentie"
  },
  "it": {
   "yes": "Sì",
@@ -4267,6 +4312,11 @@
   "st_chalk_d": "Linee di gesso e maiuscole su verde ardesia",
   "ts_storage_full": "Non salvato: memoria del browser piena (prova un logo più piccolo)",
   "st_ice": "Ghiaccio",
-  "st_ice_d": "Azzurri ghiaccio tenui con confini grigio-blu"
+  "st_ice_d": "Azzurri ghiaccio tenui con confini grigio-blu",
+  "drag_reset": "Ripristina posizioni",
+  "drag_reset_t": "Riporta al loro posto testi, legenda e logo spostati",
+  "drag_hint": "Trascina titolo, legenda, logo ed etichette; doppio clic per ripristinare.",
+  "snap": "Aggancia alle posizioni della pagina (Ctrl: libero)",
+  "about_src": "codice sorgente e licenza commerciale"
  }
 }

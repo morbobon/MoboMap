@@ -985,3 +985,24 @@ body.no-strip .looksbar,
 body.fs .looksbar {
   display: none;
 }
+
+/* draggable texts on the map */
+#svg .drg {
+  cursor: move;
+}
+#svg .drg:hover {
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--accent) 70%, transparent));
+}
+#wrap.dragging,
+#wrap.dragging * {
+  cursor: grabbing !important;
+}
+
+.about {
+  margin: 18px 4px 6px;
+  font-size: 11px;
+  color: var(--mute);
+}
+.about a {
+  color: var(--mute);
+}

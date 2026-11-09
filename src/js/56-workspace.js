@@ -100,6 +100,7 @@ function thumbKey() {
     S.focusHide,
     S.dsColours,
     S.guard,
+    S.drag,
     CK.map((k) => document.getElementById(k).checked),
     ['title', 'sub', 'titlePos', 'subPos', 'frameSel', 'footerLabel', 'autoText'].map((k) => {
       const el = document.getElementById(k);
@@ -235,7 +236,19 @@ function afterRender() {
     ).length;
     dsum.textContent = on + '/6';
   }
-  if (HIST.restoring) return;
+  // a transparent hit area behind every draggable, so the gaps between letters grab the text too
+  document.querySelectorAll('#svg .drg').forEach((g) => {
+    try {
+      const b = g.getBBox();
+      g.insertAdjacentHTML(
+        'afterbegin',
+        `<rect class="drg-hit" x="${(b.x - 4).toFixed(1)}" y="${(b.y - 4).toFixed(1)}" width="${(b.width + 8).toFixed(1)}" height="${(b.height + 8).toFixed(1)}" fill="transparent"/>`,
+      );
+    } catch {
+      /* not laid out */
+    }
+  });
+  if (HIST.restoring || (typeof textDrag !== 'undefined' && textDrag)) return;
   clearTimeout(HIST.timer);
   HIST.timer = setTimeout(
     () => {

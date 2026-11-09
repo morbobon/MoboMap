@@ -55,7 +55,8 @@ async function exportMap(fmt) {
     };
     for (const l of window._links || []) lk(l.x, l.y, l.w, l.h, l.url);
     const D = DS[S.ds];
-    if (D.company.link) lk(W - PAD.l - 240, 30, 260, 70, D.company.link);
+    const lo = (S.drag && S.drag.logo) || [0, 0];
+    if (D.company.link) lk(W - PAD.l - 240 + lo[0], 30 + lo[1], 260, 70, D.company.link);
     pdf.save(name + '.pdf');
   }
   toast(fmt.toUpperCase() + ' ' + t('ts_downloaded'));

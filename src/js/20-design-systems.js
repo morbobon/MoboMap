@@ -123,8 +123,7 @@ function importDSObject(obj) {
   // or "default": true on one profile; otherwise the first one in the file
   const want = !Array.isArray(obj) && typeof obj.default === 'string' ? obj.default : null;
   const flagged = list.find((d) => d && d.default === true);
-  const n =
-    added.find((r) => r.id === want) || added.find((r) => flagged && r.id === String(flagged.id)) || added[0];
+  const n = added.find((r) => r.id === want) || added.find((r) => flagged && r.id === String(flagged.id)) || added[0];
   setDS(n.id);
   toast(t('ts_imported') + ': ' + (added.length > 1 ? added.length + ' · ' : '') + loc(n.name));
 }

@@ -23,6 +23,7 @@ function projectState() {
     focus: S.focus,
     focusHide: !!S.focusHide,
     far: S.far,
+    drag: S.drag,
     dsColours: !!S.dsColours,
     guard: S.guard !== false,
     fx: S.fx,
@@ -70,6 +71,9 @@ function loadProject(p, quiet) {
   S.ds = DS[p.designSystem] ? p.designSystem : DSORDER[0];
   const D = DS[S.ds];
   S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';
+  S.drag = {};
+  for (const [k, v] of Object.entries(p.drag || {}))
+    if (Array.isArray(v) && v.length === 2 && v.every(Number.isFinite)) S.drag[k] = [v[0], v[1]];
   S.dsColours = !!p.dsColours;
   S.guard = p.guard !== false;
   S.fx = Object.assign(

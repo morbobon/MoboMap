@@ -1,6 +1,12 @@
 // target: an SVG element to draw into instead of the page (look thumbnails) – no other side effects then
 function render(target) {
   const links = window._links;
+  // texts the user dragged: S.drag[key] = [dx, dy] in page units; dragG wraps an element so it can be moved
+  const dragOf = (k) => (S.drag && S.drag[k]) || [0, 0];
+  const dragG = (k, inner) => {
+    const [dx, dy] = dragOf(k);
+    return `<g class="drg" data-drag="${esc(k)}" pointer-events="all"${dx || dy ? ` transform="translate(${dx.toFixed(1)},${dy.toFixed(1)})"` : ''}>${inner}</g>`;
+  };
   setLayout(S.layout);
   fxLayout();
   const D = DS[S.ds],
@@ -579,16 +585,83 @@ function render(target) {
   // navne, pins, labels, callouts
   const lf = ds.body;
   out += '<g pointer-events="none">';
+  // label pills: placed before the unit names, in the first spot that is free of cities and other pills
+  const pillAt = {};
+  // pin markers are reserved first, so pills never cover them
+  groups.forEach((g) => {
+    if (!g.hl.has('pin')) return;
+    for (const c of g.sel) {
+      const k = GEO.units.find((u) => u.c === c);
+      if (!k || (S.focusHide && !inFocus(k))) continue;
+      const [px, py] = kc(k);
+      cityBoxes.push([px - 10, py - 10, px + 10, py + 10]);
+    }
+  });
+  let pillLeads = '';
+  groups.forEach((g) => {
+    if (!g.hl.has('label') || g.hl.has('callout')) return;
+    for (const c of g.sel) {
+      const k = GEO.units.find((u) => u.c === c);
+      if (!k || (S.focusHide && !inFocus(k))) continue;
+      const [x, y0] = kc(k);
+      const y = y0 - (g.hl.has('pin') ? 16 : 0);
+      const w = nm(k).length * 6.6 + 16;
+      // candidates: above, below, right, left, further up, further down (box = pill incl. a little air)
+      const below = g.hl.has('pin') ? 16 : 0; // "below" spots start under the pin marker
+      const cands = [
+        [0, 0],
+        [0, 24 + below * 2],
+        [w / 2 + 12, 10],
+        [-w / 2 - 12, 10],
+        [0, -22],
+        [0, 46 + below * 2],
+        [w / 2 + 12, -14],
+        [-w / 2 - 12, -14],
+      ];
+      // then rings further out (8 directions), up to ~150 units
+      for (let r = 40; r <= 150; r += 22)
+        for (let a = 0; a < 8; a++)
+          cands.push([Math.cos((a * Math.PI) / 4) * (r + w / 3), Math.sin((a * Math.PI) / 4) * r]);
+      const boxOf = ([ox, oy]) => [x + ox - w / 2 - 2, y + oy - 21, x + ox + w / 2 + 2, y + oy - 1];
+      const onPage = (b) => b[0] >= 4 && b[2] <= W - 4 && b[1] >= 4 && b[3] <= H - FOOT - 4;
+      const overlap = (bx) =>
+        cityBoxes.reduce(
+          (s, b) =>
+            s +
+            Math.max(0, Math.min(b[2], bx[2]) - Math.max(b[0], bx[0])) *
+              Math.max(0, Math.min(b[3], bx[3]) - Math.max(b[1], bx[1])),
+          0,
+        );
+      let pick = cands.find((o) => onPage(boxOf(o)) && !cityBoxes.some((b) => boxHit(b, boxOf(o))));
+      // nowhere free: the spot with the least overlap (never simply on top of another pill)
+      if (!pick)
+        pick =
+          cands.filter((o) => onPage(boxOf(o))).sort((a, b) => overlap(boxOf(a)) - overlap(boxOf(b)))[0] || cands[0];
+      cityBoxes.push(boxOf(pick));
+      pillAt[c] = { x, y, ox: pick[0], oy: pick[1], w };
+      // leader (follows a hand-dragged pill too), drawn under all pills with a halo
+      const [ddx, ddy] = dragOf('lb:' + k.c);
+      if (pick[0] || pick[1] || ddx || ddy) {
+        const lc = dark ? g.color : ds.primary;
+        const d = `M${x.toFixed(1)} ${y0.toFixed(1)}L${(x + pick[0] + ddx).toFixed(1)} ${(y + pick[1] - 10 + ddy).toFixed(1)}`;
+        pillLeads += `<path d="${d}" stroke="${bg}" stroke-width="3.4" opacity=".7" stroke-linecap="round"/><path d="${d}" stroke="${lc}" stroke-width="1.3" stroke-linecap="round"/>`;
+      }
+    }
+  });
+  out += `<g pointer-events="none">${pillLeads}</g>`;
   if (all || sp.labels)
-    for (const k of unsel) {
+    // bigger units first, so they keep their names when space is short
+    for (const k of unsel.slice().sort((a, b) => b.a - a.a)) {
       if (S.focusHide && !inFocus(k)) continue;
       const [x, y] = kc(k);
       if (k.a < (sp.labels ? TH.h : TH.l) && !isBH(k)) continue;
       const caps = sp.labels === 'caps';
       // a unit label gives way to a city label it would run into
       const lfs = caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5,
-        lw = nm(k).length * lfs * 0.6;
-      if (cityBoxes.some((b) => boxHit(b, [x - lw / 2, y - lfs, x + lw / 2, y + 2]))) continue;
+        lw = caps ? nm(k).length * (lfs * 0.68 + 1.2) : nm(k).length * lfs * 0.6;
+      const nb = [x - lw / 2 - 1, y - lfs, x + lw / 2 + 1, y + 2];
+      if (cityBoxes.some((b) => boxHit(b, nb))) continue;
+      cityBoxes.push(nb);
       out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5}" ${caps ? 'letter-spacing="1.2"' : 'font-weight="700"'} text-anchor="middle" fill="${labelFill}" ${labelHalo} opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
     }
   const margin = { l: [], r: [] };
@@ -601,27 +674,47 @@ function render(target) {
       const [x, y] = kc(k);
       if (hl.has('pin'))
         out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${col}" stroke-width="2.5" class="pulse"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" stroke="${onCol(col)}" stroke-width="1.6"/>`;
-      if (hl.has('label') && !hl.has('callout')) {
-        const w = nm(k).length * 6.6 + 16;
-        out += `<g transform="translate(${x.toFixed(1)},${(y - (hl.has('pin') ? 16 : 0)).toFixed(1)})"><rect x="${-w / 2}" y="-20" width="${w}" height="18" rx="4" fill="${dark ? col : ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark ? onCol(col) : onCol(ds.primary)}">${esc(nm(k))}</text></g>`;
+      if (hl.has('label') && !hl.has('callout') && pillAt[c]) {
+        const q = pillAt[c],
+          w = q.w;
+        out += dragG(
+          'lb:' + k.c,
+          `<g transform="translate(${(q.x + q.ox).toFixed(1)},${(q.y + q.oy).toFixed(1)})"><rect x="${-w / 2}" y="-20" width="${w}" height="18" rx="4" fill="${dark ? col : ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark ? onCol(col) : onCol(ds.primary)}">${esc(nm(k))}</text></g>`,
+        );
       }
-      if (hl.has('callout')) (x < W / 2 ? margin.l : margin.r).push({ k, x, y, col });
+      if (hl.has('callout')) {
+        // the label column is chosen on the unzoomed page, so labels stay put relative to the map
+        const bx = (x - S.zoom.x) / S.zoom.k,
+          by = (y - S.zoom.y) / S.zoom.k;
+        (bx < W / 2 ? margin.l : margin.r).push({ k, x, y, bx, by, col });
+      }
     }
   });
   for (const side of ['l', 'r']) {
-    const arr = margin[side].sort((a, b) => a.y - b.y);
+    const arr = margin[side].sort((a, b) => a.by - b.by);
     const n = arr.length;
     if (!n) continue;
     const avail = H - FOOT - 260;
     const step = Math.min(70, avail / n);
     const y0 = (H - FOOT - step * (n - 1)) / 2 + 40;
+    const z = S.zoom;
     arr.forEach((o, i) => {
-      const lab = y0 + i * step;
-      const lx = side === 'l' ? PAD.l - 18 : W - PAD.r + 18;
-      const tx = side === 'l' ? 24 : W - 24;
-      const ln = `M${o.x.toFixed(1)} ${o.y.toFixed(1)}L${lx} ${lab.toFixed(1)}`;
+      // position on the unzoomed page, then moved with the map (zoom/pan), then by the user's drag
+      const [ddx, ddy] = dragOf('co:' + o.k.c);
+      // follows zoom/pan, but never leaves the page; the user's drag comes on top
+      const tx = Math.min(W - 24, Math.max(24, (side === 'l' ? 24 : W - 24) * z.k + z.x)) + ddx,
+        lab = Math.min(H - FOOT - 24, Math.max(PAD.t * 0.6, (y0 + i * step) * z.k + z.y)) + ddy;
+      const name = nm(o.k),
+        nw = name.length * 15 * 0.6,
+        rw = String(GEO.groups[o.k.r] || '').length * (9 * 0.66 + 1.5) + 4,
+        uw = Math.max(nw, rw);
+      // the leader line meets the end of the underline that faces the map, never the text
+      const ex = side === 'l' ? tx + uw : tx - uw;
+      const ln = `M${o.x.toFixed(1)} ${o.y.toFixed(1)}L${ex.toFixed(1)} ${(lab + 1).toFixed(1)}`;
       const lc = o.col.toLowerCase() === land.toLowerCase() ? onCol(land) : o.col;
-      out += `<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/><text x="${tx}" y="${(lab - 4).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}">${esc(nm(o.k))}</text><text x="${tx}" y="${(lab + 10).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".7">${GEO.groups[o.k.r].toUpperCase()}</text>`;
+      out += `<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/>`;
+      // the label (dragged as a whole; its offset is already in tx/lab)
+      out += `<g class="drg" data-drag="co:${esc(o.k.c)}" pointer-events="all"><path d="M${(side === 'l' ? tx : tx - uw).toFixed(1)} ${(lab + 1).toFixed(1)}h${uw.toFixed(1)}" stroke="${lc}" stroke-width="1.6"/><text x="${tx.toFixed(1)}" y="${(lab - 4).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}" stroke="${bg}" stroke-width="3" stroke-opacity=".8" paint-order="stroke">${esc(name)}</text><text x="${tx.toFixed(1)}" y="${(lab + 12).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".75" stroke="${bg}" stroke-width="2.5" stroke-opacity=".85" paint-order="stroke">${GEO.groups[o.k.r].toUpperCase()}</text></g>`;
     });
   }
   // signaturforklaring
@@ -686,7 +779,9 @@ function render(target) {
       if (textTop[side] != null) y -= Math.max(0, H - FOOT - 2 - textTop[side]);
       const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
       const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw : PAD.l - 20;
-      out += `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
+      let lg = `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
+      const legOut = out;
+      out = '';
       items.forEach((o) => {
         if (o.head)
           out += `<text x="${x}" y="${y + 11}" font-family="'${lf}'" font-size="11" font-weight="700" fill="${ink}">${esc(o.label)}</text>`;
@@ -696,6 +791,7 @@ function render(target) {
           out += `<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;
         y += 18;
       });
+      out = legOut + dragG('legend', lg + out);
     }
   }
   out += '</g>';
@@ -704,11 +800,17 @@ function render(target) {
     const t = sp.titleCaps ? title.toUpperCase() : title;
     const ls = sp.titleCaps ? 8 : -1;
     if (title)
-      out += `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}" ${guard && isHex(bg) && (S.focus || S.zoom.k > 1.2) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"` : ''}>${esc(t)}</text>`;
+      out += dragG(
+        'title',
+        `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}" ${guard && isHex(bg) && (S.focus || S.zoom.k > 1.2) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"` : ''}>${esc(t)}</text>`,
+      );
     if (sub) {
       const sh = sPos === 'under' ? tp[1] : sPos[1];
       const sy = sPos === 'under' ? ty + 24 : sPos[0] === 't' ? top : bot;
-      out += `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''}>${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`;
+      out += dragG(
+        'sub',
+        `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''}>${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`,
+      );
     }
   }
   if (document.getElementById('showLogo').checked) {
@@ -730,13 +832,22 @@ function render(target) {
             .filter(isHex)
             .some((b) => contrast('#ffffff', b) < 4.5 || contrast(ds.headingOnDark || ds.accent, b) < 3));
       if (!box)
-        out += `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`;
+        out += dragG(
+          'logo',
+          `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`,
+        );
       else
-        out += `<rect x="${W - PAD.l + 12 - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`;
+        out += dragG(
+          'logo',
+          `<rect x="${W - PAD.l + 12 - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`,
+        );
     } else {
       const txt = loc(L.text) || loc(D.company.name);
       if (txt)
-        out += `<text x="${W - PAD.l + 12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - PAD.l + 12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`;
+        out += dragG(
+          'logo',
+          `<text x="${W - PAD.l + 12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - PAD.l + 12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`,
+        );
     }
   }
   out += '</g>';
@@ -744,6 +855,8 @@ function render(target) {
   window._links = [];
   if (FOOT) {
     const fy = H - FOOT;
+    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y)
+      out += `<rect x="0" y="${fy}" width="${W}" height="${FOOT}" fill="${bg}"/>`;
     const label = document.getElementById('footerLabel').value;
     const dv = D.footer.divider;
     let dcol = dv.color || ds.primary;
@@ -784,6 +897,13 @@ function render(target) {
     out += '</g>';
   }
   out += fxContentTop(ink, ds.accent);
+  if (!target && typeof SNAP_GUIDES !== 'undefined' && SNAP_GUIDES) {
+    const gcol = ds.accent;
+    if (SNAP_GUIDES.x != null)
+      out += `<line x1="${SNAP_GUIDES.x}" y1="0" x2="${SNAP_GUIDES.x}" y2="${H}" stroke="${gcol}" stroke-width="1" stroke-dasharray="5 4" pointer-events="none"/>`;
+    if (SNAP_GUIDES.y != null)
+      out += `<line x1="0" y1="${SNAP_GUIDES.y}" x2="${W}" y2="${SNAP_GUIDES.y}" stroke="${gcol}" stroke-width="1" stroke-dasharray="5 4" pointer-events="none"/>`;
+  }
   if (target) {
     target.setAttribute('viewBox', `0 0 ${W} ${H}`);
     target.innerHTML = defs + fxWrap(out, bg, ink, ds.accent);

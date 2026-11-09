@@ -21,6 +21,7 @@ const S = {
   }, // effects & picture frame (55-fx.js)
   dsColours: false, // map styles use the design system's colours (keeping their effects)
   guard: true, // contrast guard: readable text and visible highlights
+  drag: {}, // texts moved by hand: { title | sub | legend | logo | co:<unit> | lb:<unit>: [dx, dy] }
   far: 'inset', // far-away parts (Alaska, Bornholm …): 'inset' | 'show' | 'hide'
   focusHide: false, // hide units outside the focus
   worldProj: DEFAULT_PROJ, // remembered world projection while viewing a country
