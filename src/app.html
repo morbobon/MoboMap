@@ -463,6 +463,13 @@
                     oninput="setFooterOpt('margin', +this.value)"
                 /></label>
               </div>
+              <label
+                ><span data-i18n="pt_align"></span
+                ><select id="ptAlign" onchange="setFooterOpt('align', this.value)">
+                  <option value="left" data-i18n="al_left"></option>
+                  <option value="center" data-i18n="al_center"></option>
+                  <option value="right" data-i18n="al_right"></option></select
+              ></label>
               <label class="ck" data-i18n-title="pt_auto_t"
                 ><input type="checkbox" id="ptAuto" checked onchange="setFooterOpt('autoScale', this.checked)" />
                 <span data-i18n="pt_auto"></span

@@ -1,13 +1,14 @@
 // Partner footer: order (array order), visibility (p.hidden), row (p.row) and layout options (S.footer).
 // Order and rows can be changed in the list (drag, ▲▼) and on the map: drag a logo – it snaps into the
 // nearest row and slot; with Ctrl (or snapping off) it stays exactly where it is dropped.
-const FOOTER_DEFAULT = { rows: 1, autoScale: true, margin: 5 };
+const FOOTER_DEFAULT = { rows: 1, autoScale: true, margin: 5, align: 'left' };
 S.footer = Object.assign({}, FOOTER_DEFAULT);
 function footerOpts() {
   const f = Object.assign({}, FOOTER_DEFAULT, S.footer || {});
   f.rows = Math.max(1, Math.min(4, Math.round(+f.rows) || 1));
   f.margin = Math.max(0, Math.min(20, +f.margin));
   if (!Number.isFinite(f.margin)) f.margin = FOOTER_DEFAULT.margin;
+  if (!['left', 'center', 'right'].includes(f.align)) f.align = 'left';
   return f;
 }
 const partnerShown = (p) => !p.hidden && ((p.logo && p.logo.src) || p.name);
@@ -44,8 +45,9 @@ function partnersSvg(c) {
   const gap0 = Math.round(W * 0.03);
   const rows = [...Array(f.rows)].map(() => []);
   S.partners.forEach((p) => partnerShown(p) && rows[partnerRow(p)].push(p));
-  const natW = (p, lh) => (p.logo && p.logo.src ? Math.min(lh * (p.logo.aspect || 2), W * 0.2) : p.name.length * 8);
-  const labelW = c.label ? c.label.length * 7.2 : 0;
+  const natW = (p, lh) =>
+    p.logo && p.logo.src ? Math.min(lh * (p.logo.aspect || 2), W * 0.2) : textW(p.name, c.head, 700, 13);
+  const labelW = c.label ? textW(c.label.toUpperCase(), c.lf, 400, 11, 1) : 0;
   // one scale for all rows, so the logos keep the same size relative to each other
   let s = 1;
   if (f.autoScale)
@@ -63,7 +65,12 @@ function partnersSvg(c) {
   const ys = rows.map((_, ri) => c.fy + rowH * (ri + 0.5));
   rows.forEach((r, ri) => {
     const ty = ys[ri];
-    let x = m;
+    // row width at this scale, for centre / right alignment
+    const rowW =
+      r.reduce((a, p) => a + natW(p, lh0) * s, 0) +
+      gap * Math.max(0, r.length - 1) +
+      (ri === 0 && c.label ? labelW * s + (r.length ? gap : 0) : 0);
+    let x = f.align === 'center' ? (W - rowW) / 2 : f.align === 'right' ? W - m - rowW : m;
     if (ri === 0 && c.label) {
       out += `<text x="${x.toFixed(1)}" y="${(ty + 4 * s).toFixed(1)}" font-family="'${c.lf}'" font-size="${(11 * s).toFixed(1)}" letter-spacing="${s}" fill="${c.ink}" opacity="${c.tOp(0.75)}">${esc(c.label.toUpperCase())}</text>`;
       x += labelW * s + gap;
@@ -168,6 +175,7 @@ function partnersUI() {
   document.getElementById('partnerCount').textContent = (shown < n ? shown + '/' : '') + n + ' ' + t('partners');
   document.getElementById('ptRows').value = String(f.rows);
   document.getElementById('ptAuto').checked = !!f.autoScale;
+  document.getElementById('ptAlign').value = f.align;
   document.getElementById('ptMargin').value = f.margin;
   document.getElementById('ptMarginV').textContent = f.margin + ' %';
 }

@@ -478,7 +478,11 @@
   "pt_up": "Move up",
   "pt_down": "Move down",
   "ts_ds_pending": "This link uses the design system \"{id}\", which is not in this browser. Import it (Look tab → design system) and the map appears as sent.",
-  "ts_ds_applied": "Link applied with \"{id}\""
+  "ts_ds_applied": "Link applied with \"{id}\"",
+  "pt_align": "Partner alignment",
+  "al_left": "Left",
+  "al_center": "Centre",
+  "al_right": "Right"
  },
  "da": {
   "yes": "Ja",
@@ -959,7 +963,11 @@
   "pt_up": "Flyt op",
   "pt_down": "Flyt ned",
   "ts_ds_pending": "Linket bruger designsystemet \"{id}\", som ikke findes i denne browser. Importér det (Udseende → designsystem), så vises kortet som sendt.",
-  "ts_ds_applied": "Link anvendt med \"{id}\""
+  "ts_ds_applied": "Link anvendt med \"{id}\"",
+  "pt_align": "Justering af partnere",
+  "al_left": "Venstre",
+  "al_center": "Midte",
+  "al_right": "Højre"
  },
  "de": {
   "yes": "Ja",
@@ -1440,7 +1448,11 @@
   "pt_up": "Nach oben",
   "pt_down": "Nach unten",
   "ts_ds_pending": "Dieser Link nutzt das Designsystem „{id}“, das in diesem Browser fehlt. Importiere es (Look → Designsystem), dann erscheint die Karte wie gesendet.",
-  "ts_ds_applied": "Link mit „{id}“ angewendet"
+  "ts_ds_applied": "Link mit „{id}“ angewendet",
+  "pt_align": "Ausrichtung der Partner",
+  "al_left": "Links",
+  "al_center": "Mitte",
+  "al_right": "Rechts"
  },
  "fr": {
   "yes": "Oui",
@@ -1921,7 +1933,11 @@
   "pt_up": "Monter",
   "pt_down": "Descendre",
   "ts_ds_pending": "Ce lien utilise le système de design « {id} », absent de ce navigateur. Importez-le (Apparence → système de design) et la carte s’affiche comme envoyée.",
-  "ts_ds_applied": "Lien appliqué avec « {id} »"
+  "ts_ds_applied": "Lien appliqué avec « {id} »",
+  "pt_align": "Alignement des partenaires",
+  "al_left": "Gauche",
+  "al_center": "Centre",
+  "al_right": "Droite"
  },
  "es": {
   "yes": "Sí",
@@ -2402,7 +2418,11 @@
   "pt_up": "Subir",
   "pt_down": "Bajar",
   "ts_ds_pending": "Este enlace usa el sistema de diseño «{id}», que no está en este navegador. Impórtalo (Aspecto → sistema de diseño) y el mapa aparecerá tal como se envió.",
-  "ts_ds_applied": "Enlace aplicado con «{id}»"
+  "ts_ds_applied": "Enlace aplicado con «{id}»",
+  "pt_align": "Alineación de socios",
+  "al_left": "Izquierda",
+  "al_center": "Centro",
+  "al_right": "Derecha"
  },
  "sv": {
   "yes": "Ja",
@@ -2883,7 +2903,11 @@
   "pt_up": "Flytta upp",
   "pt_down": "Flytta ned",
   "ts_ds_pending": "Länken använder designsystemet ”{id}” som saknas i den här webbläsaren. Importera det (Utseende → designsystem) så visas kartan som den skickades.",
-  "ts_ds_applied": "Länk tillämpad med ”{id}”"
+  "ts_ds_applied": "Länk tillämpad med ”{id}”",
+  "pt_align": "Justering av partner",
+  "al_left": "Vänster",
+  "al_center": "Mitten",
+  "al_right": "Höger"
  },
  "no": {
   "yes": "Ja",
@@ -3364,7 +3388,11 @@
   "pt_up": "Flytt opp",
   "pt_down": "Flytt ned",
   "ts_ds_pending": "Lenken bruker designsystemet «{id}», som ikke finnes i denne nettleseren. Importer det (Utseende → designsystem), så vises kartet som sendt.",
-  "ts_ds_applied": "Lenke brukt med «{id}»"
+  "ts_ds_applied": "Lenke brukt med «{id}»",
+  "pt_align": "Justering av partnere",
+  "al_left": "Venstre",
+  "al_center": "Midten",
+  "al_right": "Høyre"
  },
  "fi": {
   "yes": "Kyllä",
@@ -3845,7 +3873,11 @@
   "pt_up": "Siirrä ylös",
   "pt_down": "Siirrä alas",
   "ts_ds_pending": "Linkki käyttää suunnittelujärjestelmää ”{id}”, jota tässä selaimessa ei ole. Tuo se (Ulkoasu → suunnittelujärjestelmä), niin kartta näkyy lähetetyn mukaisena.",
-  "ts_ds_applied": "Linkki otettu käyttöön: ”{id}”"
+  "ts_ds_applied": "Linkki otettu käyttöön: ”{id}”",
+  "pt_align": "Kumppanien tasaus",
+  "al_left": "Vasen",
+  "al_center": "Keskellä",
+  "al_right": "Oikea"
  },
  "nl": {
   "yes": "Ja",
@@ -4326,7 +4358,11 @@
   "pt_up": "Omhoog",
   "pt_down": "Omlaag",
   "ts_ds_pending": "Deze link gebruikt het designsysteem \"{id}\", dat niet in deze browser staat. Importeer het (Uiterlijk → designsysteem) en de kaart verschijnt zoals verstuurd.",
-  "ts_ds_applied": "Link toegepast met \"{id}\""
+  "ts_ds_applied": "Link toegepast met \"{id}\"",
+  "pt_align": "Uitlijning partners",
+  "al_left": "Links",
+  "al_center": "Midden",
+  "al_right": "Rechts"
  },
  "it": {
   "yes": "Sì",
@@ -4807,6 +4843,10 @@
   "pt_up": "Sposta su",
   "pt_down": "Sposta giù",
   "ts_ds_pending": "Questo link usa il design system \"{id}\", assente in questo browser. Importalo (Aspetto → design system) e la mappa apparirà come inviata.",
-  "ts_ds_applied": "Link applicato con \"{id}\""
+  "ts_ds_applied": "Link applicato con \"{id}\"",
+  "pt_align": "Allineamento partner",
+  "al_left": "Sinistra",
+  "al_center": "Centro",
+  "al_right": "Destra"
  }
 }
