@@ -17,6 +17,19 @@ function linkBase() {
   b.zoom = { k: 1, x: 0, y: 0 };
   return b;
 }
+// a link waiting for its design system: { ds, search }
+let PENDING_LINK = null;
+// called after design systems were added: true when a waiting link was applied
+function applyPendingLink(ids) {
+  if (!PENDING_LINK || !ids.includes(PENDING_LINK.ds)) return false;
+  const pl = PENDING_LINK;
+  PENDING_LINK = null;
+  const p = projectFromUrl(pl.search);
+  if (!p) return false;
+  loadProject(p, true);
+  toast(t('ts_ds_applied').replace('{id}', loc(DS[pl.ds].name)));
+  return true;
+}
 function shareParams() {
   const p = projectState(),
     d = linkBase();
@@ -28,7 +41,7 @@ function shareParams() {
   put('c', p.country || 'world', d.country || 'world');
   put('f', p.focus, d.focus || '');
   put('st', p.style, d.style || 'flat');
-  put('ds', p.designSystem, d.designSystem || '');
+  put('ds', PENDING_LINK ? PENDING_LINK.ds : p.designSystem, d.designSystem || '');
   put('lay', p.layout, d.layout || 'land');
   if (GEO.geo) put('proj', p.proj, p.country ? 'local' : d.proj || DEFAULT_PROJ);
   put('attr', p.attr, d.attr || 'none');
@@ -186,7 +199,12 @@ function projectFromUrl(search) {
   if (q.has('ds')) {
     const v = g('ds');
     if (DS[v]) p.designSystem = v;
-    else setTimeout(() => toast(t('ts_link_bad') + ': ds=' + v), 600);
+    else {
+      // a private profile the receiver does not have (yet): keep the link as it is and apply it again as
+      // soon as a profile with that id is added (import, sidecar file)
+      PENDING_LINK = { ds: v, search: search };
+      setTimeout(() => toast(t('ts_ds_pending').replace('{id}', v), 8000), 600);
+    }
   }
   if (q.has('lay') && LAYOUTS.some((l) => l.id === g('lay'))) p.layout = g('lay');
   if (q.has('proj') && Object.hasOwn(PROJS, g('proj'))) p.proj = g('proj');

@@ -476,7 +476,9 @@
   "pt_show_t": "Show on this map",
   "pt_row": "Row",
   "pt_up": "Move up",
-  "pt_down": "Move down"
+  "pt_down": "Move down",
+  "ts_ds_pending": "This link uses the design system \"{id}\", which is not in this browser. Import it (Look tab → design system) and the map appears as sent.",
+  "ts_ds_applied": "Link applied with \"{id}\""
  },
  "da": {
   "yes": "Ja",
@@ -955,7 +957,9 @@
   "pt_show_t": "Vis på dette kort",
   "pt_row": "Række",
   "pt_up": "Flyt op",
-  "pt_down": "Flyt ned"
+  "pt_down": "Flyt ned",
+  "ts_ds_pending": "Linket bruger designsystemet \"{id}\", som ikke findes i denne browser. Importér det (Udseende → designsystem), så vises kortet som sendt.",
+  "ts_ds_applied": "Link anvendt med \"{id}\""
  },
  "de": {
   "yes": "Ja",
@@ -1434,7 +1438,9 @@
   "pt_show_t": "Auf dieser Karte zeigen",
   "pt_row": "Zeile",
   "pt_up": "Nach oben",
-  "pt_down": "Nach unten"
+  "pt_down": "Nach unten",
+  "ts_ds_pending": "Dieser Link nutzt das Designsystem „{id}“, das in diesem Browser fehlt. Importiere es (Look → Designsystem), dann erscheint die Karte wie gesendet.",
+  "ts_ds_applied": "Link mit „{id}“ angewendet"
  },
  "fr": {
   "yes": "Oui",
@@ -1913,7 +1919,9 @@
   "pt_show_t": "Afficher sur cette carte",
   "pt_row": "Rangée",
   "pt_up": "Monter",
-  "pt_down": "Descendre"
+  "pt_down": "Descendre",
+  "ts_ds_pending": "Ce lien utilise le système de design « {id} », absent de ce navigateur. Importez-le (Apparence → système de design) et la carte s’affiche comme envoyée.",
+  "ts_ds_applied": "Lien appliqué avec « {id} »"
  },
  "es": {
   "yes": "Sí",
@@ -2392,7 +2400,9 @@
   "pt_show_t": "Mostrar en este mapa",
   "pt_row": "Fila",
   "pt_up": "Subir",
-  "pt_down": "Bajar"
+  "pt_down": "Bajar",
+  "ts_ds_pending": "Este enlace usa el sistema de diseño «{id}», que no está en este navegador. Impórtalo (Aspecto → sistema de diseño) y el mapa aparecerá tal como se envió.",
+  "ts_ds_applied": "Enlace aplicado con «{id}»"
  },
  "sv": {
   "yes": "Ja",
@@ -2871,7 +2881,9 @@
   "pt_show_t": "Visa på den här kartan",
   "pt_row": "Rad",
   "pt_up": "Flytta upp",
-  "pt_down": "Flytta ned"
+  "pt_down": "Flytta ned",
+  "ts_ds_pending": "Länken använder designsystemet ”{id}” som saknas i den här webbläsaren. Importera det (Utseende → designsystem) så visas kartan som den skickades.",
+  "ts_ds_applied": "Länk tillämpad med ”{id}”"
  },
  "no": {
   "yes": "Ja",
@@ -3350,7 +3362,9 @@
   "pt_show_t": "Vis på dette kartet",
   "pt_row": "Rad",
   "pt_up": "Flytt opp",
-  "pt_down": "Flytt ned"
+  "pt_down": "Flytt ned",
+  "ts_ds_pending": "Lenken bruker designsystemet «{id}», som ikke finnes i denne nettleseren. Importer det (Utseende → designsystem), så vises kartet som sendt.",
+  "ts_ds_applied": "Lenke brukt med «{id}»"
  },
  "fi": {
   "yes": "Kyllä",
@@ -3829,7 +3843,9 @@
   "pt_show_t": "Näytä tällä kartalla",
   "pt_row": "Rivi",
   "pt_up": "Siirrä ylös",
-  "pt_down": "Siirrä alas"
+  "pt_down": "Siirrä alas",
+  "ts_ds_pending": "Linkki käyttää suunnittelujärjestelmää ”{id}”, jota tässä selaimessa ei ole. Tuo se (Ulkoasu → suunnittelujärjestelmä), niin kartta näkyy lähetetyn mukaisena.",
+  "ts_ds_applied": "Linkki otettu käyttöön: ”{id}”"
  },
  "nl": {
   "yes": "Ja",
@@ -4308,7 +4324,9 @@
   "pt_show_t": "Tonen op deze kaart",
   "pt_row": "Rij",
   "pt_up": "Omhoog",
-  "pt_down": "Omlaag"
+  "pt_down": "Omlaag",
+  "ts_ds_pending": "Deze link gebruikt het designsysteem \"{id}\", dat niet in deze browser staat. Importeer het (Uiterlijk → designsysteem) en de kaart verschijnt zoals verstuurd.",
+  "ts_ds_applied": "Link toegepast met \"{id}\""
  },
  "it": {
   "yes": "Sì",
@@ -4787,6 +4805,8 @@
   "pt_show_t": "Mostra su questa mappa",
   "pt_row": "Riga",
   "pt_up": "Sposta su",
-  "pt_down": "Sposta giù"
+  "pt_down": "Sposta giù",
+  "ts_ds_pending": "Questo link usa il design system \"{id}\", assente in questo browser. Importalo (Aspetto → design system) e la mappa apparirà come inviata.",
+  "ts_ds_applied": "Link applicato con \"{id}\""
  }
 }

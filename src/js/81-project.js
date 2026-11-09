@@ -68,7 +68,8 @@ function loadProject(p, quiet) {
       saveUserDS();
     }
   }
-  if (!DS[p.designSystem]) toast(t('ts_ds_missing').replace('{id}', p.designSystem) + ' ' + loc(DS[DSORDER[0]].name));
+  if (!DS[p.designSystem] && !(typeof PENDING_LINK !== 'undefined' && PENDING_LINK))
+    toast(t('ts_ds_missing').replace('{id}', p.designSystem) + ' ' + loc(DS[DSORDER[0]].name));
   S.ds = DS[p.designSystem] ? p.designSystem : DSORDER[0];
   const D = DS[S.ds];
   S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';

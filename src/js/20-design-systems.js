@@ -124,6 +124,7 @@ function importDSObject(obj) {
   const want = !Array.isArray(obj) && typeof obj.default === 'string' ? obj.default : null;
   const flagged = list.find((d) => d && d.default === true);
   const n = added.find((r) => r.id === want) || added.find((r) => flagged && r.id === String(flagged.id)) || added[0];
+  if (typeof applyPendingLink === 'function' && applyPendingLink(added.map((r) => r.id))) return;
   setDS(n.id);
   toast(t('ts_imported') + ': ' + (added.length > 1 ? added.length + ' · ' : '') + loc(n.name));
 }

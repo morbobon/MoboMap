@@ -145,6 +145,7 @@ function ui() {
   partnersUI();
 }
 function setDS(v) {
+  if (typeof PENDING_LINK !== 'undefined' && PENDING_LINK && PENDING_LINK.ds !== v) PENDING_LINK = null;
   // groups using the previous profile's palette take the matching colour of the new one; custom colours stay
   const prev = DS[S.ds];
   if (prev && prev !== DS[v])
@@ -301,12 +302,12 @@ function presetRegionActive(r) {
   ui();
   render();
 }
-function toast(m) {
+function toast(m, ms) {
   const t = document.getElementById('toast');
   t.textContent = m;
   t.classList.add('show');
   clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+  t._t = setTimeout(() => t.classList.remove('show'), ms || 2800);
 }
 const svg = document.getElementById('svg'),
   tip = document.getElementById('tip');
