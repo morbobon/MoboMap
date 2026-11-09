@@ -9,7 +9,32 @@ function footerOpts() {
   f.margin = Math.max(0, Math.min(20, +f.margin));
   if (!Number.isFinite(f.margin)) f.margin = FOOTER_DEFAULT.margin;
   if (!['left', 'center', 'right'].includes(f.align)) f.align = 'left';
+  // each row can have its own alignment; '' = the common one
+  f.rowAlign = [...Array(f.rows)].map((_, r) => {
+    const a = (Array.isArray(f.rowAlign) ? f.rowAlign : [])[r];
+    // a single row simply follows the common setting (it has no field of its own)
+    return f.rows > 1 && ['left', 'center', 'right'].includes(a) ? a : '';
+  });
   return f;
+}
+// link form: common alignment + one letter per row ('-' = the common one), e.g. "lc-r"
+const AL_CH = { left: 'l', center: 'c', right: 'r' };
+const AL_OF = { l: 'left', c: 'center', r: 'right' };
+function footerAlignCode(f) {
+  return (
+    (AL_CH[f.align] || 'l') +
+    (f.rowAlign || [])
+      .map((a) => AL_CH[a] || '-')
+      .join('')
+      .replace(/-+$/, '')
+  );
+}
+function setRowAlign(r, v) {
+  const f = footerOpts();
+  f.rowAlign[r] = v;
+  S.footer = f;
+  ui();
+  render();
 }
 // a partner's own size on top of the common scale (0.3–3, 1 = normal)
 const pScale = (p) => Math.max(0.3, Math.min(3, +p.scale || 1));
@@ -75,7 +100,8 @@ function partnersSvg(c) {
       r.reduce((a, p) => a + natW(p, lh0) * s, 0) +
       gap * Math.max(0, r.length - 1) +
       (ri === 0 && c.label ? labelW * s + (r.length ? gap : 0) : 0);
-    let x = f.align === 'center' ? (W - rowW) / 2 : f.align === 'right' ? W - m - rowW : m;
+    const al = f.rowAlign[ri] || f.align;
+    let x = al === 'center' ? (W - rowW) / 2 : al === 'right' ? W - m - rowW : m;
     if (ri === 0 && c.label) {
       out += `<text x="${x.toFixed(1)}" y="${(ty + 4 * s).toFixed(1)}" font-family="'${c.lf}'" font-size="${(11 * s).toFixed(1)}" letter-spacing="${s}" fill="${c.ink}" opacity="${c.tOp(0.75)}">${esc(c.label.toUpperCase())}</text>`;
       x += labelW * s + gap;
@@ -182,6 +208,16 @@ function partnersUI() {
   document.getElementById('ptRows').value = String(f.rows);
   document.getElementById('ptAuto').checked = !!f.autoScale;
   document.getElementById('ptAlign').value = f.align;
+  // one alignment per row (only with several rows)
+  document.getElementById('ptRowAlign').innerHTML =
+    f.rows > 1
+      ? f.rowAlign
+          .map(
+            (a, r) =>
+              `<label><span>${esc(t('pt_row'))} ${r + 1}</span><select onchange="setRowAlign(${r}, this.value)">${['', 'left', 'center', 'right'].map((v) => `<option value="${v}" ${a === v ? 'selected' : ''}>${esc(t(v ? 'al_' + v : 'al_common'))}</option>`).join('')}</select></label>`,
+          )
+          .join('')
+      : '';
   document.getElementById('ptMargin').value = f.margin;
   document.getElementById('ptMarginV').textContent = f.margin + ' %';
 }

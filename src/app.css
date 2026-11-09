@@ -1074,3 +1074,9 @@ header h1 a.home {
   padding: 1px 4px;
   flex: 0 0 auto;
 }
+.rowaligns {
+  flex-wrap: wrap;
+}
+.rowaligns:empty {
+  display: none;
+}

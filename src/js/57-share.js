@@ -71,8 +71,9 @@ function shareParams() {
   // partner footer: rows.autoScale.margin, and the profile partners' order / rows / visibility
   const fo = p.footer,
     fd = Object.assign({}, FOOTER_DEFAULT, d.footer || {});
-  if (fo.rows !== fd.rows || !!fo.autoScale !== !!fd.autoScale || fo.margin !== fd.margin || fo.align !== fd.align)
-    q.set('pf', [fo.rows, fo.autoScale ? 1 : 0, fo.margin, fo.align[0]].join('_'));
+  const ac = footerAlignCode(fo);
+  if (fo.rows !== fd.rows || !!fo.autoScale !== !!fd.autoScale || fo.margin !== fd.margin || ac !== footerAlignCode(fd))
+    q.set('pf', [fo.rows, fo.autoScale ? 1 : 0, fo.margin, ac].join('_'));
   const po = partnerOrderParam();
   if (po) q.set('po', po);
   put('tp', p.titlePos, d.titlePos || 'auto');
@@ -244,7 +245,7 @@ function projectFromUrl(search) {
   if (q.has('sp') && posOk(g('sp'), 'under')) p.subPos = g('sp');
   if (q.has('ft')) p.footerLabel = g('ft');
   if (q.has('pf')) {
-    // rows_auto_margin_align (l/c/r); the first links used '.' and had no alignment
+    // rows_auto_margin_align (l/c/r, then one letter per row, '-' = the common one); the first links used '.' and had no alignment
     const v = g('pf');
     const [r, a, m, al] = v.includes('_')
       ? v.split('_')
@@ -253,7 +254,8 @@ function projectFromUrl(search) {
       rows: num(r) ?? 1,
       autoScale: a !== '0',
       margin: num(m) ?? FOOTER_DEFAULT.margin,
-      align: { l: 'left', c: 'center', r: 'right' }[al] || 'left',
+      align: AL_OF[(al || '')[0]] || 'left',
+      rowAlign: [...(al || '').slice(1)].map((ch) => AL_OF[ch] || ''),
     };
   }
   if (q.has('po')) p.partnerOrder = g('po');

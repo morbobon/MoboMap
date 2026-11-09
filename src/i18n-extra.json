@@ -515,7 +515,8 @@
   "scope_sel": "Colour highlighted areas only",
   "scope_only": "Colour only",
   "scope_t": "Where the statistic colours the map; everything else keeps the map style",
-  "pt_size_t": "Size in % – or hold Alt and scroll over the logo on the map"
+  "pt_size_t": "Size in % – or hold Alt and scroll over the logo on the map",
+  "al_common": "Same as footer"
  },
  "da": {
   "yes": "Ja",
@@ -1033,7 +1034,8 @@
   "scope_sel": "Farv kun fremhævede områder",
   "scope_only": "Farv kun",
   "scope_t": "Hvor statistikken farver kortet; resten beholder kortstilen",
-  "pt_size_t": "Størrelse i % – eller hold Alt nede og scroll over logoet på kortet"
+  "pt_size_t": "Størrelse i % – eller hold Alt nede og scroll over logoet på kortet",
+  "al_common": "Som sidefoden"
  },
  "de": {
   "yes": "Ja",
@@ -1551,7 +1553,8 @@
   "scope_sel": "Nur hervorgehobene Gebiete färben",
   "scope_only": "Nur färben",
   "scope_t": "Wo die Statistik die Karte färbt; der Rest behält den Kartenstil",
-  "pt_size_t": "Größe in % – oder Alt halten und über dem Logo auf der Karte scrollen"
+  "pt_size_t": "Größe in % – oder Alt halten und über dem Logo auf der Karte scrollen",
+  "al_common": "Wie Fußzeile"
  },
  "fr": {
   "yes": "Oui",
@@ -2069,7 +2072,8 @@
   "scope_sel": "Colorer seulement les zones surlignées",
   "scope_only": "Colorer seulement",
   "scope_t": "Où la statistique colore la carte ; le reste garde le style",
-  "pt_size_t": "Taille en % – ou maintenez Alt et faites défiler sur le logo"
+  "pt_size_t": "Taille en % – ou maintenez Alt et faites défiler sur le logo",
+  "al_common": "Comme le pied de page"
  },
  "es": {
   "yes": "Sí",
@@ -2587,7 +2591,8 @@
   "scope_sel": "Colorear solo las zonas resaltadas",
   "scope_only": "Colorear solo",
   "scope_t": "Dónde colorea la estadística; el resto mantiene el estilo",
-  "pt_size_t": "Tamaño en % – o mantén Alt y desplaza sobre el logo en el mapa"
+  "pt_size_t": "Tamaño en % – o mantén Alt y desplaza sobre el logo en el mapa",
+  "al_common": "Igual que el pie"
  },
  "sv": {
   "yes": "Ja",
@@ -3105,7 +3110,8 @@
   "scope_sel": "Färga bara markerade områden",
   "scope_only": "Färga bara",
   "scope_t": "Var statistiken färgar kartan; resten behåller kartstilen",
-  "pt_size_t": "Storlek i % – eller håll Alt och scrolla över logotypen på kartan"
+  "pt_size_t": "Storlek i % – eller håll Alt och scrolla över logotypen på kartan",
+  "al_common": "Som sidfoten"
  },
  "no": {
   "yes": "Ja",
@@ -3623,7 +3629,8 @@
   "scope_sel": "Farg bare uthevede områder",
   "scope_only": "Farg bare",
   "scope_t": "Hvor statistikken farger kartet; resten beholder kartstilen",
-  "pt_size_t": "Størrelse i % – eller hold Alt og rull over logoen på kartet"
+  "pt_size_t": "Størrelse i % – eller hold Alt og rull over logoen på kartet",
+  "al_common": "Som bunnteksten"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4141,7 +4148,8 @@
   "scope_sel": "Väritä vain korostetut alueet",
   "scope_only": "Väritä vain",
   "scope_t": "Missä tilasto värittää kartan; muu säilyttää tyylin",
-  "pt_size_t": "Koko %:na – tai pidä Alt pohjassa ja vieritä logon päällä"
+  "pt_size_t": "Koko %:na – tai pidä Alt pohjassa ja vieritä logon päällä",
+  "al_common": "Kuten alatunniste"
  },
  "nl": {
   "yes": "Ja",
@@ -4659,7 +4667,8 @@
   "scope_sel": "Alleen gemarkeerde gebieden kleuren",
   "scope_only": "Alleen kleuren",
   "scope_t": "Waar de statistiek kleurt; de rest houdt de kaartstijl",
-  "pt_size_t": "Grootte in % – of houd Alt ingedrukt en scroll over het logo"
+  "pt_size_t": "Grootte in % – of houd Alt ingedrukt en scroll over het logo",
+  "al_common": "Zoals voettekst"
  },
  "it": {
   "yes": "Sì",
@@ -5177,7 +5186,8 @@
   "scope_sel": "Colora solo le aree evidenziate",
   "scope_only": "Colora solo",
   "scope_t": "Dove la statistica colora; il resto mantiene lo stile",
-  "pt_size_t": "Dimensione in % – o tieni premuto Alt e scorri sul logo"
+  "pt_size_t": "Dimensione in % – o tieni premuto Alt e scorri sul logo",
+  "al_common": "Come il piè di pagina"
  },
  "tr": {
   "yes": "Evet",
@@ -5695,6 +5705,7 @@
   "scope_sel": "Yalnızca vurgulanan alanları renklendir",
   "scope_only": "Yalnızca renklendir",
   "scope_t": "İstatistiğin haritayı renklendirdiği yer; geri kalanı harita stilini korur",
-  "pt_size_t": "Boyut % olarak – veya Alt tuşunu basılı tutup haritadaki logonun üzerinde kaydırın"
+  "pt_size_t": "Boyut % olarak – veya Alt tuşunu basılı tutup haritadaki logonun üzerinde kaydırın",
+  "al_common": "Altbilgiyle aynı"
  }
 }
