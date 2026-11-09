@@ -14,7 +14,7 @@ if (!fs.existsSync(SRC)) {
 }
 
 const fields =
-  'adm1_code,adm0_a3,name,name_en,name_de,name_fr,name_es,name_sv,name_nl,name_it,region,type_en,iso_3166_2';
+  'adm1_code,adm0_a3,name,name_en,name_de,name_fr,name_es,name_sv,name_nl,name_it,name_tr,region,type_en,iso_3166_2';
 // Global pass: simplify (interval in metres for unprojected data), keep shapes, drop tiny islands
 const simp = await mapshaper.applyCommands(
   `-i in.json -filter-fields ${fields} -simplify dp interval=3500 keep-shapes -filter-islands min-area=25km2 remove-empty -clean -o out.json format=geojson precision=0.002`,

@@ -19,6 +19,7 @@ function projectState() {
     map: S.map,
     country: S.country,
     attr: S.attr,
+    attrScope: S.attrScope || 'all',
     proj: S.proj,
     focus: S.focus,
     focusHide: !!S.focusHide,
@@ -100,6 +101,7 @@ function loadProject(p, quiet) {
   if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
+  S.attrScope = typeof p.attrScope === 'string' ? p.attrScope : 'all';
   document.getElementById('titlePos').value = p.titlePos || 'auto';
   document.getElementById('subPos').value = p.subPos || 'under';
   S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : DEFAULT_PROJ) : DEFAULT_PROJ;

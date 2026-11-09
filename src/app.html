@@ -9,9 +9,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MoboMap – Design Studio</title>
-    <script>
-      /*__JSPDF__*/
-    </script>
     <!-- Valgfri: designsystems.js i samme mappe (window.DESIGN_SYSTEMS = [...]). Ignoreres hvis den mangler. -->
     <script src="designsystems.js" onerror="void 0"></script>
     <style>
@@ -165,6 +162,14 @@
                   <span data-i18n="attr_to_groups"></span>
                 </button>
               </div>
+              <select
+                id="attrScope"
+                onchange="
+                  S.attrScope = this.value;
+                  render();
+                "
+                data-i18n-title="scope_t"
+              ></select>
             </div>
           </section>
           <section class="sec" data-sec="groups">

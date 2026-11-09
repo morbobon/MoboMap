@@ -95,6 +95,7 @@ function countryData(iso) {
         a: areaR(d),
         d,
         s: d,
+        st: (c.s && c.s[u[0]]) || null, // regional statistics (Eurostat, CDC …)
       };
     })
     .filter((u) => u.d.length);
@@ -125,6 +126,7 @@ function countryData(iso) {
     cityList: (DATA.world.cities || {})[iso] || [],
     cname: c.n,
     cnames: wu && wu.names,
+    statsMeta: DATA.regionMeta,
   });
 }
 const countryName = (iso) => {

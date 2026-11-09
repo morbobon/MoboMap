@@ -24,7 +24,7 @@ await mapshaper.runCommands(`-i ${g}k_detail.json -points inner -o ${g}points.js
 // ---------- Verden (Natural Earth 110m, Robinson) ----------
 const w = 'assets/geo/';
 const fields =
-  'ADM0_A3,NAME_EN,NAME_DE,NAME_FR,NAME_ES,NAME_SV,NAME_NL,NAME_IT,CONTINENT,REGION_UN,SUBREGION,ECONOMY,INCOME_GRP,POP_EST,GDP_MD';
+  'ADM0_A3,NAME_EN,NAME_DE,NAME_FR,NAME_ES,NAME_SV,NAME_NL,NAME_IT,NAME_TR,CONTINENT,REGION_UN,SUBREGION,ECONOMY,INCOME_GRP,POP_EST,GDP_MD';
 for (const [lvl, pct] of [
   ['detail', '60%'],
   ['simple', '20%'],

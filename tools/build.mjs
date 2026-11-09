@@ -1,6 +1,7 @@
 // Builds one self-contained HTML file (index.html) from src/ + assets/ + designsystems/.
 // Usage: node tools/build.mjs [--public] [--out=path]   (--public skips designsystems/private/)
 import fs from 'fs';
+import zlib from 'zlib';
 import path from 'path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
@@ -239,6 +240,7 @@ const world = dataset({
       sv: p.NAME_SV,
       nl: p.NAME_NL,
       it: p.NAME_IT,
+      tr: p.NAME_TR,
     },
     at: {
       un: p.REGION_UN,
@@ -361,7 +363,7 @@ const adm1 = {};
         u: c.units.map((u) => {
           const p = u.p,
             names = {};
-          for (const l of ['de', 'fr', 'es', 'sv', 'nl', 'it']) {
+          for (const l of ['de', 'fr', 'es', 'sv', 'nl', 'it', 'tr']) {
             const v = p['name_' + l];
             if (v && v !== (p.name_en || p.name)) names[l] = v;
           }
@@ -385,7 +387,16 @@ const adm1 = {};
 }
 // Elevation contours for the terrain relief (tools/prepare-elevation.mjs)
 const elev = fs.existsSync(A('geo/elevation.json')) ? readJSON('geo/elevation.json') : null;
-const data = { dk, world, adm1, elev };
+// Regional statistics (tools/prepare-regional-stats.mjs): municipality / region -> { indicator: value }
+const regionMeta = {};
+if (fs.existsSync(A('geo/regional-stats.json'))) {
+  const rs = readJSON('geo/regional-stats.json');
+  Object.assign(regionMeta, rs.meta);
+  for (const u of dk.units) if (rs.dk[u.c]) u.st = rs.dk[u.c];
+  dk.statsMeta = rs.meta;
+  for (const [iso, v] of Object.entries(rs.adm1)) if (adm1[iso]) adm1[iso].s = v;
+}
+const data = { dk, world, adm1, elev, regionMeta };
 
 // ---------- Fonte ----------
 const b64 = (p) => fs.readFileSync(A(p)).toString('base64');
@@ -469,6 +480,7 @@ const designSystems = walk(DSDIR)
   });
 console.log('design systems:', designSystems.map((d) => d.id).join(', '));
 
+const pack = (text) => zlib.deflateRawSync(Buffer.from(text, 'utf8'), { level: 9 }).toString('base64');
 // ---------- App source: markup + css + js modules (src/js/NN-*.js, concatenated in name order) ----------
 const SRC = path.join(root, 'src');
 const jsFiles = fs
@@ -481,9 +493,10 @@ let html = fs
   .replace('/*__CSS__*/', () => fs.readFileSync(path.join(SRC, 'app.css'), 'utf8'))
   .replace('/*__JS__*/', () => appJs);
 html = html
-  .replace('/*__DATA__*/', () => 'const DATA = ' + JSON.stringify(data) + ';')
+  // map data and jsPDF are stored deflated (base64) and unpacked in the page (src/js/00-inflate.js)
+  .replace('/*__DATA__*/', () => 'const DATA = unpackJSON("' + pack(JSON.stringify(data)) + '");')
   .replace('/*__FONTS__*/', () => 'const FONTS = ' + JSON.stringify(fonts) + ';')
-  .replace('/*__JSPDF__*/', () => fs.readFileSync(A('jspdf.umd.min.js'), 'utf8'))
+  .replace("/*__JSPDF_Z__*/ ''", () => '"' + pack(fs.readFileSync(A('jspdf.umd.min.js'), 'utf8')) + '"')
   .replace(/\/\*__DESIGNSYSTEMS__\*\/\s*\[\]/, () => JSON.stringify(designSystems))
   .replace(/\/\*__DEFAULT_PROJECT__\*\/\s*null/, () =>
     JSON.stringify(JSON.parse(fs.readFileSync(path.join(root, 'src', 'default-project.json'), 'utf8'))),

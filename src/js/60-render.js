@@ -262,7 +262,7 @@ function render(target) {
     if (sp.flag) return S.map === 'world' ? (FLAGS[k.c] ? `url(#fl_${k.c})` : mix(land, '#888888', 0.3)) : land;
     if (st === 'halftone') return 'url(#dotsBase)';
     if (st === 'blueprint') return dsc ? land : '#1d4a73';
-    if (AT && !sp.patterns && !sp.text) return attrColor(AT, AT.f(k), ATC, land);
+    if (AT && !sp.patterns && !sp.text && attrInScope(k)) return attrColor(AT, AT.f(k), ATC, land);
     if (st === 'shades') {
       const i = (codeNum(k.c) * 7) % 5;
       return [land, landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12)][i];
@@ -775,7 +775,10 @@ function render(target) {
       });
     if (AT && !sp.patterns && !sp.text) {
       items.push({ head: true, label: t(AT.n) });
-      ATC.forEach((v) => items.push({ sw: attrColor(AT, v, ATC, land), stroke: ink, sw2: 0.4, label: v }));
+      const shown = new Set(GEO.units.filter(attrInScope).map(AT.f));
+      ATC.filter((v) => shown.has(v)).forEach((v) =>
+        items.push({ sw: attrColor(AT, v, ATC, land), stroke: ink, sw2: 0.4, label: v }),
+      );
       const src = attrSource(AT);
       if (src) items.push({ src: true, label: src });
     }

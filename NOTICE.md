@@ -32,6 +32,10 @@ Third-party content bundled in builds:
 - Country boundaries and populated places: Natural Earth (naturalearthdata.com) – public domain.
 - Country statistics: Our World in Data (ourworldindata.org) – CC BY 4.0, with data from UCDP, V-Dem,
   World Bank, FAO, WHO, UN WPP, UNDP, ITU, Global Carbon Project, Ember and the Energy Institute.
+- Regional statistics: Statistics Denmark (statbank.dk, CC BY 4.0); Eurostat regional statistics and
+  GISCO NUTS boundaries (© European Union, CC BY 4.0); County Health Rankings & Roadmaps (University of
+  Wisconsin Population Health Institute) and US Census Bureau ACS, both via Data USA; CDC / NCHS U.S. State
+  Life Tables (public domain).
 - Elevation: ETOPO1 Global Relief Model (NOAA NCEI), via NOAA CoastWatch ERDDAP – public domain.
 - Fonts: Arvo, Work Sans, Roboto Slab, Space Grotesk, DM Serif Display, IBM Plex Mono –
   SIL Open Font License 1.1 (Google Fonts).

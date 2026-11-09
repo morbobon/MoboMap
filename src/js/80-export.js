@@ -41,7 +41,7 @@ async function exportMap(fmt) {
   if (fmt === 'png') dl(c.toDataURL('image/png'), name + '.png');
   else if (fmt === 'jpg') dl(c.toDataURL('image/jpeg', 0.93), name + '.jpg');
   else {
-    const { jsPDF } = window.jspdf;
+    const { jsPDF } = loadJsPDF();
     const pdf = new jsPDF({ orientation: W >= H ? 'landscape' : 'portrait', unit: 'mm', format: 'a4' });
     const pw = pdf.internal.pageSize.getWidth(),
       ph = pdf.internal.pageSize.getHeight();

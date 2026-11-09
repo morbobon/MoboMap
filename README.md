@@ -15,11 +15,12 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Home** – click *MoboMap* in the header to return to the start map; with unsaved changes it first offers to save them as a look in the browser or as a project file.
 - **Effects & frames** – 34 effects (aged paper, grain, crumpled, coffee and water stains, burnt/torn edges, curled corner, papyrus roll, gallery spotlight, window light, blind shadows, dappled leaves, sunbeams, dusk, glass, emboss, gold foil, sepia, halftone, compass rose, rhumb lines, map border …) with an **intensity per effect**, an overall strength, **light direction** (shadows, relief, spotlight, glass and frame shading follow it) and warmth; 26 frames from realistic wood and metal (oak, walnut, driftwood, ebony, brushed steel, brass, copper, gold, floater …) to graphic ones (card, polaroid, stamp, tape, pins, neon).
 - **Title & subtitle flair** – optional title effects (drop shadow, long shadow, 3D block, retro outline, letterpress, soft glow, neon sign, gold foil, colour gradient, rubber stamp, highlighter, brush swash, ribbon banner, old-map cartouche, brass plaque) and subtitle effects (side rules, ornaments, pill, accent bar, underline, spaced capitals, italic serif). *Auto* follows the design system (`defaults.titleFx` / `subFx`), else the map style (vintage → cartouche, neon → neon sign …); choosing a design system, a style or a look sets them again, and the Page tab overrides them.
+- **Colour only part of the map** – "Colour by" can be limited to one continent or region, the focused area, or the highlighted areas; everything else keeps the map style.
 - **Contrast guard** – title, text, labels and dividers pick the profile colour that stays readable on what is really behind them; **design-system colours** let styles with their own palette use the profile instead.
 - **Cities** – zoom to a city from Focus (31 Danish towns, Natural Earth cities elsewhere), with markers that avoid each other.
 - **Frame** – the thin frame around the page follows the map style or can be switched on/off for any style; the legend stays inside it.
 - **Highlight groups** – several groups at once, each with its own colour and modes (solid, hatched, dots, tint, glow, outline, raised, pin, label, callout, dim others).
-- **Colour by** – 28 attributes in six categories, or turn any of them into highlight groups with one click:
+- **Colour by** – 28 world attributes in six categories, plus regional statistics for Denmark's municipalities, the regions of EU/EFTA countries and Turkey, and US states (see *Data*), or turn any of them into highlight groups with one click:
   - *Geography*: continent, UN region, subregion, hemisphere, area, first letter
   - *Economy*: income group, economy class, GDP per capita, extreme poverty (< $3/day)
   - *Society*: population, life expectancy, Human Development Index, median age, children per woman, internet users, access to electricity, majority religion
@@ -32,7 +33,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Projections**: Miller (default for the world), Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée.
 - **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos (1–4 rows, order and rows by dragging in the list or right on the map – it snaps into a row and slot, Ctrl places it freely – a visibility toggle per partner for this map, and auto-scaling so many logos stay inside a configurable side margin), legend. **Automatic title/subtitle** from the focus, the selection and the "Colour by" attribute; title and subtitle can each be placed top/bottom × left/centre/right.
 - **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
-- **UI in 10 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
+- **UI in 11 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian, Turkish (country and region names too) – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
 - **10 design systems** built in – Aurora (dark), Nordic minimal (used by the start project), Sunset, Ocean, Mono / brutalist, Pastel, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.
 
 ## Examples
@@ -65,6 +66,7 @@ Everything ships as one `index.html` (~4.4 MB) that works from `file://` without
 ```bash
 npm install
 npm run build        # -> index.html
+npm run regional     # regional statistics (Statistics Denmark, Eurostat, US data) -> assets/geo/regional-stats.json
 npm run check        # build + syntax check + i18n coverage (all languages, unused keys) + unused declarations
 npm run format       # Prettier on src/ and tools/
 npm run release      # -> release/MoboMap-<version>-<date>.zip (+ a -public variant); also re-renders the examples
@@ -150,7 +152,19 @@ Elevation comes from **ETOPO1** (NOAA NCEI, public domain), sampled at 0.25° th
 
 Classes are fixed per statistic (see `stat(...)` in `src/js/43-attributes.js`); countries without data are shown as "No data".
 
+**Regional statistics** (inside countries) come from `tools/prepare-regional-stats.mjs` → `assets/geo/regional-stats.json` (~250 KB). Each map only lists the statistics it has data for, in five classes from its own spread (quintiles, rounded to tidy numbers):
+
+| Where | Units | Source | Statistics |
+|---|---|---|---|
+| Denmark | 98 municipalities | Statistics Denmark (CC BY 4.0) | disposable income, inequality (Gini), unemployment, population, density, average age, 65+, higher education, immigrants & descendants, reported crime, life expectancy |
+| EU, EFTA, Turkey, candidate countries | the map's regions (provinces, Länder, régions …), matched to NUTS 1–3 by name, else by location and size | Eurostat (CC BY 4.0) | GDP per person (PPS), household income, unemployment, at risk of poverty, density, median age, 65+, higher education, life expectancy, infant mortality |
+| USA | 50 states | County Health Rankings & Roadmaps and ACS (via Data USA), CDC/NCHS | obesity, diabetes, smoking, inactivity, food insecurity, overdose deaths, uninsured, median household income, unemployment, child poverty, violent crime, some college, median age, life expectancy |
+
+Where a region is finer than the published data (e.g. Turkish provinces vs. NUTS 2), it shows its parent region's value.
+
 Adding a dataset: a `dataset({...})` call in `tools/build.mjs`, a branch in `countryData()` (`src/js/40-datasets.js`) and, optionally, extra attributes in `ATTRS` (`src/js/43-attributes.js`).
+
+**Page size.** The map data and jsPDF are stored deflated (base64) inside `index.html` and unpacked at start-up (~0.2 s) by a small decoder (`src/js/00-inflate.js`); jsPDF only when a PDF is exported. This keeps the single-file page at about 3 MB instead of 5 MB – it matters for the downloaded/offline file; over the web GitHub Pages compresses either way.
 
 ## Project layout
 

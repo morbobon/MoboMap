@@ -45,6 +45,7 @@ function shareParams() {
   put('lay', p.layout, d.layout || 'land');
   if (GEO.geo) put('proj', p.proj, p.country ? 'local' : d.proj || DEFAULT_PROJ);
   put('attr', p.attr, d.attr || 'none');
+  put('as', p.attrScope, 'all');
   put('l', p.lang, 'en');
   const dfx = d.fx || {};
   put('fx', p.fx.fx.join('.'), (dfx.fx || []).join('.'));
@@ -176,6 +177,7 @@ function projectFromUrl(search) {
     'sfx',
     'pf',
     'po',
+    'as',
   ];
   if (!known.some((k) => q.has(k))) return null;
   const p = linkBase();
@@ -208,6 +210,7 @@ function projectFromUrl(search) {
   }
   if (q.has('lay') && LAYOUTS.some((l) => l.id === g('lay'))) p.layout = g('lay');
   if (q.has('proj') && Object.hasOwn(PROJS, g('proj'))) p.proj = g('proj');
+  if (q.has('as') && /^(all|focus|sel|r:[\w-]+)$/.test(g('as'))) p.attrScope = g('as');
   if (q.has('attr') && (g('attr') === 'none' || Object.values(ATTRS).some((a) => a.some((x) => x.id === g('attr')))))
     p.attr = g('attr');
   if (q.has('l')) p.lang = g('l');

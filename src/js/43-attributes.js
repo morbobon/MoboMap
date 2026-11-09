@@ -71,6 +71,116 @@ function stat(id, cat, n, cuts, ramp, { unit = '', keys = null } = {}) {
   };
 }
 
+// A regional statistic (Statistics Denmark, Eurostat, CDC …): five classes from the map's own spread
+// (quintiles, rounded to tidy numbers), since every country has its own range
+// rounding step from the spread of the values (a narrow 74–79 range still gets five classes)
+const niceStep = (range) => {
+  const p = 10 ** Math.floor(Math.log10(Math.max(1e-9, range / 20)));
+  const f = range / 20 / p;
+  return p * (f >= 5 ? 5 : f >= 2 ? 2 : 1);
+};
+const nice = (v, step) => +(Math.round(v / step) * step).toPrecision(12);
+const fmtN = (v) =>
+  Math.abs(v) >= 10000 ? Math.round(v).toLocaleString('en').replace(/,/g, ' ') : String(+v.toFixed(2));
+const QCUTS = {};
+function qcuts(id) {
+  const key = (S.country || 'world') + '|' + id;
+  if (QCUTS[key]) return QCUTS[key];
+  const v = GEO.units
+    .map((k) => k.st && k.st[id])
+    .filter((x) => x != null)
+    .sort((a, b) => a - b);
+  if (v.length < 3) return (QCUTS[key] = []);
+  // quantiles over distinct values (regions sharing one NUTS value count once); each boundary rounded to the
+  // finer of two significant digits and a step from the overall spread
+  const u = [...new Set(v)];
+  const step = niceStep(u[u.length - 1] - u[0]);
+  const cuts = [
+    ...new Set(
+      [0.2, 0.4, 0.6, 0.8].map((q) => {
+        const x = u[Math.min(u.length - 1, Math.floor(u.length * q))];
+        return nice(x, Math.min(step, niceStep(Math.abs(x) * 1.2)));
+      }),
+    ),
+  ];
+  return (QCUTS[key] = cuts.filter((c, i) => c > v[0] && c <= v[v.length - 1] && (!i || c > cuts[i - 1])));
+}
+function qstat(id, cat, n, ramp) {
+  const unit = () => ((GEO.statsMeta || {})[id] || {}).unit || '';
+  const labels = () => {
+    const c = qcuts(id),
+      u = unit().replace(/^ ?(\/|‰)/, ' $1');
+    if (!c.length) return [];
+    return [
+      `< ${fmtN(c[0])}${u}`,
+      ...c.slice(1).map((x, i) => `${fmtN(c[i])}–${fmtN(x)}${u}`),
+      `> ${fmtN(c[c.length - 1])}${u}`,
+    ];
+  };
+  return {
+    id,
+    cat,
+    n,
+    stat: id,
+    ramp,
+    regional: true,
+    get ord() {
+      return labels();
+    },
+    f: (k) => {
+      const v = k.st && k.st[id];
+      if (v == null) return t('no_data');
+      const c = qcuts(id);
+      let i = 0;
+      while (i < c.length && v >= c[i]) i++;
+      return labels()[i];
+    },
+  };
+}
+// statistics the current map has data for
+const hasStat = (a) => !a.stat || GEO.units.some((k) => k.st && k.st[a.stat] != null);
+// Eurostat (EU, EFTA, Turkey, candidates) and US states; only those with data show up per country
+const REGIONAL = [
+  qstat('es_gdp', 'economy', 'attr_gdp_pps', 'good'),
+  qstat('es_income', 'economy', 'attr_hh_income', 'good'),
+  qstat('es_unemp', 'economy', 'attr_unemp', 'bad'),
+  qstat('es_poverty', 'economy', 'attr_arope', 'bad'),
+  qstat('us_income', 'economy', 'attr_hh_income', 'good'),
+  qstat('us_unemp', 'economy', 'attr_unemp', 'bad'),
+  qstat('us_childPoverty', 'economy', 'attr_child_poverty', 'bad'),
+  qstat('es_density', 'society', 'attr_density', 'neutral'),
+  qstat('es_medianAge', 'society', 'attr_median_age', 'neutral'),
+  qstat('us_medianAge', 'society', 'attr_median_age', 'neutral'),
+  qstat('es_old65', 'society', 'attr_old65', 'neutral'),
+  qstat('es_higherEdu', 'society', 'attr_higher_edu', 'good'),
+  qstat('us_someCollege', 'society', 'attr_some_college', 'good'),
+  qstat('us_crime', 'society', 'attr_violent_crime', 'bad'),
+  qstat('es_life', 'health', 'attr_life', 'good'),
+  qstat('us_life', 'health', 'attr_life', 'good'),
+  qstat('es_infant', 'health', 'attr_infant', 'bad'),
+  qstat('us_obesity', 'health', 'attr_obesity', 'bad'),
+  qstat('us_diabetes', 'health', 'attr_diabetes', 'bad'),
+  qstat('us_smoking', 'health', 'attr_smoking', 'bad'),
+  qstat('us_inactive', 'health', 'attr_inactive', 'bad'),
+  qstat('us_foodInsecure', 'health', 'attr_food_insecure', 'bad'),
+  qstat('us_overdose', 'health', 'attr_overdose', 'bad'),
+  qstat('us_uninsured', 'health', 'attr_uninsured', 'bad'),
+];
+// Denmark's municipalities (Statistics Denmark)
+const DK_STATS = [
+  qstat('income', 'economy', 'attr_disp_income', 'good'),
+  qstat('gini', 'economy', 'attr_gini', 'bad'),
+  qstat('unemp', 'economy', 'attr_unemp', 'bad'),
+  qstat('pop', 'society', 'attr_population', 'neutral'),
+  qstat('density', 'society', 'attr_density', 'neutral'),
+  qstat('avgAge', 'society', 'attr_avg_age', 'neutral'),
+  qstat('old65', 'society', 'attr_old65', 'neutral'),
+  qstat('higherEdu', 'society', 'attr_higher_edu', 'good'),
+  qstat('immig', 'society', 'attr_immig', 'neutral'),
+  qstat('crime', 'society', 'attr_crime', 'bad'),
+  qstat('life', 'health', 'attr_life', 'good'),
+];
+
 // Attributes shared by every dataset
 const COMMON = [
   { id: 'area', cat: 'geo', n: 'attr_area', ordKeys: ['area_s', 'area_m', 'area_l', 'area_xl'], f: areaBand },
@@ -143,6 +253,7 @@ const ATTRS = {
     { id: 'group', cat: 'geo', n: 'attr_region', f: (k) => GEO.groups[k.r] },
     { id: 'type', cat: 'geo', n: 'attr_type', f: (k) => k.typ || '–' },
     ...COMMON,
+    ...REGIONAL,
   ],
   // Denmark (municipalities): extra Danish groupings
   dk: [
@@ -166,11 +277,12 @@ const ATTRS = {
     },
     { id: 'storkbh', cat: 'local', n: 'attr_storkbh', f: (k) => yesNo(GEO.lists.storkbh.includes(k.c)) },
     ...COMMON,
+    ...DK_STATS,
   ],
 };
 
 function attrDef() {
-  return (ATTRS[S.map] || []).find((a) => a.id === S.attr) || null;
+  return (ATTRS[S.map] || []).find((a) => a.id === S.attr && hasStat(a)) || null;
 }
 // Categories present in the current dataset, in display order ("No data" last)
 function attrCats(a) {
@@ -210,7 +322,7 @@ function attrToGroups() {
   cats.forEach((v) => {
     const g = newGroup(String(v), ['fill'], attrColor(a, v, cats, land, S.groups.length));
     for (const k of GEO.units) {
-      if (a.f(k) !== v) continue;
+      if (a.f(k) !== v || !attrInScope(k)) continue;
       S.groups.forEach((o) => o.sel.delete(k.c));
       g.sel.add(k.c);
     }
@@ -221,4 +333,34 @@ function attrToGroups() {
   ui();
   render();
   toast(t('groups_added').replace('{n}', cats.length));
+}
+
+// Where "Colour by" applies: 'all' | 'focus' (the focused area) | 'sel' (highlighted units) | 'r:<group>'
+// (one continent / region). Units outside keep the map style's own colour.
+S.attrScope = 'all';
+function attrInScope(k) {
+  const s = S.attrScope || 'all';
+  if (s === 'all') return true;
+  if (s === 'focus') return !S.focus || inFocus(k);
+  if (s === 'sel') return S.groups.some((g) => g.sel.has(k.c));
+  if (s.startsWith('r:')) return k.r === s.slice(2);
+  return true;
+}
+function attrScopeUI() {
+  const el = document.getElementById('attrScope');
+  if (!el) return;
+  const regs = Object.entries(GEO.groups).filter(([r]) => r !== '_');
+  el.innerHTML =
+    `<option value="all">${esc(t('scope_all'))}</option>` +
+    `<option value="focus">${esc(t('scope_focus'))}</option>` +
+    `<option value="sel">${esc(t('scope_sel'))}</option>` +
+    (regs.length > 1
+      ? `<optgroup label="${esc(t('scope_only'))}">` +
+        regs.map(([r, n]) => `<option value="r:${esc(r)}">${esc(n)}</option>`).join('') +
+        '</optgroup>'
+      : '');
+  const ok = [...el.options].some((o) => o.value === S.attrScope);
+  if (!ok) S.attrScope = 'all';
+  el.value = S.attrScope;
+  el.style.display = S.attr && S.attr !== 'none' ? '' : 'none';
 }

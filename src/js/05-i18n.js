@@ -9,6 +9,7 @@ const LANGN = {
   fi: 'Suomi',
   nl: 'Nederlands',
   it: 'Italiano',
+  tr: 'Türkçe',
 };
 const T = /*__I18N__*/ {};
 function t(k) {

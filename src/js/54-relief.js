@@ -47,7 +47,9 @@ const HYPSO = {
   5000: '#f3f0ec',
 };
 function reliefOn(sp) {
-  return !!DATA.elev && (sp.relief || sp.reliefShade || document.getElementById('relief').checked);
+  // a statistic ("Colour by") takes over the land colours of the topographic style; the relief checkbox still adds it
+  const byStat = typeof attrDef === 'function' && attrDef();
+  return !!DATA.elev && ((sp.relief && !byStat) || sp.reliefShade || document.getElementById('relief').checked);
 }
 // Sea depths: drawn under the land.
 function reliefSea(sp, bg, dark) {

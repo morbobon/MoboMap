@@ -28,7 +28,7 @@ function ui() {
   document.getElementById('dsName').title = loc(D.note) || (D.source === 'user' ? t('grp_user') : '');
   document.getElementById('dsDel').style.display = D.source === 'user' ? '' : 'none';
   // "Colour by": attributes grouped by category (Geography, Economy, Society, Health, Politics, Environment)
-  const attrs = ATTRS[S.map] || [];
+  const attrs = (ATTRS[S.map] || []).filter(hasStat); // statistics without data here are left out
   document.getElementById('attrSel').innerHTML =
     `<option value="none">${esc(t('colour_by'))}: ${esc(t('none'))}</option>` +
     ATTR_CATS.map((c) => {
@@ -40,6 +40,7 @@ function ui() {
         : '';
     }).join('');
   document.getElementById('attrSel').value = S.attr;
+  attrScopeUI();
   document.getElementById('mapInfo').textContent =
     (S.country ? countryName(S.country) + ' · ' : '') + GEO.units.length + ' ' + t(MAPS[S.map].unitKey);
   document.getElementById('attrBtn').style.display = S.attr === 'none' ? 'none' : '';
