@@ -1,7 +1,7 @@
 // Release build: builds index.html (all profiles) and packs two zips in release/:
 //   MoboMap-<version>-<date>.zip         – all profiles in designsystems/ (incl. private/)
 //   MoboMap-<version>-<date>-public.zip  – without designsystems/private/
-// Each zip contains index.html, README.txt and designsystems.example.js.
+// Each zip contains index.html, README.txt, designsystems.example.js and the licence files.
 // Also re-renders the README example images (tools/examples.mjs) unless --no-examples is given.
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -23,6 +23,9 @@ Projects are saved/opened as .mobomap.json with the buttons at the top.
 Export: PNG, JPG, PDF (A4) with clickable partner/company links in the PDF.
 
 https://github.com/morbobon/MoboMap
+
+Copyright (C) 2026 Morten Bonding. Licensed under the GNU AGPL-3.0 (LICENSE); commercial
+licences are available (COMMERCIAL.md). Third-party notices: NOTICE.md.
 `;
 
 const example = `// Rename to designsystems.js and place it next to index.html.
@@ -50,6 +53,8 @@ function pack(name, publicOnly) {
   execFileSync('node', args, { stdio: 'inherit' });
   fs.writeFileSync(path.join(dir, 'README.txt'), readme);
   fs.writeFileSync(path.join(dir, 'designsystems.example.js'), example);
+  // licence files travel with every release
+  for (const f of ['LICENSE', 'NOTICE.md', 'COMMERCIAL.md']) fs.copyFileSync(f, path.join(dir, f));
   const zip = path.resolve('release', name + '.zip');
   fs.rmSync(zip, { force: true });
   // zip(1) if available, otherwise PowerShell Compress-Archive (present on every Windows machine)

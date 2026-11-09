@@ -196,4 +196,6 @@ UI strings: `src/i18n.json` and `src/i18n-extra.json`, key → text per language
 
 ## License
 
-MIT – see [LICENSE](LICENSE), which also lists the licenses of bundled data, fonts and libraries. Private profiles and logos are never part of the repository or the public release.
+Copyright © 2026 Morten Bonding. MoboMap is **dual-licensed**: free and open source under the **GNU AGPL-3.0** ([LICENSE](LICENSE)), or under a **commercial licence** for use without the AGPL obligations – closed-source products, hosted services, white-label use ([COMMERCIAL.md](COMMERCIAL.md)). Making maps with MoboMap never needs a commercial licence.
+
+[NOTICE.md](NOTICE.md) lists the licences of bundled data, fonts and libraries; versions up to commit `71b6a9b` were released under MIT. Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md). Private profiles and logos are never part of the repository or the public release.
