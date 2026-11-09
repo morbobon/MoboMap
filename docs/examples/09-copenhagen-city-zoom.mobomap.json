@@ -1,0 +1,45 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "dk",
+  "country": "DNK",
+  "attr": "none",
+  "proj": "miller",
+  "focus": "city:København",
+  "focusHide": false,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "flat",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": true,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": true,
+    "showNeighbours": false,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [
+      "glass",
+      "spotlight"
+    ],
+    "frame": "oakreal",
+    "surface": "#e9e5df",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**City zoom** – København in a real-grain oak frame"
+  }
+}

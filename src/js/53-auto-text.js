@@ -3,11 +3,14 @@ function listNames(arr) {
   return arr.slice(0, -1).join(', ') + ' ' + t('and') + ' ' + arr[arr.length - 1];
 }
 function autoText() {
-  const place = S.focus
-    ? GEO.groups[S.focus] || nm(GEO.units.find((k) => k.c === S.focus) || { n: '' })
-    : S.country
-      ? countryName(S.country)
-      : t('world');
+  const fc = focusCity();
+  const place = fc
+    ? fc.n
+    : S.focus
+      ? GEO.groups[S.focus] || nm(GEO.units.find((k) => k.c === S.focus) || { n: '' })
+      : S.country
+        ? countryName(S.country)
+        : t('world');
   const gs = S.groups.filter((g) => g.sel.size);
   const tot = gs.reduce((n, g) => n + g.sel.size, 0);
   let sub = '';

@@ -70,13 +70,15 @@ function deleteLook(id, e) {
 function renderLooks() {
   const el = document.getElementById('looks');
   if (!el) return;
+  const dice = `<button class="look rnd ${S.fx.preset === 'random' ? 'on' : ''}" onclick="randomLook()" title="${esc(t('look_random_t'))}"><span class="lthumb">🎲</span><span class="lname">${esc(t('look_random'))}</span></button>`;
   el.innerHTML =
     allLooks()
       .map(
         (l) =>
           `<button class="look ${S.fx.preset === l.id ? 'on' : ''}" onclick="applyLook('${l.id}')" title="${esc(l.name)}"><span class="lthumb"><img data-look="${l.id}" alt="" ${THUMB.img[l.id] ? `src="${THUMB.img[l.id]}"` : ''}/></span><span class="lname">${esc(l.name)}</span>${l.builtin ? '' : `<span class="ldel" onclick="deleteLook('${l.id}', event)" title="${esc(t('delete'))}">×</span>`}</button>`,
       )
-      .join('') +
+      .join('')
+      .replace('</button>', '</button>' + dice) +
     `<button class="look add" onclick="saveLook()"><span class="lthumb">＋</span><span class="lname">${esc(t('look_save'))}</span></button>`;
 }
 // Thumbnails show the current map (area, groups, profile, format) in each look. They are rendered into a
@@ -169,6 +171,7 @@ function pushHistory() {
   if (HIST.list.length > 80) HIST.list.shift();
   HIST.pos = HIST.list.length - 1;
   histButtons();
+  syncUrl();
 }
 function restore(pos) {
   if (pos < 0 || pos >= HIST.list.length) return;
@@ -180,6 +183,7 @@ function restore(pos) {
     HIST.restoring = false;
   }
   histButtons();
+  syncUrl();
 }
 function flushHistory() {
   if (!HIST.timer) return;
@@ -241,3 +245,51 @@ function afterRender() {
     HIST.list.length ? 450 : 0,
   );
 }
+
+// ---- hide the side panel / looks strip, fullscreen (map only) ----
+const CHROME_KEY = 'mobomap.chrome';
+function chromeState() {
+  try {
+    return JSON.parse(localStorage.getItem(CHROME_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+function applyChrome() {
+  const c = chromeState(),
+    b = document.body;
+  b.classList.toggle('no-panel', !!c.panel);
+  b.classList.toggle('no-strip', !!c.strip);
+  document.getElementById('panelBtn').classList.toggle('on', !c.panel);
+  document.getElementById('stripBtn').classList.toggle('on', !c.strip);
+}
+// what: 'panel' | 'strip' – the stored value is "hidden"
+function toggleChrome(what) {
+  const c = chromeState();
+  c[what] = !c[what];
+  localStorage.setItem(CHROME_KEY, JSON.stringify(c));
+  applyChrome();
+  render();
+}
+function toggleFullscreen() {
+  const b = document.body;
+  if (b.classList.contains('fs')) {
+    b.classList.remove('fs');
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  } else {
+    b.classList.add('fs');
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  }
+  render();
+}
+document.addEventListener('fullscreenchange', () => {
+  // leaving the browser's fullscreen (Esc) also leaves the map-only view
+  if (!document.fullscreenElement && document.body.classList.contains('fs')) {
+    document.body.classList.remove('fs');
+    render();
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('fs') && !document.fullscreenElement) toggleFullscreen();
+});

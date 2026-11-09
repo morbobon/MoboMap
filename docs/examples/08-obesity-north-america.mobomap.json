@@ -1,0 +1,42 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "world",
+  "country": "",
+  "attr": "obesity",
+  "proj": "miller",
+  "focus": "NA",
+  "focusHide": true,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "flat",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": true,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": false,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [],
+    "frame": "none",
+    "surface": "#e8e4dc",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Statistics** – adult obesity in North America (WHO via Our World in Data)"
+  }
+}

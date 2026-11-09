@@ -28,6 +28,11 @@
         <select id="ds" class="hdr" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
         <button id="undoBtn" class="hdr" onclick="undo()" data-i18n-title="undo">↶</button>
         <button id="redoBtn" class="hdr" onclick="redo()" data-i18n-title="redo">↷</button>
+        <button id="shareBtn" class="hdr" onclick="shareLink()" data-i18n-title="share_link">🔗</button>
+        <button id="panelBtn" class="hdr" onclick="toggleChrome('panel')" data-i18n-title="toggle_panel">◧</button>
+        <button id="stripBtn" class="hdr" onclick="toggleChrome('strip')" data-i18n-title="toggle_strip">⬓</button>
+        <button id="fsBtn" class="hdr" onclick="toggleFullscreen()" data-i18n-title="fullscreen">⛶</button>
+        <select id="uiStyle" class="hdr" onchange="setUiStyle(this.value)" data-i18n-title="ui_style"></select>
         <button id="uiMode" class="hdr" onclick="cycleUiMode()"></button>
         <select
           id="langSel"
@@ -217,6 +222,7 @@
                   render();
                 "
               ></select>
+              <div id="fxLight"></div>
               <div id="fxList"></div>
               <div class="row">
                 <label class="ck"
@@ -239,6 +245,25 @@
             </h2>
             <div class="body">
               <div class="row" id="dsSw"></div>
+              <button class="chip" onclick="dsEditOpen()"><span data-i18n="dse_open"></span></button>
+              <details id="dsEdit">
+                <summary data-i18n="dse_title"></summary>
+                <div id="dsEditBody"></div>
+                <input
+                  type="file"
+                  id="dseLogo"
+                  accept="image/*"
+                  hidden
+                  onchange="
+                    dsEditLogo(this.files[0]);
+                    this.value = '';
+                  "
+                />
+                <div class="row">
+                  <button class="chip on" onclick="dsEditSave()"><span data-i18n="save"></span></button>
+                  <button class="chip" onclick="dsEditCancel()"><span data-i18n="dse_cancel"></span></button>
+                </div>
+              </details>
               <details id="manage">
                 <summary data-i18n="manage_profiles"></summary>
                 <div class="row">
@@ -418,6 +443,7 @@
         <div id="wrap">
           <svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg>
           <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+          <button id="fsExit" class="chip" onclick="toggleFullscreen()" data-i18n="fs_exit"></button>
         </div>
         <div id="looks" class="looks"></div>
       </div>

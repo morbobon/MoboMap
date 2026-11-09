@@ -1,0 +1,49 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "adm1",
+  "country": "TUR",
+  "attr": "none",
+  "proj": "local",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "atlas",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": true,
+    "detail": false,
+    "legend": false,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": true,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [
+      "paper",
+      "grain",
+      "rhumb",
+      "compass",
+      "sepia",
+      "border"
+    ],
+    "frame": "none",
+    "surface": "#ddd8cf",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Old sea chart** – Turkey, provinces and major cities"
+  }
+}

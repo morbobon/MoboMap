@@ -82,10 +82,23 @@ function loadDS() {
   } catch (e) {}
 }
 function saveUserDS() {
-  localStorage.setItem(
-    LS_KEY,
-    JSON.stringify(DSORDER.filter((i) => DS[i].source === 'user').map((i) => stripDS(DS[i]))),
-  );
+  try {
+    localStorage.setItem(
+      LS_KEY,
+      JSON.stringify(
+        DSORDER.filter(
+          (i) =>
+            DS[i] &&
+            DS[i].source === 'user' &&
+            !(typeof DSE !== 'undefined' && DSE.draft && DSE.isNew && DSE.draft.id === i),
+        ).map((i) => stripDS(DS[i])),
+      ),
+    );
+    return true;
+  } catch (e) {
+    toast(t('ts_storage_full'));
+    return false;
+  }
 }
 function stripDS(d) {
   const { source, ...rest } = d;
@@ -253,4 +266,6 @@ function applyTheme() {
   r.setProperty('--fb', "'" + d.fonts.body + "'");
   // text colour of the light UI, tinted by the profile (dark UI mode uses its own, see app.css)
   r.setProperty('--ink-brand', light(c.primary) ? '#222' : mix(c.primary, '#000', 0.3));
+  // a fixed UI style (default: cool dark) overrides the profile-derived chrome
+  if (typeof applyUiStyle === 'function') applyUiStyle();
 }

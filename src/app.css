@@ -778,3 +778,145 @@ header button:disabled {
   opacity: 0.4;
   cursor: default;
 }
+
+/* ---- hidden panel / strip, fullscreen ---- */
+body {
+  --chrome: 250px;
+}
+body.no-strip {
+  --chrome: 120px;
+}
+body.no-panel aside,
+body.no-panel .rail,
+body.no-strip .looks,
+body.fs header,
+body.fs aside,
+body.fs .rail,
+body.fs .looks {
+  display: none !important;
+}
+body.fs {
+  --chrome: 36px;
+}
+body.fs .stage {
+  padding: 18px;
+}
+header button.hdr.on {
+  background: color-mix(in srgb, var(--on-primary) 18%, transparent);
+}
+#fsExit {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: none;
+  opacity: 0.55;
+}
+body.fs #fsExit {
+  display: block;
+}
+#fsExit:hover {
+  opacity: 1;
+}
+
+.fxrow {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 44px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin: 3px 0;
+}
+.fxrow select {
+  grid-column: span 2;
+  padding: 4px 6px;
+}
+.fxrow b {
+  font-weight: 500;
+  color: var(--mute);
+  text-align: right;
+  font-size: 11px;
+}
+.fxrow input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent2);
+}
+
+/* design-system editor */
+.dse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 10px;
+  align-items: center;
+}
+.dse-col {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+.dse-col input[type='color'] {
+  width: 30px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: none;
+}
+#dsEdit {
+  margin-top: 8px;
+}
+#uiStyle {
+  width: auto;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+#panelBtn.on,
+#stripBtn.on {
+  background: var(--btn);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+#panelBtn:not(.on),
+#stripBtn:not(.on) {
+  background: transparent;
+  color: var(--on-primary);
+  opacity: 0.8;
+}
+
+/* selected tiles in fixed UI styles (falls back to the profile look) */
+.tile.on {
+  background: var(--sel-bg, var(--primary));
+  border-color: var(--sel-border, var(--primary));
+}
+.tile.on b {
+  color: var(--sel-ink, var(--accent-on-primary));
+}
+.tile.on i {
+  color: var(--sel-ink, var(--on-primary));
+}
+/* header: the title keeps a minimum, the controls wrap instead of pushing Export off-screen */
+header > div:first-child {
+  min-width: 150px;
+  flex: 1 1 150px;
+  overflow: hidden;
+}
+header .btns {
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 6px;
+}
+@media (max-width: 1320px) {
+  header small {
+    display: none;
+  }
+  header #langSel,
+  header select.hdr {
+    max-width: 130px;
+  }
+  header #uiStyle {
+    max-width: 150px;
+  }
+}

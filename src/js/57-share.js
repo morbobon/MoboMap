@@ -1,0 +1,236 @@
+// Share links: the current map as readable URL parameters, only where it differs from the start project.
+//   c=DNK  f=city:Aarhus  st=topo  ds=nordic  lay=wide  proj=robinson  attr=pop  l=da  fx=grain.glass  fr=oak
+//   sf=e8e4dc  t=Title  sub=Subtitle  tp=tl  sp=under  far=hide  dsc=1  gd=0  z=1.6,-250,-60  fh=1
+//   ck=+labels.-showCities  g=e4573d*fill.glow*DNK.SWE*Nordics_3a86ff*hatch*NOR   (groups: colour*modes*codes*name)
+// The address bar follows the map (history.replaceState), and "Share link" copies it.
+const SHARE_DEMO = 'https://morbobon.github.io/MoboMap/';
+function shareBase() {
+  // a page opened from disk cannot be shared as such: point at the public demo instead
+  return location.protocol === 'file:' ? SHARE_DEMO : location.origin + location.pathname;
+}
+function shareParams() {
+  const p = projectState(),
+    d = DEFAULT_PROJECT || {};
+  const q = new URLSearchParams();
+  const put = (k, v, def) => {
+    if (v == null) return;
+    if (String(v) !== String(def == null ? '' : def)) q.set(k, v);
+  };
+  put('c', p.country || 'world', d.country || 'world');
+  put('f', p.focus, d.focus || '');
+  put('st', p.style, d.style || 'flat');
+  put('ds', p.designSystem, d.designSystem || '');
+  put('lay', p.layout, d.layout || 'land');
+  if (GEO.geo) put('proj', p.proj, p.country ? 'local' : d.proj || DEFAULT_PROJ);
+  put('attr', p.attr, d.attr || 'none');
+  put('l', p.lang, 'en');
+  const dfx = d.fx || {};
+  put('fx', p.fx.fx.join('.'), (dfx.fx || []).join('.'));
+  put('fr', p.fx.frame, dfx.frame || 'none');
+  put('sf', String(p.fx.surface || '').replace('#', ''), String(dfx.surface || '#e8e4dc').replace('#', ''));
+  if (p.fx.seed !== (dfx.seed || 7)) q.set('seed', p.fx.seed);
+  const am = Object.entries(p.fx.amt || {}).filter(([k, v]) => p.fx.fx.includes(k) && Math.abs(v - 1) > 0.001);
+  if (am.length) q.set('fa', am.map(([k, v]) => k + ':' + Math.round(v * 100)).join('.'));
+  if (p.fx.strength != null && Math.abs(p.fx.strength - 1) > 0.001) q.set('fs', Math.round(p.fx.strength * 100));
+  const lt = p.fx.light || {};
+  if (lt.dir != null && lt.dir !== 250) q.set('ld', lt.dir);
+  if (lt.warm) q.set('lw', Math.round(lt.warm * 100));
+  put('tp', p.titlePos, d.titlePos || 'auto');
+  put('sp', p.subPos, d.subPos || 'under');
+  put('far', p.far, d.far || 'inset');
+  if (p.dsColours) q.set('dsc', '1');
+  const dsFooter = DS[p.designSystem] ? loc(DS[p.designSystem].footer.label) : '';
+  if (p.footerLabel && p.footerLabel !== dsFooter) q.set('ft', p.footerLabel);
+  if (p.fx.preset && (p.fx.preset === 'random' || FX_PRESETS[p.fx.preset])) q.set('pr', p.fx.preset);
+  if (!p.guard) q.set('gd', '0');
+  if (p.focusHide) q.set('fh', '1');
+  if (p.frame !== 'auto') q.set('fl', p.frame);
+  const z = p.zoom || { k: 1, x: 0, y: 0 };
+  if (z.k !== 1 || z.x || z.y) q.set('z', [z.k.toFixed(3), Math.round(z.x), Math.round(z.y)].join(','));
+  // checkboxes that differ from the start project
+  const dck = d.checks || {};
+  const ck = CK.filter((k) => k in p.checks && !!p.checks[k] !== !!(k in dck ? dck[k] : DEFAULT_CHECKS[k])).map(
+    (k) => (p.checks[k] ? '+' : '-') + k,
+  );
+  if (ck.length) q.set('ck', ck.join('.'));
+  if (!p.checks.autoText) {
+    put('t', p.title, d.title || '');
+    put('sub', p.sub, d.sub || '');
+  }
+  const gs = p.groups.map((g, i) =>
+    [
+      String(g.color).replace('#', ''),
+      g.hl.join('.'),
+      g.kommuner.join('.'),
+      g.name === t('group') + ' ' + (i + 1)
+        ? ''
+        : encodeURIComponent(g.name).replace(/\*/g, '%2A').replace(/_/g, '%5F'),
+    ].join('*'),
+  );
+  const dg = (d.groups || []).length;
+  if (gs.length || dg) q.set('g', gs.join('_'));
+  return q;
+}
+// a number only from a non-empty numeric string ('' and 'abc' are ignored)
+const num = (s) => (/^-?\d+(\.\d+)?$/.test(s || '') ? +s : null);
+const safeDecode = (s) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+};
+// default checkbox states in the markup, for projects that do not list a checkbox
+const DEFAULT_CHECKS = {};
+function shareUrl() {
+  const q = shareParams().toString();
+  return shareBase() + (q ? '?' + q : '');
+}
+// URL -> project object (start project + the parameters), or null without parameters
+function projectFromUrl(search) {
+  const q = new URLSearchParams(search || '');
+  const known = [
+    'c',
+    'f',
+    'st',
+    'ds',
+    'lay',
+    'proj',
+    'attr',
+    'l',
+    'fx',
+    'fr',
+    'sf',
+    'seed',
+    'tp',
+    'sp',
+    'far',
+    'dsc',
+    'gd',
+    'fh',
+    'fl',
+    'z',
+    'ck',
+    't',
+    'sub',
+    'g',
+    'fa',
+    'fs',
+    'ld',
+    'lw',
+    'ft',
+    'pr',
+  ];
+  if (!known.some((k) => q.has(k))) return null;
+  const p = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
+  p.format = 'mobomap-project';
+  const g = (k) => q.get(k);
+  const okCountry = (c) => c === 'world' || c.toUpperCase() === 'DNK' || Object.hasOwn(DATA.adm1, c.toUpperCase());
+  if (q.has('c') && !okCountry(g('c'))) {
+    const bad = g('c');
+    setTimeout(() => toast(t('ts_link_bad') + ': c=' + bad), 600);
+    q.delete('c');
+    q.delete('f');
+  }
+  if (q.has('c')) {
+    const c = g('c');
+    p.country = c === 'world' ? '' : c.toUpperCase();
+    p.map = c === 'world' ? 'world' : c.toUpperCase() === 'DNK' ? 'dk' : 'adm1';
+    if (!q.has('proj')) p.proj = c === 'world' ? (DEFAULT_PROJECT || {}).proj || DEFAULT_PROJ : 'local';
+  }
+  if (q.has('f')) p.focus = g('f');
+  if (q.has('st') && STYLES.some((s) => s.id === g('st'))) p.style = g('st');
+  if (q.has('ds')) {
+    const v = g('ds');
+    if (DS[v]) p.designSystem = v;
+    else setTimeout(() => toast(t('ts_link_bad') + ': ds=' + v), 600);
+  }
+  if (q.has('lay') && LAYOUTS.some((l) => l.id === g('lay'))) p.layout = g('lay');
+  if (q.has('proj') && Object.hasOwn(PROJS, g('proj'))) p.proj = g('proj');
+  if (q.has('attr') && (g('attr') === 'none' || Object.values(ATTRS).some((a) => a.some((x) => x.id === g('attr')))))
+    p.attr = g('attr');
+  if (q.has('l')) p.lang = g('l');
+  p.fx = Object.assign({ fx: [], frame: 'none', surface: '#e8e4dc', seed: 7, preset: '' }, p.fx || {});
+  if (q.has('fx'))
+    p.fx.fx = g('fx')
+      ? g('fx')
+          .split('.')
+          .filter((x) => FX_IDS.includes(x))
+      : [];
+  if (q.has('fr') && FRAME_IDS.includes(g('fr'))) p.fx.frame = g('fr');
+  if (q.has('sf') && /^[0-9a-f]{3,6}$/i.test(g('sf'))) p.fx.surface = '#' + g('sf');
+  if (q.has('seed')) p.fx.seed = +g('seed') || 7;
+  if (q.has('fa'))
+    p.fx.amt = Object.fromEntries(
+      g('fa')
+        .split('.')
+        .map((x) => x.split(':'))
+        .filter(([k, v]) => FX_IDS.includes(k) && num(v) != null)
+        .map(([k, v]) => [k, Math.max(0, Math.min(2, +v / 100))]),
+    );
+  if (num(g('fs')) != null && num(g('fs')) >= 0 && num(g('fs')) <= 200) p.fx.strength = num(g('fs')) / 100;
+  p.fx.light = Object.assign({ dir: 250, warm: 0 }, p.fx.light || {});
+  if (num(g('ld')) != null) p.fx.light.dir = ((num(g('ld')) % 360) + 360) % 360;
+  if (num(g('lw')) != null) p.fx.light.warm = Math.max(-1, Math.min(1, num(g('lw')) / 100));
+  p.fx.preset = q.has('pr') && (g('pr') === 'random' || Object.hasOwn(FX_PRESETS, g('pr'))) ? g('pr') : '';
+  const posOk = (v, extra) => ['tl', 'tc', 'tr', 'bl', 'bc', 'br', extra].includes(v);
+  if (q.has('tp') && posOk(g('tp'), 'auto')) p.titlePos = g('tp');
+  if (q.has('sp') && posOk(g('sp'), 'under')) p.subPos = g('sp');
+  if (q.has('ft')) p.footerLabel = g('ft');
+  if (q.has('far')) p.far = g('far');
+  if (q.has('dsc')) p.dsColours = g('dsc') === '1';
+  if (q.has('gd')) p.guard = g('gd') !== '0';
+  if (q.has('fh')) p.focusHide = g('fh') === '1';
+  if (q.has('fl')) p.frame = g('fl');
+  if (q.has('z')) {
+    const [k, x, y] = g('z').split(',').map(Number);
+    if (Number.isFinite(k) && k > 0)
+      p.zoom = { k: Math.min(40, Math.max(0.5, k)), x: Number.isFinite(x) ? x : 0, y: Number.isFinite(y) ? y : 0 };
+  }
+  p.checks = Object.assign({}, DEFAULT_CHECKS, p.checks || {});
+  if (q.has('ck'))
+    for (const c of g('ck').split('.')) {
+      const k = c.slice(1);
+      if (CK.includes(k)) p.checks[k] = c[0] === '+';
+    }
+  if (q.has('t') || q.has('sub')) {
+    p.checks.autoText = false;
+    p.title = g('t') || '';
+    p.sub = g('sub') || '';
+  }
+  if (q.has('g'))
+    p.groups = g('g')
+      ? g('g')
+          .split('_')
+          .map((s, i) => {
+            const [col, hl, codes, name] = s.split('*');
+            return {
+              name: name ? safeDecode(name) : '',
+              color: /^[0-9a-f]{3,6}$/i.test(col || '') ? '#' + col : undefined,
+              hl: hl ? hl.split('.').filter((h) => HLS.some((x) => x.id === h)) : ['fill'],
+              kommuner: codes ? codes.split('.') : [],
+            };
+          })
+      : [];
+  delete p.partners; // partners come from the profile
+  return p;
+}
+function syncUrl() {
+  if (!history.replaceState) return;
+  try {
+    const q = shareParams().toString();
+    const url = location.pathname + (q ? '?' + q : '') + location.hash;
+    if (url !== location.pathname + location.search + location.hash) history.replaceState(null, '', url);
+  } catch {
+    /* file:// pages may refuse URL changes; the Share button still works */
+  }
+}
+async function shareLink() {
+  const url = shareUrl();
+  try {
+    await navigator.clipboard.writeText(url);
+    toast(t('ts_link_copied') + (location.protocol === 'file:' ? ' · ' + t('ts_link_demo') : ''));
+  } catch {
+    prompt(t('share_link'), url);
+  }
+}

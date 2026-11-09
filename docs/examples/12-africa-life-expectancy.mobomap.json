@@ -1,0 +1,42 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "world",
+  "country": "",
+  "attr": "life",
+  "proj": "miller",
+  "focus": "AF",
+  "focusHide": true,
+  "designSystem": "pastel",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "extrude",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": false,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [],
+    "frame": "none",
+    "surface": "#e8e4dc",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Life expectancy** – Africa as 3D blocks"
+  }
+}

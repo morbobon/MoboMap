@@ -1,0 +1,46 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "world",
+  "country": "",
+  "attr": "none",
+  "proj": "miller",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "blackgold",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": false,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": false,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [
+      "foil",
+      "speckle",
+      "grain"
+    ],
+    "frame": "ash",
+    "surface": "#f1f0ed",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Gold foil** – black and gold in a thin ash frame"
+  }
+}

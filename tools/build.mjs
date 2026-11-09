@@ -132,12 +132,51 @@ const dk = dataset({
   const box = [r1(mainB[2] - bw - 2 * pad), r1(mainB[1] + 6), r1(mainB[2]), r1(mainB[1] + 6 + bhh + 2 * pad)];
   dk.main = mainB;
   dk.inset = { unit: '400', dx: r1(box[0] + pad - bh.b[0]), dy: r1(box[1] + pad - bh.b[1]), box };
+}
+// Danish towns (≥ about 20,000 inhabitants, urban areas, Danmarks Statistik 2024, rounded) + Rønne: [name, lat, lon, pop]
+{
+  const T = [
+    ['København', 55.6761, 12.5683, 1381000, 1],
+    ['Aarhus', 56.1567, 10.2108, 290000],
+    ['Odense', 55.3959, 10.3883, 182000],
+    ['Aalborg', 57.0488, 9.9217, 143000],
+    ['Esbjerg', 55.4703, 8.4519, 71000],
+    ['Randers', 56.4607, 10.0364, 63000],
+    ['Kolding', 55.4904, 9.4722, 63000],
+    ['Horsens', 55.8607, 9.8503, 62000],
+    ['Vejle', 55.7093, 9.5357, 61000],
+    ['Roskilde', 55.6415, 12.0803, 52000],
+    ['Herning', 56.1393, 8.9738, 51000],
+    ['Silkeborg', 56.1697, 9.5451, 51000],
+    ['Helsingør', 56.0361, 12.6136, 47000],
+    ['Næstved', 55.2299, 11.7609, 44000],
+    ['Fredericia', 55.5657, 9.7526, 41000],
+    ['Viborg', 56.4532, 9.402, 41000],
+    ['Køge', 55.458, 12.1821, 38000],
+    ['Holstebro', 56.3601, 8.616, 37000],
+    ['Hillerød', 55.9267, 12.3109, 36000],
+    ['Slagelse', 55.4028, 11.3546, 34000],
+    ['Holbæk', 55.7175, 11.7128, 29000],
+    ['Sønderborg', 54.9138, 9.7922, 28000],
+    ['Svendborg', 55.0598, 10.6068, 27000],
+    ['Hjørring', 57.4642, 9.9823, 25000],
+    ['Ringsted', 55.4426, 11.79, 23000],
+    ['Haderslev', 55.2531, 9.4891, 22000],
+    ['Frederikshavn', 57.4407, 10.5366, 22000],
+    ['Skive', 56.5657, 9.0272, 20000],
+    ['Nykøbing Falster', 54.7691, 11.8743, 16000],
+    ['Thisted', 56.9552, 8.6943, 13000],
+    ['Rønne', 55.1009, 14.7065, 13000],
+  ];
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  dk.cityList = T.map(([n, lat, lon, pop, cap]) => ({ n, x: r3(lon + 180), y: r3(90 - lat), pop, cap: cap ? 1 : 0 }));
   // sea labels: [x fraction, y fraction, i18n key]
+  // sea / neighbour names: [longitude, latitude, i18n key]
   dk.sea = [
-    [0.12, 0.31, 'sea_north'],
-    [0.64, 0.29, 'sea_kattegat'],
-    [0.56, 0.9, 'sea_baltic'],
-    [0.9, 0.41, 'land_sweden'],
+    [6.7, 56.45, 'sea_north'],
+    [11.45, 56.95, 'sea_kattegat'],
+    [13.7, 54.72, 'sea_baltic'],
+    [14.3, 56.65, 'land_sweden'],
   ];
   dk.alias = {
     kbh: '101',
@@ -231,7 +270,7 @@ dk.lists = { fyn: extra.dk_fyn, storkbh: extra.dk_storkbh };
   const by = {};
   for (const p of places) {
     (by[p.adm0_a3] = by[p.adm0_a3] || []).push({
-      n: p.name,
+      n: String(p.name).replace(/\s+/g, ' ').trim(),
       x: r1(p.longitude + 180),
       y: r1(90 - p.latitude),
       pop: p.pop_max,
@@ -242,11 +281,12 @@ dk.lists = { fyn: extra.dk_fyn, storkbh: extra.dk_storkbh };
   for (const [c, arr] of Object.entries(by))
     world.cities[c] = arr.sort((a, b) => b.cap - a.cap || b.pop - a.pop).slice(0, 8);
 }
+// ocean names: [longitude, latitude, i18n key]
 world.sea = [
-  [0.2, 0.45, 'sea_atlantic'],
-  [0.8, 0.5, 'sea_pacific'],
-  [0.62, 0.7, 'sea_indian'],
-  [0.5, 0.06, 'sea_arctic'],
+  [-38, 27, 'sea_atlantic'],
+  [-142, 4, 'sea_pacific'],
+  [78, -23, 'sea_indian'],
+  [12, 79, 'sea_arctic'],
 ];
 world.alias = {
   uk: 'GBR',

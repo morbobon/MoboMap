@@ -68,6 +68,8 @@ for (const id of idList('FX_IDS')) required.add('fx_' + id);
 for (const id of idList('FXC_IDS')) required.add('fxc_' + id);
 for (const id of idList('FRAME_IDS')) required.add('fr_' + id);
 for (const id of idList('FX_PRESET_IDS')) required.add('pre_' + id);
+for (const id of idList('UI_STYLE_IDS')) required.add('uis_' + id);
+for (const id of idList('DSE_COLOURS')) required.add('dse_c_' + id);
 const missingEn = [...required].filter((k) => !en.has(k));
 if (missingEn.length) err('keys used but missing in en: ' + missingEn.join(', '));
 else ok(`all ${required.size} referenced keys exist in en`);

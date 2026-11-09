@@ -9,7 +9,16 @@ const S = {
   proj: DEFAULT_PROJ,
   focus: '', // zoom target inside the dataset: a group code or a unit code
   zoom: { k: 1, x: 0, y: 0 }, // wheel zoom / drag pan on top of the framing (screen units)
-  fx: { fx: [], frame: 'none', surface: '#e8e4dc', seed: 7, preset: '' }, // effects & picture frame (55-fx.js)
+  fx: {
+    fx: [],
+    frame: 'none',
+    surface: '#e8e4dc',
+    seed: 7,
+    preset: '',
+    amt: {},
+    strength: 1,
+    light: { dir: 250, warm: 0 },
+  }, // effects & picture frame (55-fx.js)
   dsColours: false, // map styles use the design system's colours (keeping their effects)
   guard: true, // contrast guard: readable text and visible highlights
   far: 'inset', // far-away parts (Alaska, Bornholm …): 'inset' | 'show' | 'hide'

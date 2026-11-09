@@ -78,6 +78,15 @@ function ui() {
     h += `<option value="world">← ${esc(t('world'))}</option><option value="">${esc(t('focus'))}: ${esc(countryName(S.country))} – ${esc(t('whole_country'))}</option>`;
     const gs = Object.entries(GEO.groups).filter(([r]) => r !== '_');
     if (gs.length > 1) h += og(t('regions'), gs.sort(cmp));
+    const cl = cityList();
+    if (cl.length)
+      h += og(
+        t('focus_cities'),
+        cl
+          .slice()
+          .sort((a, b) => b.cap - a.cap || b.pop - a.pop)
+          .map((c) => [CITY_PREFIX + c.n, c.n]),
+      );
     h += og(t('zoom_unit'), GEO.units.map((k) => [k.c, nm(k)]).sort(cmp));
     h += og(
       t('other_countries'),
@@ -489,9 +498,17 @@ function uiMode() {
 }
 function applyUiMode() {
   const m = uiMode();
-  const dark = m === 'dark' || (m === 'auto' && sysDark && sysDark.matches);
+  const fixed = UI_STYLES[uiStyle()];
+  const dark = fixed ? fixed.dark : m === 'dark' || (m === 'auto' && sysDark && sysDark.matches);
   document.documentElement.dataset.ui = dark ? 'dark' : 'light';
+  const us = document.getElementById('uiStyle');
+  if (us) {
+    us.innerHTML = UI_STYLE_IDS.map((id) => `<option value="${id}">${esc(t('uis_' + id))}</option>`).join('');
+    us.value = uiStyle();
+  }
   const b = document.getElementById('uiMode');
+  // light/dark only applies when the UI follows the profile
+  b.style.display = fixed ? 'none' : '';
   b.textContent = UI_ICONS[m];
   b.title = t('ui_mode') + ': ' + t('ui_' + m);
 }

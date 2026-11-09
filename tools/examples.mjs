@@ -45,13 +45,15 @@ try {
     const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
     await page.goto(pathToFileURL(html).href);
     await page.waitForFunction(() => typeof loadProject === 'function' && document.fonts.status === 'loaded');
-    const dataUrl = await page.evaluate(
+    const { dataUrl, live } = await page.evaluate(
       async ([p, scale, q]) => {
         loadProject(p, true);
         render();
         await document.fonts.ready;
         const c = await renderCanvas(scale);
-        return c.toDataURL('image/jpeg', q);
+        // the same map as a link to the online demo (only what differs from the start project)
+        const qs = shareParams().toString();
+        return { dataUrl: c.toDataURL('image/jpeg', q), live: SHARE_DEMO + (qs ? '?' + qs : '') };
       },
       [project, SCALE, QUALITY],
     );
@@ -59,7 +61,7 @@ try {
     const jpg = name + '.jpg';
     fs.writeFileSync(path.join(DIR, jpg), Buffer.from(dataUrl.split(',')[1], 'base64'));
     const caption = (project.example && project.example.caption) || name;
-    rows.push({ jpg, f, caption, alt: caption.replace(/\*\*/g, '') });
+    rows.push({ jpg, f, caption, live, alt: caption.replace(/\*\*/g, '') });
     console.log('example', jpg);
   }
 } finally {
@@ -80,7 +82,7 @@ for (let i = 0; i < rows.length; i += 2) {
       .concat(pair.length < 2 ? [''] : [])
       .join(' | ');
   md += `| ${cell((r) => `![${r.alt}](docs/examples/${r.jpg})`)} |\n`;
-  md += `| ${cell((r) => `${r.caption} · [project](docs/examples/${r.f})`)} |\n`;
+  md += `| ${cell((r) => `${r.caption}<br>[▶ open live](${r.live}) · [project](docs/examples/${r.f})`)} |\n`;
 }
 const START = '<!-- examples:start -->',
   END = '<!-- examples:end -->';

@@ -8,6 +8,7 @@ const CK = [
   'showCities',
   'showNeighbours',
   'relief',
+  'autoText',
 ];
 function projectState() {
   const D = DS[S.ds];
@@ -71,7 +72,19 @@ function loadProject(p, quiet) {
   S.far = FAR_MODES.includes(p.far) ? p.far : 'inset';
   S.dsColours = !!p.dsColours;
   S.guard = p.guard !== false;
-  S.fx = Object.assign({ fx: [], frame: 'none', surface: '#e8e4dc', seed: 7, preset: '' }, p.fx || {});
+  S.fx = Object.assign(
+    {
+      fx: [],
+      frame: 'none',
+      surface: '#e8e4dc',
+      seed: 7,
+      preset: '',
+      amt: {},
+      strength: 1,
+      light: { dir: 250, warm: 0 },
+    },
+    p.fx || {},
+  );
   S.fx.fx = (S.fx.fx || []).filter((id) => FX_IDS.includes(id));
   if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
@@ -80,15 +93,31 @@ function loadProject(p, quiet) {
   document.getElementById('subPos').value = p.subPos || 'under';
   S.proj = PROJS[p.proj] ? p.proj : GEO.geo ? (S.country ? 'local' : DEFAULT_PROJ) : DEFAULT_PROJ;
   S.focus = p.focus || '';
+  // a focus that does not exist in this map (old project, hand-edited link) is dropped
+  if (S.focus) {
+    const f = S.focus,
+      ok = f.startsWith(CITY_PREFIX)
+        ? cityList().some((c) => CITY_PREFIX + c.n === f)
+        : Object.hasOwn(GEO.groups, f) || GEO.units.some((u) => u.c === f);
+    if (!ok) {
+      S.focus = '';
+      if (!quiet || p.focus) setTimeout(() => toast(t('ts_focus_missing') + ': ' + f), 600);
+    }
+  }
   S.focusHide = !!p.focusHide;
-  if (p.zoom && p.zoom.k > 0) S.zoom = { k: +p.zoom.k, x: +p.zoom.x || 0, y: +p.zoom.y || 0 };
+  if (p.zoom && Number.isFinite(+p.zoom.k) && p.zoom.k > 0)
+    S.zoom = {
+      k: Math.min(40, Math.max(0.5, +p.zoom.k)),
+      x: Number.isFinite(+p.zoom.x) ? +p.zoom.x : 0,
+      y: Number.isFinite(+p.zoom.y) ? +p.zoom.y : 0,
+    };
   document.getElementById('frameSel').value = ['on', 'off'].includes(p.frame) ? p.frame : 'auto';
   document.getElementById('focusHide').checked = S.focusHide;
   if (p.lang) setLang(p.lang, true);
   S.layout = LAYOUTS.some((l) => l.id === p.layout) ? p.layout : 'land';
   S.style = STYLES.some((s) => s.id === p.style) ? p.style : 'flat';
-  S.groups = (p.groups || []).map((g) => {
-    const n = newGroup(g.name || t('group'), g.hl || ['fill'], g.color || D.highlight[0]);
+  S.groups = (p.groups || []).map((g, gi) => {
+    const n = newGroup(g.name || t('group') + ' ' + (gi + 1), g.hl || ['fill'], g.color || D.highlight[0]);
     (g.kommuner || []).forEach((c) => {
       const code = byName[String(c).toLowerCase()] || byName[c];
       if (code) n.sel.add(code);

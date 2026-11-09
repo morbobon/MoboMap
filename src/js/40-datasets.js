@@ -86,7 +86,7 @@ function countryData(iso) {
       const b = bboxR(d);
       return {
         c: u[0],
-        n: u[1],
+        n: u[1] || u[0],
         names: u[2] || null,
         r: u[3] || '_',
         typ: u[4],
@@ -181,7 +181,7 @@ function setData(id) {
   TH = { l: q(0.3), h: q(0.5), big: q(0.85) };
   byName = {};
   GEO.units.forEach((k) => {
-    byName[norm(k.n)] = k.c;
+    if (k.n) byName[norm(k.n)] = k.c;
     byName[k.c.toLowerCase()] = k.c;
     if (k.names) for (const v of Object.values(k.names)) if (v) byName[norm(v)] = k.c;
   });

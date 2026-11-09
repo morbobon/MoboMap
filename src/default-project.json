@@ -4,7 +4,7 @@
   "map": "world",
   "country": "",
   "attr": "none",
-  "proj": "robinson",
+  "proj": "miller",
   "focus": "",
   "focusHide": false,
   "designSystem": "nordic",

@@ -1,0 +1,42 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "adm1",
+  "country": "JPN",
+  "attr": "none",
+  "proj": "local",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "nordic",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "topo",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": true,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [],
+    "frame": "none",
+    "surface": "#e8e4dc",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Real elevation** – Japan, prefectures, Okinawa in an inset"
+  }
+}

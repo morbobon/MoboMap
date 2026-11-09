@@ -1,0 +1,42 @@
+{
+  "format": "mobomap-project",
+  "version": 1,
+  "map": "adm1",
+  "country": "USA",
+  "attr": "group",
+  "proj": "local",
+  "focus": "",
+  "focusHide": false,
+  "designSystem": "corp",
+  "designSystemData": null,
+  "layout": "wide",
+  "style": "poster",
+  "active": 0,
+  "groups": [],
+  "title": "",
+  "sub": "",
+  "titlePos": "tl",
+  "subPos": "under",
+  "checks": {
+    "labels": false,
+    "detail": false,
+    "legend": true,
+    "showText": true,
+    "showLogo": false,
+    "showFooter": false,
+    "showCities": true,
+    "showNeighbours": true,
+    "relief": false
+  },
+  "far": "inset",
+  "fx": {
+    "fx": [],
+    "frame": "none",
+    "surface": "#e8e4dc",
+    "seed": 7,
+    "preset": ""
+  },
+  "example": {
+    "caption": "**Far-away parts** – USA by census region, Alaska and Hawaii in insets"
+  }
+}

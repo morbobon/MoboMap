@@ -5,7 +5,7 @@ function render(target) {
   fxLayout();
   const D = DS[S.ds],
     st = S.style,
-    det = document.getElementById('detail').checked,
+    det = document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
     all = document.getElementById('labels').checked;
   const ds = Object.assign({ head: D.fonts.heading, body: D.fonts.body }, D.colors);
   let sp = SP[st] || {};
@@ -176,28 +176,46 @@ function render(target) {
   <pattern id="dots${i}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="4" cy="4" r="2.2" fill="${lineCol}" fill-opacity=".9"/></pattern>`;
   });
   defs += fxDefs() + '</defs>';
-  let out = `<rect width="${W}" height="${H}" fill="${bg}"/>`;
+  // the area the sheet covers, in content coordinates (larger than W x H inside a frame)
+  const BGR =
+    FXL.active && FXL.P
+      ? [
+          (FXL.P[0] - FXL.tx) / FXL.s,
+          (FXL.P[1] - FXL.ty) / FXL.s,
+          (FXL.P[2] - FXL.P[0]) / FXL.s,
+          (FXL.P[3] - FXL.P[1]) / FXL.s,
+        ]
+      : [0, 0, W, H];
+  const bgR = `x="${BGR[0].toFixed(1)}" y="${BGR[1].toFixed(1)}" width="${BGR[2].toFixed(1)}" height="${BGR[3].toFixed(1)}"`;
+  let out = `<rect ${bgR} fill="${bg}"/>`;
   if (st === 'blueprint')
-    out += `<rect width="${W}" height="${H}" fill="url(#grid)"/><rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="${bpLine}" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="${guard ? readable([bpLine, D.colors.ink, D.colors.primary], textBgs, 4.5, 0.85) : bpLine}" fill-opacity="${guard ? 0.85 : 0.7}">${[...Array(9)].map((_, i) => `<text x="${PAD.l + (i * (W - PAD.l - PAD.r)) / 8}" y="${H - FOOT - 26}">${(8 + i * 0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_, i) => `<text x="26" y="${150 + (i * (H - 200)) / 5}" transform="rotate(-90 26 ${150 + (i * (H - 200)) / 5})">${(57.8 - i * 0.5).toFixed(1)}°N</text>`).join('')}</g>`;
-  if (st === 'neon' && dark) out += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
-  if (sp.bgGradient) out += `<rect width="${W}" height="${H}" fill="url(#midbg)"/>`;
+    out += `<rect ${bgR} fill="url(#grid)"/><rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="${bpLine}" stroke-opacity=".5"/><g font-family="'IBM Plex Mono'" font-size="9" fill="${guard ? readable([bpLine, D.colors.ink, D.colors.primary], textBgs, 4.5, 0.85) : bpLine}" fill-opacity="${guard ? 0.85 : 0.7}">${[...Array(9)].map((_, i) => `<text x="${PAD.l + (i * (W - PAD.l - PAD.r)) / 8}" y="${H - FOOT - 26}">${(8 + i * 0.6).toFixed(1)}°E</text>`).join('')}${[...Array(6)].map((_, i) => `<text x="26" y="${150 + (i * (H - 200)) / 5}" transform="rotate(-90 26 ${150 + (i * (H - 200)) / 5})">${(57.8 - i * 0.5).toFixed(1)}°N</text>`).join('')}</g>`;
+  if (st === 'neon' && dark) out += `<rect ${bgR} fill="url(#vignette)"/>`;
+  if (sp.bgGradient) out += `<rect ${bgR} fill="url(#midbg)"/>`;
   if (sp.stars) {
     let r = 12345;
     const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
     out += '<g pointer-events="none">';
     for (let i = 0; i < 160; i++)
-      out += `<circle cx="${(rnd() * W).toFixed(0)}" cy="${(rnd() * (H - FOOT)).toFixed(0)}" r="${(0.4 + rnd() * 1.2).toFixed(1)}" fill="#fff" opacity="${(0.2 + rnd() * 0.6).toFixed(2)}"/>`;
+      out += `<circle cx="${(BGR[0] + rnd() * BGR[2]).toFixed(0)}" cy="${(BGR[1] + rnd() * (BGR[3] - FOOT)).toFixed(0)}" r="${(0.4 + rnd() * 1.2).toFixed(1)}" fill="#fff" opacity="${(0.2 + rnd() * 0.6).toFixed(2)}"/>`;
     out += '</g>';
   }
-  if (sp.concrete) out += `<rect width="${W}" height="${H}" fill="#fff" filter="url(#concrete)"/>`;
-  if (sp.waves) out += `<rect width="${W}" height="${H}" fill="url(#waves)"/>`;
+  if (sp.concrete) out += `<rect ${bgR} fill="#fff" filter="url(#concrete)"/>`;
+  if (sp.waves) out += `<rect ${bgR} fill="url(#waves)"/>`;
   const fsel = document.getElementById('frameSel').value;
   const frame = fsel === 'on' || (fsel !== 'off' && !!sp.frame);
   if (frame)
     out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink0}" stroke-opacity=".6" stroke-width="1.5"/>`;
   const relief = reliefOn(sp);
   if (relief) out += reliefSea(sp, bg, dark);
-  const allPath = landPath(det) + (GEO.xland || []).map((k) => kp(k, det)).join('');
+  // with 'hide outside focus' the land outline (glow, extrusion, shadows) is only the focus
+  const allPath =
+    S.focusHide && S.focus
+      ? GEO.units
+          .filter(inFocus)
+          .map((k) => kp(k, det))
+          .join('')
+      : landPath(det) + (GEO.xland || []).map((k) => kp(k, det)).join('');
   // neighbouring countries as grey context (country views)
   if (S.map !== 'world' && document.getElementById('showNeighbours').checked && !S.focusHide) {
     const nb = neighboursPath();
@@ -208,6 +226,7 @@ function render(target) {
   for (const R of insetRects()) {
     out += `<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="${bg}" fill-opacity=".92" stroke="${st === 'neon' ? stroke : ink0}" stroke-opacity=".45" stroke-width="1" ${st === 'blueprint' ? 'stroke-dasharray="4 3"' : ''}/>`;
   }
+  out += fxUnder(allPath, ink);
   if (sp.flag && S.map !== 'world') {
     const iso = S.country || 'DNK',
       fl = FLAGS[iso];
@@ -267,7 +286,6 @@ function render(target) {
               ? 0
               : 0.9;
   const strokeBase = st === 'silhouette' ? 'none' : stroke;
-  out += fxUnder(allPath, ink);
   out += `<g id="unsel"${st === 'paper' ? ' filter="url(#paper)"' : sp.filter ? ' filter="url(#' + sp.filter + ')"' : ''}>`;
   for (const k of unsel) {
     const fo = !inFocus(k);
@@ -403,13 +421,10 @@ function render(target) {
     out += '</g>';
   }
   if (sp.sea) {
-    const sea =
-      S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
-        ? []
-        : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
+    const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
     out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
     for (const [fx, fy, t] of sea)
-      out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle">${t}</text>`;
+      out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle">${t}</text>`;
     out += '</g>';
   }
   if (st === 'atlas' || st === 'regions') {
@@ -424,12 +439,9 @@ function render(target) {
       out += `<text x="${x.toFixed(0)}" y="${(y + 3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`;
     }
     if (st === 'atlas') {
-      const sea =
-        S.focus || S.zoom.k !== 1 || S.zoom.x || S.zoom.y
-          ? []
-          : (GEO.sea || []).map((x) => [x[0], x[1], t(x[2]).toUpperCase()]);
+      const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
       for (const [fx, fy, t] of sea)
-        out += `<text x="${(fx * W).toFixed(0)}" y="${(fy * (H - FOOT)).toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`;
+        out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`;
     }
     out += '</g>';
   }
@@ -485,18 +497,48 @@ function render(target) {
   out += fxMap(allPath);
   // major cities (country views, or focused units in the world view)
   const CL =
-    S.map === 'adm1'
-      ? GEO.cityList
+    S.map !== 'world'
+      ? citiesToDraw()
       : S.focus && GEO.cities
         ? (focusUnits() || []).flatMap((u) => (GEO.cities[u.c] || []).filter((c) => !GEO.groups[S.focus] || c.cap))
         : [];
+  const cityBoxes = [];
+  const boxHit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
   if (CL.length && document.getElementById('showCities').checked) {
     out += '<g pointer-events="none">';
     for (const u of [0]) {
+      // every dot first, so no label covers a city that is drawn later
       for (const c of CL) {
-        const [x, y] = P(c.x, c.y);
-        const big = c.cap || c.pop > 2e6;
-        out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4.5 : 3}" fill="${c.cap ? ds.accent : '#ffffff'}" stroke="${ink}" stroke-width="1.2"/><text x="${(x + 7).toFixed(1)}" y="${(y + 4).toFixed(1)}" font-family="'${ds.body}'" font-size="${big ? 12 : 10}" font-weight="${c.cap ? 700 : 500}" fill="${ink}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(c.n)}</text>`;
+        const [dx, dy0] = S.map === 'world' ? P(c.x, c.y) : cityPt(c);
+        cityBoxes.push([dx - 5, dy0 - 5, dx + 5, dy0 + 5]);
+      }
+      for (const c of CL) {
+        const [x, y] = S.map === 'world' ? P(c.x, c.y) : cityPt(c);
+        const big = c.cap || c.pop > (S.map === 'dk' ? 2e5 : 2e6);
+        const fs = big ? 12 : 10,
+          tw = c.n.length * fs * 0.56;
+        // right of the dot, or left when that would collide with a label already placed
+        let box = [x + 6, y - fs * 0.8, x + 7 + tw, y + fs * 0.35],
+          left = false;
+        let dy = 0;
+        if (cityBoxes.some((b) => boxHit(b, box))) {
+          // left, then above, then below; a lesser city that fits nowhere keeps only its dot
+          const opts = [
+            [[x - 7 - tw, box[1], x - 6, box[3]], true, 0],
+            [[x - tw / 2, y - fs * 1.9, x + tw / 2, y - fs * 0.75], 'mid', -fs * 1.05],
+            [[x - tw / 2, y + fs * 0.5, x + tw / 2, y + fs * 1.65], 'mid', fs * 1.3],
+          ];
+          const fit = opts.find(([bx]) => !cityBoxes.some((b) => boxHit(b, bx)));
+          if (fit) [box, left, dy] = fit;
+          else if (!c.cap) left = 'skip';
+        }
+        cityBoxes.push([x - 5, y - 5, x + 5, y + 5]);
+        if (left !== 'skip') cityBoxes.push(box);
+        const tx = left === 'mid' ? x : left ? x - 7 : x + 7,
+          anchor = left === 'mid' ? 'middle' : left ? 'end' : 'start';
+        out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4.5 : 3}" fill="${c.cap ? ds.accent : '#ffffff'}" stroke="${ink}" stroke-width="1.2"/>`;
+        if (left !== 'skip')
+          out += `<text x="${tx.toFixed(1)}" y="${(y + 4 + dy).toFixed(1)}" text-anchor="${anchor}" font-family="'${ds.body}'" font-size="${fs}" font-weight="${c.cap ? 700 : 500}" fill="${ink}" stroke="${bg}" stroke-width="3" paint-order="stroke">${esc(c.n)}</text>`;
       }
     }
     out += '</g>';
@@ -539,9 +581,14 @@ function render(target) {
   out += '<g pointer-events="none">';
   if (all || sp.labels)
     for (const k of unsel) {
+      if (S.focusHide && !inFocus(k)) continue;
       const [x, y] = kc(k);
       if (k.a < (sp.labels ? TH.h : TH.l) && !isBH(k)) continue;
       const caps = sp.labels === 'caps';
+      // a unit label gives way to a city label it would run into
+      const lfs = caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5,
+        lw = nm(k).length * lfs * 0.6;
+      if (cityBoxes.some((b) => boxHit(b, [x - lw / 2, y - lfs, x + lw / 2, y + 2]))) continue;
       out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5}" ${caps ? 'letter-spacing="1.2"' : 'font-weight="700"'} text-anchor="middle" fill="${labelFill}" ${labelHalo} opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
     }
   const margin = { l: [], r: [] };
@@ -657,7 +704,7 @@ function render(target) {
     const t = sp.titleCaps ? title.toUpperCase() : title;
     const ls = sp.titleCaps ? 8 : -1;
     if (title)
-      out += `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}">${esc(t)}</text>`;
+      out += `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}" ${guard && isHex(bg) && (S.focus || S.zoom.k > 1.2) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"` : ''}>${esc(t)}</text>`;
     if (sub) {
       const sh = sPos === 'under' ? tp[1] : sPos[1];
       const sy = sPos === 'under' ? ty + 24 : sPos[0] === 't' ? top : bot;

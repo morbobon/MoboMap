@@ -1,6 +1,8 @@
 // ---- focus and framing ----
 const focusUnits = () => {
   if (!S.focus) return null;
+  const fc = typeof focusCity === 'function' && focusCity();
+  if (fc) return cityUnits(fc);
   if (GEO.groups[S.focus]) return GEO.units.filter((k) => k.r === S.focus);
   const u = GEO.units.find((k) => k.c === S.focus);
   return u ? [u] : null;
@@ -13,6 +15,8 @@ function computeMain() {
   const key = 'main|' + (S.country || 'world') + '|' + S.proj + '|' + S.focus + '|' + S.far;
   if (cache[key]) return cache[key];
   LC = null;
+  const fc = focusCity();
+  if (fc) return (cache[key] = cityFrame(fc));
   const fu = focusUnits();
   let b;
   if (!GEO.geo && !fu) b = GEO.main.slice();
@@ -44,6 +48,13 @@ function computeMain() {
         }
     }
     if (!fu && GEO.insets) b = layoutInsets(b);
+    if (!fu && S.map === 'world') {
+      // the globe's own width at the equator, so the outline is centred
+      const [x0] = prj(0, 90),
+        [x1] = prj(360, 90);
+      b[0] = Math.min(b[0], x0, x1);
+      b[2] = Math.max(b[2], x0, x1);
+    }
     if (fu) {
       const px = (b[2] - b[0]) * 0.08,
         py = (b[3] - b[1]) * 0.08;
@@ -79,7 +90,7 @@ function setLayout(id) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const wrap = document.getElementById('wrap');
   wrap.style.aspectRatio = W + '/' + H;
-  wrap.style.width = `min(100%,calc((100vh - 250px) * ${(W / H).toFixed(4)}))`;
+  wrap.style.width = `min(100%,calc((100vh - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`;
 }
 // ins: the inset a point belongs to (insOf) – Bornholm is shifted, adm1 insets have their own projection
 const P = (x, y, ins) => {

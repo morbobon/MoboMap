@@ -115,7 +115,7 @@ function laeaCenter(units) {
 // Inset that a unit is drawn in (adm1 insets only while no focus is set; Bornholm always)
 function insOf(k) {
   if (GEO.insetOf) return S.focus ? null : GEO.insetOf[k.c] || null;
-  return I && k.c === I.unit ? I : null;
+  return I && k.c === I.unit && !insetCityFocus() ? I : null;
 }
 // Unit coordinates (x = lon+180, y = 90-lat) in the inset's own projection, before box placement
 function insPrj(ins, x, y) {
@@ -204,7 +204,7 @@ function insetRects() {
       h: (ins.box[3] - ins.box[1]) * sc,
     }));
   }
-  return I ? [bhRect()] : [];
+  return I && !focusCity() ? [bhRect()] : [];
 }
 function setFar(v) {
   S.far = v;

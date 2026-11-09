@@ -29,9 +29,32 @@ const STYLES = [
   'stone',
   'midnight',
   'blackgold',
+  'chalk',
+  'ice',
 ].map((id) => ({ id }));
 // Style properties used generically by render(): colours, filters, labels, title alignment, decorations
 const SP = {
+  ice: {
+    bg: '#f3f8fc',
+    land: '#dbe9f4',
+    stroke: '#86a9c4',
+    ink: '#2c4a60',
+    heading: '#2c4a60',
+    dark: false,
+    strokeW: 0.8,
+    landAlt: '#cfe2f0',
+  },
+  chalk: {
+    bg: '#2e3a33',
+    land: '#3a4a40',
+    stroke: '#e8e8dc',
+    ink: '#ecebe0',
+    heading: '#f4f1e4',
+    dark: true,
+    strokeW: 1.1,
+    labels: 'caps',
+    labelColor: '#ecebe0',
+  },
   blackgold: {
     bg: '#151413',
     land: '#a8813f',
