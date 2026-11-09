@@ -22,7 +22,8 @@
     <header>
       <div>
         <h1>
-          <span data-i18n="app_title">MoboMap – Design Studio</span
+          <a class="home" href="./" onclick="return goHome(event);" data-i18n-title="home_t"
+            ><span data-i18n="app_title">MoboMap – Design Studio</span></a
           ><small data-i18n="app_sub"
             >Choose design system, map, layout, style and highlight groups · click the map or paste lists ·
             export</small
@@ -131,6 +132,10 @@
                     render();
                   " />
                 <span data-i18n="focus_hide"></span
+              ></label>
+              <label class="ck" data-i18n-title="autodetail_t"
+                ><input type="checkbox" id="autoDetail" checked onchange="setAutoDetail(this.checked)" />
+                <span data-i18n="autodetail"></span
               ></label>
 
               <label class="ck"
@@ -485,6 +490,16 @@
     </main>
     <div id="tip"></div>
     <div id="toast"></div>
+    <dialog id="homeDlg">
+      <h3 data-i18n="home_q"></h3>
+      <p data-i18n="home_info"></p>
+      <div class="col">
+        <button class="chip" onclick="homeSave('look')" data-i18n="home_look"></button>
+        <button class="chip" onclick="homeSave('project')" data-i18n="home_project"></button>
+        <button class="chip" onclick="homeSave('leave')" data-i18n="home_leave"></button>
+        <button class="chip" onclick="homeSave('cancel')" data-i18n="home_cancel"></button>
+      </div>
+    </dialog>
     <script>
       /*__JS__*/
     </script>

@@ -372,12 +372,19 @@ svg.addEventListener(
     const [sx, sy] = svgPoint(e);
     const z = S.zoom;
     const step = Math.max(-0.12, Math.min(0.12, -e.deltaY * 0.0006));
-    let k2 = Math.min(40, Math.max(0.5, z.k * Math.exp(step)));
+    // with auto-detail a country or focus can be zoomed out far enough to step up a level
+    const kMin = autoDetailOn() && (S.focus || S.map !== 'world') ? 0.3 : 0.5;
+    // small countries need a deep world zoom before they fill half the page and open their regions
+    const kMax = autoDetailOn() && S.map === 'world' ? 400 : 40;
+    let k2 = Math.min(kMax, Math.max(kMin, z.k * Math.exp(step)));
     if (Math.abs(k2 - 1) < 0.03) k2 = 1;
     // keep the point under the cursor in place: screen = unzoomed * k + offset
     const bx = (sx - z.x) / z.k,
       by = (sy - z.y) / z.k;
     S.zoom = { k: k2, x: sx - bx * k2, y: sy - by * k2 };
+    // auto-detail: a country filling the page opens its regions, a small map steps up a level
+    const under = e.target.closest && e.target.closest('.k');
+    if (typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c)) return;
     zoomChanged();
   },
   { passive: false },

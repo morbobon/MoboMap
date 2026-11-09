@@ -1043,3 +1043,7 @@ header h1 .home:hover {
 #homeDlg .col button {
   text-align: left;
 }
+header h1 a.home {
+  color: inherit;
+  text-decoration: none;
+}
