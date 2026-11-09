@@ -8,9 +8,18 @@ function shareBase() {
   // a page opened from disk cannot be shared as such: point at the public demo instead
   return location.protocol === 'file:' ? SHARE_DEMO : location.origin + location.pathname;
 }
+// Links are read against a neutral base: the start project without its effects and zoom. Only the bare
+// address (no parameters) gets the start view's effects, so links made before those defaults existed
+// still open as they were made.
+function linkBase() {
+  const b = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
+  b.fx = Object.assign({}, b.fx || {}, { fx: [], amt: {}, frame: 'none', preset: '' });
+  b.zoom = { k: 1, x: 0, y: 0 };
+  return b;
+}
 function shareParams() {
   const p = projectState(),
-    d = DEFAULT_PROJECT || {};
+    d = linkBase();
   const q = new URLSearchParams();
   const put = (k, v, def) => {
     if (v == null) return;
@@ -156,7 +165,7 @@ function projectFromUrl(search) {
     'po',
   ];
   if (!known.some((k) => q.has(k))) return null;
-  const p = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
+  const p = linkBase();
   p.format = 'mobomap-project';
   const g = (k) => q.get(k);
   const okCountry = (c) => c === 'world' || c.toUpperCase() === 'DNK' || Object.hasOwn(DATA.adm1, c.toUpperCase());
