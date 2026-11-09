@@ -482,7 +482,8 @@
   "pt_align": "Partner alignment",
   "al_left": "Left",
   "al_center": "Centre",
-  "al_right": "Right"
+  "al_right": "Right",
+  "grp_fold": "Fold to one line"
  },
  "da": {
   "yes": "Ja",
@@ -967,7 +968,8 @@
   "pt_align": "Justering af partnere",
   "al_left": "Venstre",
   "al_center": "Midte",
-  "al_right": "Højre"
+  "al_right": "Højre",
+  "grp_fold": "Fold sammen til én linje"
  },
  "de": {
   "yes": "Ja",
@@ -1452,7 +1454,8 @@
   "pt_align": "Ausrichtung der Partner",
   "al_left": "Links",
   "al_center": "Mitte",
-  "al_right": "Rechts"
+  "al_right": "Rechts",
+  "grp_fold": "Auf eine Zeile einklappen"
  },
  "fr": {
   "yes": "Oui",
@@ -1937,7 +1940,8 @@
   "pt_align": "Alignement des partenaires",
   "al_left": "Gauche",
   "al_center": "Centre",
-  "al_right": "Droite"
+  "al_right": "Droite",
+  "grp_fold": "Replier sur une ligne"
  },
  "es": {
   "yes": "Sí",
@@ -2422,7 +2426,8 @@
   "pt_align": "Alineación de socios",
   "al_left": "Izquierda",
   "al_center": "Centro",
-  "al_right": "Derecha"
+  "al_right": "Derecha",
+  "grp_fold": "Plegar en una línea"
  },
  "sv": {
   "yes": "Ja",
@@ -2907,7 +2912,8 @@
   "pt_align": "Justering av partner",
   "al_left": "Vänster",
   "al_center": "Mitten",
-  "al_right": "Höger"
+  "al_right": "Höger",
+  "grp_fold": "Fäll ihop till en rad"
  },
  "no": {
   "yes": "Ja",
@@ -3392,7 +3398,8 @@
   "pt_align": "Justering av partnere",
   "al_left": "Venstre",
   "al_center": "Midten",
-  "al_right": "Høyre"
+  "al_right": "Høyre",
+  "grp_fold": "Brett sammen til én linje"
  },
  "fi": {
   "yes": "Kyllä",
@@ -3877,7 +3884,8 @@
   "pt_align": "Kumppanien tasaus",
   "al_left": "Vasen",
   "al_center": "Keskellä",
-  "al_right": "Oikea"
+  "al_right": "Oikea",
+  "grp_fold": "Taita yhdelle riville"
  },
  "nl": {
   "yes": "Ja",
@@ -4362,7 +4370,8 @@
   "pt_align": "Uitlijning partners",
   "al_left": "Links",
   "al_center": "Midden",
-  "al_right": "Rechts"
+  "al_right": "Rechts",
+  "grp_fold": "Inklappen tot één regel"
  },
  "it": {
   "yes": "Sì",
@@ -4847,6 +4856,7 @@
   "pt_align": "Allineamento partner",
   "al_left": "Sinistra",
   "al_center": "Centro",
-  "al_right": "Destra"
+  "al_right": "Destra",
+  "grp_fold": "Comprimi in una riga"
  }
 }

@@ -8,6 +8,8 @@ function setTab(id) {
   document.querySelectorAll('.rail button').forEach((b) => b.classList.toggle('on', b.dataset.tab === id));
   document.querySelectorAll('aside .tab').forEach((p) => p.classList.toggle('on', p.dataset.tab === id));
   document.querySelector('aside').scrollTop = 0;
+  // the highlight groups open as far as the room allows: measure now that the tab is visible
+  if (id === 'highlight' && typeof ui === 'function' && S.groups) ui();
 }
 
 // ---- export menu ----

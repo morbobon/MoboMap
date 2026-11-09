@@ -127,18 +127,34 @@ function ui() {
         : 'transparent';
   const removeBtn = (i) =>
     `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>`;
-  const fullCard = (g, i) => `<div class="grp active">
-  <div class="hd"><input type="radio" name="act" checked title="${esc(t('active_group'))}"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>
+  const fullCard = (g, i) => `<div class="grp ${i === S.active ? 'active' : 'open'}">
+  <div class="hd"${i === S.active ? '' : ` onclick="if(event.target===this||event.target.type==='radio')activateGroup(${i})"`}><input type="radio" name="act" ${i === S.active ? 'checked' : ''} title="${esc(t('active_group'))}"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${i === S.active ? '' : `<button class="fold" title="${esc(t('grp_fold'))}" onclick="event.stopPropagation();foldGroup(${i})">▴</button>`}${removeBtn(i)}</div>
   <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
   <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
  </div>`;
   const compact = (g, i) =>
-    `<div class="grp compact" title="${esc(t('active_group'))}" onclick="S.active=${i};ui();render()"><span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
-  document.getElementById('groups').innerHTML = S.groups.length
-    ? S.groups.map((g, i) => (i === S.active ? fullCard(g, i) : compact(g, i))).join('')
-    : `<div class="groups-empty">${esc(t('no_groups'))}</div>`;
+    `<div class="grp compact" title="${esc(t('active_group'))}" onclick="activateGroup(${i})"><span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
+  // as many groups open as there is room for: the active one always, then the most recently opened;
+  // the rest fold to one line only when the panel would otherwise scroll
+  const gEl = document.getElementById('groups');
+  const html = (open) =>
+    S.groups.length
+      ? S.groups.map((g, i) => (open.has(i) ? fullCard(g, i) : compact(g, i))).join('')
+      : `<div class="groups-empty">${esc(t('no_groups'))}</div>`;
+  const want = S.groups.map((_, i) => i).filter((i) => i === S.active || !S.groups[i].closed);
+  const spare = want
+    .filter((i) => i !== S.active)
+    .sort((a, b) => (S.groups[a].openedAt || 0) - (S.groups[b].openedAt || 0));
+  const open = new Set(want);
+  gEl.innerHTML = html(open);
+  const sc = gEl.closest('aside');
+  if (sc && gEl.offsetParent !== null && sc.clientHeight)
+    while (sc.scrollHeight > sc.clientHeight + 1 && spare.length) {
+      open.delete(spare.shift()); // the longest-unused first
+      gEl.innerHTML = html(open);
+    }
   S.groups.forEach((g) => {
     if (!g.color) g.color = cols[Math.min(S.groups.indexOf(g), cols.length - 1)];
   });
@@ -182,6 +198,25 @@ function toggleHL(i, id) {
   ui();
   render();
 }
+function activateGroup(i) {
+  const g = S.groups[i];
+  if (!g) return;
+  S.active = i;
+  g.closed = false;
+  g.openedAt = Date.now();
+  ui();
+  render();
+}
+function foldGroup(i) {
+  S.groups[i].closed = true;
+  ui();
+}
+// room changes: tab, window size, panel
+let groupFitT = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(groupFitT);
+  groupFitT = setTimeout(() => typeof ui === 'function' && ui(), 150);
+});
 function addGroup() {
   const D = DS[S.ds];
   const i = S.groups.length;
@@ -194,6 +229,7 @@ function addGroup() {
     ),
   );
   S.active = i;
+  S.groups[i].openedAt = Date.now();
   ui();
   render();
 }
