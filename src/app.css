@@ -1069,3 +1069,8 @@ header h1 a.home {
   font-size: 10px;
   line-height: 1;
 }
+.partner .psize {
+  width: 52px;
+  padding: 1px 4px;
+  flex: 0 0 auto;
+}

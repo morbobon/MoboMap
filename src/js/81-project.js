@@ -145,6 +145,7 @@ function loadProject(p, quiet) {
     ...(q.id ? { id: String(q.id) } : {}),
     ...(q.hidden ? { hidden: true } : {}),
     ...(q.row ? { row: +q.row || 0 } : {}),
+    ...(q.scale && +q.scale !== 1 ? { scale: +q.scale } : {}),
   }));
   S.footer = Object.assign({}, FOOTER_DEFAULT, p.footer || {});
   if (p.partnerOrder) applyPartnerOrder(p.partnerOrder);

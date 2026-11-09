@@ -11,6 +11,8 @@ function footerOpts() {
   if (!['left', 'center', 'right'].includes(f.align)) f.align = 'left';
   return f;
 }
+// a partner's own size on top of the common scale (0.3–3, 1 = normal)
+const pScale = (p) => Math.max(0.3, Math.min(3, +p.scale || 1));
 const partnerShown = (p) => !p.hidden && ((p.logo && p.logo.src) || p.name);
 const partnerRow = (p) => Math.max(0, Math.min(footerOpts().rows - 1, Math.round(+p.row) || 0));
 // stable ids (drag offsets are stored per partner, not per position)
@@ -46,7 +48,7 @@ function partnersSvg(c) {
   const rows = [...Array(f.rows)].map(() => []);
   S.partners.forEach((p) => partnerShown(p) && rows[partnerRow(p)].push(p));
   const natW = (p, lh) =>
-    p.logo && p.logo.src ? Math.min(lh * (p.logo.aspect || 2), W * 0.2) : textW(p.name, c.head, 700, 13);
+    pScale(p) * (p.logo && p.logo.src ? Math.min(lh * (p.logo.aspect || 2), W * 0.2) : textW(p.name, c.head, 700, 13));
   const labelW = c.label ? textW(c.label.toUpperCase(), c.lf, 400, 11, 1) : 0;
   // one scale for all rows, so the logos keep the same size relative to each other
   let s = 1;
@@ -57,6 +59,9 @@ function partnersSvg(c) {
         gap0 * Math.max(0, r.length - 1) +
         (ri === 0 && labelW ? labelW + gap0 : 0);
       if (tot > avail) s = Math.min(s, avail / tot);
+      // and the tallest logo (with its own size) stays inside its row, frame included
+      const tall = Math.max(0, ...r.filter((p) => p.logo && p.logo.src).map(pScale));
+      if (tall && lh0 * tall + 12 > rowH * 0.92) s = Math.min(s, (rowH * 0.92 - 12) / (lh0 * tall));
     });
   const lh = lh0 * s,
     gap = gap0 * s;
@@ -81,12 +86,13 @@ function partnersSvg(c) {
       const w = natW(p, lh0) * s;
       let inner;
       if (p.logo && p.logo.src) {
-        const by = ty - lh / 2;
-        inner = `<rect x="${(x - 6 * s).toFixed(1)}" y="${(by - 6 * s).toFixed(1)}" width="${(w + 12 * s).toFixed(1)}" height="${(lh + 12 * s).toFixed(1)}" rx="4" fill="#ffffff" fill-opacity="${c.dark || !nearWhite(c.bg) ? 0.92 : 0}"/><image href="${p.logo.src}" x="${x.toFixed(1)}" y="${by.toFixed(1)}" width="${w.toFixed(1)}" height="${lh.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
-        if (p.link) c.links.push({ x: x + dx, y: by + dy, w, h: lh, url: p.link });
+        const ph = lh * pScale(p);
+        const by = ty - ph / 2;
+        inner = `<rect x="${(x - 6 * s).toFixed(1)}" y="${(by - 6 * s).toFixed(1)}" width="${(w + 12 * s).toFixed(1)}" height="${(ph + 12 * s).toFixed(1)}" rx="4" fill="#ffffff" fill-opacity="${c.dark || !nearWhite(c.bg) ? 0.92 : 0}"/><image href="${p.logo.src}" x="${x.toFixed(1)}" y="${by.toFixed(1)}" width="${w.toFixed(1)}" height="${ph.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
+        if (p.link) c.links.push({ x: x + dx, y: by + dy, w, h: ph, url: p.link });
       } else {
-        inner = `<text x="${x.toFixed(1)}" y="${(ty + 4 * s).toFixed(1)}" font-family="'${c.head}'" font-weight="700" font-size="${(13 * s).toFixed(1)}" fill="${c.ink}">${esc(p.name)}</text>`;
-        if (p.link) c.links.push({ x: x + dx, y: ty - 10 * s + dy, w, h: 20 * s, url: p.link });
+        inner = `<text x="${x.toFixed(1)}" y="${(ty + 4 * s).toFixed(1)}" font-family="'${c.head}'" font-weight="700" font-size="${(13 * s * pScale(p)).toFixed(1)}" fill="${c.ink}">${esc(p.name)}</text>`;
+        if (p.link) c.links.push({ x: x + dx, y: ty - 10 * s * pScale(p) + dy, w, h: 20 * s * pScale(p), url: p.link });
       }
       out += `<g class="drg ptn" data-drag="${esc(key)}" pointer-events="all"${dx || dy ? ` transform="translate(${dx.toFixed(1)},${dy.toFixed(1)})"` : ''}>${inner}</g>`;
       slots.push({ id: p.id, row: ri, cx: x + w / 2 });
@@ -164,7 +170,7 @@ function partnersUI() {
     S.partners
       .map(
         (p, i) =>
-          `<div class="partner${p.hidden ? ' off' : ''}" draggable="true" ondragstart="PT_DRAG=${i};event.dataTransfer.effectAllowed='move'" ondragover="event.preventDefault()" ondrop="partnerListDrop(event, ${i})"><span class="grip" title="${esc(t('pt_drag_t'))}">⋮⋮</span><input type="checkbox" ${p.hidden ? '' : 'checked'} title="${esc(t('pt_show_t'))}" onchange="partnerSet(${i}, 'hidden', !this.checked)"/>${p.logo && p.logo.src ? `<img src="${p.logo.src}" alt="">` : '<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(' + esc(t('text_only')) + ')</span>'}<span>${esc(p.name)}${p.link ? ` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--accent2)">link</a>` : ''}</span>${f.rows > 1 ? `<select class="prow" title="${esc(t('pt_row'))}" onchange="partnerSet(${i}, 'row', +this.value)">${[...Array(f.rows)].map((_, r) => `<option value="${r}" ${partnerRow(p) === r ? 'selected' : ''}>${r + 1}</option>`).join('')}</select>` : ''}<button class="chip sm" ${i ? '' : 'disabled'} onclick="partnerMove(${i}, -1)" title="${esc(t('pt_up'))}">▲</button><button class="chip sm" ${i < n - 1 ? '' : 'disabled'} onclick="partnerMove(${i}, 1)" title="${esc(t('pt_down'))}">▼</button><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`,
+          `<div class="partner${p.hidden ? ' off' : ''}" draggable="true" ondragstart="PT_DRAG=${i};event.dataTransfer.effectAllowed='move'" ondragover="event.preventDefault()" ondrop="partnerListDrop(event, ${i})"><span class="grip" title="${esc(t('pt_drag_t'))}">⋮⋮</span><input type="checkbox" ${p.hidden ? '' : 'checked'} title="${esc(t('pt_show_t'))}" onchange="partnerSet(${i}, 'hidden', !this.checked)"/>${p.logo && p.logo.src ? `<img src="${p.logo.src}" alt="">` : '<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(' + esc(t('text_only')) + ')</span>'}<span>${esc(p.name)}${p.link ? ` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--accent2)">link</a>` : ''}</span>${f.rows > 1 ? `<select class="prow" title="${esc(t('pt_row'))}" onchange="partnerSet(${i}, 'row', +this.value)">${[...Array(f.rows)].map((_, r) => `<option value="${r}" ${partnerRow(p) === r ? 'selected' : ''}>${r + 1}</option>`).join('')}</select>` : ''}<input class="psize" type="number" min="30" max="300" step="10" value="${Math.round(pScale(p) * 100)}" title="${esc(t('pt_size_t'))}" onchange="partnerSet(${i}, 'scale', Math.max(30, Math.min(300, +this.value || 100)) / 100)"/><button class="chip sm" ${i ? '' : 'disabled'} onclick="partnerMove(${i}, -1)" title="${esc(t('pt_up'))}">▲</button><button class="chip sm" ${i < n - 1 ? '' : 'disabled'} onclick="partnerMove(${i}, 1)" title="${esc(t('pt_down'))}">▼</button><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`,
       )
       .join('') || '<p class="note" style="margin:0">' + esc(t('no_partners')) + '</p>';
   // drop on the empty space after the last one = move to the end
@@ -186,7 +192,13 @@ function partnerOrderParam() {
   const toks = S.partners
     .map((p) => [idx(p), p])
     .filter(([k]) => k >= 0)
-    .map(([k, p]) => k + (partnerRow(p) ? 'r' + partnerRow(p) : '') + (p.hidden ? 'h' : ''));
+    .map(
+      ([k, p]) =>
+        k +
+        (partnerRow(p) ? 'r' + partnerRow(p) : '') +
+        (pScale(p) !== 1 ? 's' + Math.round(pScale(p) * 100) : '') +
+        (p.hidden ? 'h' : ''),
+    );
   const plain = prof.map((_, k) => String(k)).join('.');
   const s = toks.join('.');
   return s === plain ? '' : s;
@@ -195,12 +207,33 @@ function applyPartnerOrder(s) {
   const prof = S.partners.slice();
   const out = [];
   for (const tok of String(s).split('.')) {
-    const m = /^(\d+)(?:r(\d))?(h)?$/.exec(tok);
+    const m = /^(\d+)(?:r(\d))?(?:s(\d+))?(h)?$/.exec(tok);
     if (!m || !prof[+m[1]] || out.includes(prof[+m[1]])) continue;
     const p = prof[+m[1]];
     p.row = m[2] ? +m[2] : 0;
-    p.hidden = !!m[3];
+    p.scale = m[3] ? +m[3] / 100 : 1;
+    p.hidden = !!m[4];
     out.push(p);
   }
   S.partners = out.concat(prof.filter((p) => !out.includes(p)));
 }
+
+// Alt + mouse wheel over a partner logo on the map changes its size (instead of zooming the map)
+document.getElementById('svg').addEventListener(
+  'wheel',
+  (e) => {
+    if (!e.altKey) return;
+    const g = e.target.closest && e.target.closest('.ptn');
+    if (!g) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const p = S.partners.find((q) => 'pt:' + q.id === g.dataset.drag);
+    if (!p) return;
+    p.scale = Math.max(0.3, Math.min(3, Math.round(pScale(p) * (e.deltaY < 0 ? 1.1 : 1 / 1.1) * 100) / 100));
+    partnersUI();
+    clearTimeout(HIST.timer);
+    HIST.timer = setTimeout(() => ((HIST.timer = 0), pushHistory()), 400);
+    zoomChanged();
+  },
+  { capture: true, passive: false },
+);
