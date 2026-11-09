@@ -112,15 +112,21 @@ function currentDSExport() {
 }
 function importDSObject(obj) {
   const list = Array.isArray(obj) ? obj : obj.designSystems || [obj];
-  let n = null;
+  const added = [];
   for (const d of list) {
     const r = addDS(d, 'user');
-    if (r) n = r;
+    if (r) added.push(r);
   }
-  if (!n) return toast(t('ts_none'));
+  if (!added.length) return toast(t('ts_none'));
   saveUserDS();
+  // which profile to show after importing several: { "default": "<id>" } next to "designSystems",
+  // or "default": true on one profile; otherwise the first one in the file
+  const want = !Array.isArray(obj) && typeof obj.default === 'string' ? obj.default : null;
+  const flagged = list.find((d) => d && d.default === true);
+  const n =
+    added.find((r) => r.id === want) || added.find((r) => flagged && r.id === String(flagged.id)) || added[0];
   setDS(n.id);
-  toast(t('ts_imported') + ': ' + loc(n.name));
+  toast(t('ts_imported') + ': ' + (added.length > 1 ? added.length + ' · ' : '') + loc(n.name));
 }
 function importDSFile(file) {
   if (!file) return;

@@ -77,7 +77,7 @@ A design system is one JSON document. Three ways to add one – same schema:
 
 1. **Build in** – put `name.json` (plus logo/font files) in `designsystems/` and run the build. File names control the order; the first *public* profile is the default. `designsystems/private/` is gitignored for client-specific brands and is tagged "Private" in the app.
 2. **Sidecar, no build** – put `designsystems.js` next to `index.html` containing `window.DESIGN_SYSTEMS = [ ... ]`. It loads automatically, also from `file://`. The app can generate this file from your imported profiles.
-3. **In the app** – "Import" (or drop a `.json` on the page), or "Edit / new" → JSON editor with logo picker → "Save". Stored in localStorage; "Export JSON" shares it.
+3. **In the app** – "Import" (or drop a `.json` on the page; a file with several profiles opens the first one, or the one named by a top-level `"default": "<id>"` next to `"designSystems"`, or the profile marked `"default": true`), or "Edit / new" → JSON editor with logo picker → "Save". Stored in localStorage; "Export JSON" shares it.
 
 Because a `file://` page cannot `fetch()` files from its own folder, logos and fonts in sidecar/imported profiles must be data URIs (the editor and the build do this for you). In `designsystems/`, `src` may be a relative path.
 
