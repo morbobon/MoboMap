@@ -27,8 +27,9 @@ function shareParams() {
   const dfx = d.fx || {};
   put('fx', p.fx.fx.join('.'), (dfx.fx || []).join('.'));
   put('fr', p.fx.frame, dfx.frame || 'none');
-  put('tfx', p.fx.title || 'auto', dfx.title || 'auto');
-  put('sfx', p.fx.sub || 'auto', dfx.sub || 'auto');
+  // links without tfx/sfx (old ones) mean no flair, so 'auto' is written out
+  put('tfx', p.fx.title || 'auto', 'none');
+  put('sfx', p.fx.sub || 'auto', 'none');
   put('sf', String(p.fx.surface || '').replace('#', ''), String(dfx.surface || '#e8e4dc').replace('#', ''));
   if (p.fx.seed !== (dfx.seed || 7)) q.set('seed', p.fx.seed);
   // intensities, compared with the start project's
@@ -44,6 +45,13 @@ function shareParams() {
   const lt = p.fx.light || {};
   if (lt.dir != null && lt.dir !== 250) q.set('ld', lt.dir);
   if (lt.warm) q.set('lw', Math.round(lt.warm * 100));
+  // partner footer: rows.autoScale.margin, and the profile partners' order / rows / visibility
+  const fo = p.footer,
+    fd = Object.assign({}, FOOTER_DEFAULT, d.footer || {});
+  if (fo.rows !== fd.rows || !!fo.autoScale !== !!fd.autoScale || fo.margin !== fd.margin)
+    q.set('pf', [fo.rows, fo.autoScale ? 1 : 0, fo.margin].join('.'));
+  const po = partnerOrderParam();
+  if (po) q.set('po', po);
   put('tp', p.titlePos, d.titlePos || 'auto');
   put('sp', p.subPos, d.subPos || 'under');
   put('far', p.far, d.far || 'inset');
@@ -144,6 +152,8 @@ function projectFromUrl(search) {
     'dg',
     'tfx',
     'sfx',
+    'pf',
+    'po',
   ];
   if (!known.some((k) => q.has(k))) return null;
   const p = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
@@ -182,8 +192,8 @@ function projectFromUrl(search) {
           .filter((x) => FX_IDS.includes(x))
       : [];
   if (q.has('fr') && FRAME_IDS.includes(g('fr'))) p.fx.frame = g('fr');
-  if (q.has('tfx') && TITLE_FX.includes(g('tfx'))) p.fx.title = g('tfx');
-  if (q.has('sfx') && SUB_FX.includes(g('sfx'))) p.fx.sub = g('sfx');
+  p.fx.title = q.has('tfx') && TITLE_FX.includes(g('tfx')) ? g('tfx') : 'none';
+  p.fx.sub = q.has('sfx') && SUB_FX.includes(g('sfx')) ? g('sfx') : 'none';
   if (q.has('sf') && /^[0-9a-f]{3,6}$/i.test(g('sf'))) p.fx.surface = '#' + g('sf');
   if (q.has('seed')) p.fx.seed = +g('seed') || 7;
   if (q.has('fa'))
@@ -203,6 +213,11 @@ function projectFromUrl(search) {
   if (q.has('tp') && posOk(g('tp'), 'auto')) p.titlePos = g('tp');
   if (q.has('sp') && posOk(g('sp'), 'under')) p.subPos = g('sp');
   if (q.has('ft')) p.footerLabel = g('ft');
+  if (q.has('pf')) {
+    const [r, a, m] = g('pf').split('.');
+    p.footer = { rows: num(r) ?? 1, autoScale: a !== '0', margin: num(m) ?? FOOTER_DEFAULT.margin };
+  }
+  if (q.has('po')) p.partnerOrder = g('po');
   if (q.has('dg')) {
     p.drag = {};
     for (const part of g('dg').split('.')) {

@@ -42,6 +42,7 @@ function projectState() {
     subPos: document.getElementById('subPos').value,
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
+    footer: footerOpts(),
     checks: Object.fromEntries(CK.map((k) => [k, document.getElementById(k).checked])),
   };
 }
@@ -90,8 +91,11 @@ function loadProject(p, quiet) {
     p.fx || {},
   );
   S.fx.fx = (S.fx.fx || []).filter((id) => FX_IDS.includes(id));
-  if (!TITLE_FX.includes(S.fx.title)) S.fx.title = 'auto';
-  if (!SUB_FX.includes(S.fx.sub)) S.fx.sub = 'auto';
+  // title flair: 'auto' (design system / style) only for a start from zero settings; a saved project or
+  // link made before the effects existed keeps its plain title
+  const fresh = p === DEFAULT_PROJECT;
+  if (!TITLE_FX.includes(S.fx.title)) S.fx.title = fresh ? 'auto' : 'none';
+  if (!SUB_FX.includes(S.fx.sub)) S.fx.sub = fresh ? 'auto' : 'none';
   if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
@@ -135,7 +139,12 @@ function loadProject(p, quiet) {
     name: q.name || '',
     link: q.link || '',
     logo: Object.assign({}, q.logo || {}),
+    ...(q.id ? { id: String(q.id) } : {}),
+    ...(q.hidden ? { hidden: true } : {}),
+    ...(q.row ? { row: +q.row || 0 } : {}),
   }));
+  S.footer = Object.assign({}, FOOTER_DEFAULT, p.footer || {});
+  if (p.partnerOrder) applyPartnerOrder(p.partnerOrder);
   document.getElementById('title').value = p.title ?? '';
   document.getElementById('sub').value = p.sub ?? '';
   document.getElementById('footerLabel').value = p.footerLabel ?? loc(D.footer.label);

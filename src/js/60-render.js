@@ -922,29 +922,19 @@ function render(target) {
       out += `<rect x="${dx.toFixed(1)}" y="${(fy - dv.height / 2).toFixed(1)}" width="${dw.toFixed(1)}" height="${dv.height}" rx="${dv.height / 2}" fill="${dcol}" fill-opacity="${dv.opacity}"/>`;
     else if (dv.style === 'line')
       out += `<line x1="${dx.toFixed(1)}" y1="${fy}" x2="${(dx + dw).toFixed(1)}" y2="${fy}" stroke="${dcol}" stroke-opacity="${dv.opacity}" stroke-width="1"/>`;
-    let x = PAD.l - 12;
-    const lh = FOOT * 0.5,
-      gap = Math.round(W * 0.03);
-    const ty = fy + FOOT / 2;
-    if (label) {
-      out += `<text x="${x}" y="${(ty + 4).toFixed(1)}" font-family="'${lf}'" font-size="11" letter-spacing="1" fill="${ink}" opacity="${tOp(0.75)}">${esc(label.toUpperCase())}</text>`;
-      x += label.length * 7.2 + gap;
-    }
-    for (const p of S.partners) {
-      if (p.logo && p.logo.src) {
-        const a = p.logo.aspect || 2,
-          lw = Math.min(lh * a, W * 0.2);
-        const bx = x,
-          by = ty - lh / 2;
-        out += `<rect x="${bx - 6}" y="${by - 6}" width="${lw + 12}" height="${lh + 12}" rx="4" fill="#ffffff" fill-opacity="${dark || !nearWhite(bg) ? 0.92 : 0}"/><image href="${p.logo.src}" x="${bx}" y="${by.toFixed(1)}" width="${lw.toFixed(1)}" height="${lh.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
-        if (p.link) window._links.push({ x: bx, y: by, w: lw, h: lh, url: p.link });
-        x += lw + gap;
-      } else if (p.name) {
-        out += `<text x="${x}" y="${(ty + 4).toFixed(1)}" font-family="'${ds.head}'" font-weight="700" font-size="13" fill="${ink}">${esc(p.name)}</text>`;
-        if (p.link) window._links.push({ x, y: ty - 10, w: p.name.length * 8, h: 20, url: p.link });
-        x += p.name.length * 8 + gap;
-      }
-    }
+    out += partnersSvg({
+      fy,
+      ink,
+      dark,
+      bg,
+      lf,
+      head: ds.head,
+      label,
+      tOp,
+      dragOf,
+      links: window._links,
+      target,
+    });
     out += '</g>';
   }
   out += fxContentTop(ink, ds.accent);

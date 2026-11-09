@@ -73,7 +73,7 @@ function setLayout(id) {
   M = computeMain();
   mw = M[2] - M[0];
   mh = M[3] - M[1];
-  const foot = document.getElementById('showFooter').checked && S.partners.length ? Math.round(H * 0.11) + 20 : 0;
+  const foot = footerHeight(); // partner rows (74-partners.js)
   FOOT = foot;
   PAD = { l: Math.round(W * 0.06), r: Math.round(W * 0.06), t: Math.round(H * 0.15), b: Math.round(H * 0.06) + foot };
   sc = Math.min((W - PAD.l - PAD.r) / mw, (H - PAD.t - PAD.b) / mh);

@@ -142,14 +142,7 @@ function ui() {
   S.groups.forEach((g) => {
     if (!g.color) g.color = cols[Math.min(S.groups.indexOf(g), cols.length - 1)];
   });
-  document.getElementById('partners').innerHTML =
-    S.partners
-      .map(
-        (p, i) =>
-          `<div class="partner">${p.logo && p.logo.src ? `<img src="${p.logo.src}" alt="">` : '<span style="flex:0;width:70px;text-align:center;color:var(--mute)">(' + esc(t('text_only')) + ')</span>'}<span>${esc(p.name)}${p.link ? ` · <a href="${esc(p.link)}" target="_blank" rel="noopener" style="color:var(--accent2)">link</a>` : ''}</span><button class="x chip sm" onclick="removePartner(${i})">×</button></div>`,
-      )
-      .join('') || '<p class="note" style="margin:0">' + esc(t('no_partners')) + '</p>';
-  document.getElementById('partnerCount').textContent = S.partners.length + ' ' + t('partners');
+  partnersUI();
 }
 function setDS(v) {
   // groups using the previous profile's palette take the matching colour of the new one; custom colours stay
@@ -600,8 +593,11 @@ window.addEventListener('pointermove', (e) => {
   tip.style.display = 'none';
   zoomChanged(); // re-render on the next frame
 });
-window.addEventListener('pointerup', () => {
+window.addEventListener('pointerup', (e) => {
   if (!textDrag) return;
+  // a partner logo snaps into a footer row / slot (Ctrl or snapping off: stays where dropped)
+  if (textDrag.moved && textDrag.key.startsWith('pt:'))
+    partnerDrop(textDrag.key, textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
   if (SNAP_GUIDES) {
     SNAP_GUIDES = null;
     zoomChanged();

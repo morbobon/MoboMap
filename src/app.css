@@ -1047,3 +1047,17 @@ header h1 a.home {
   color: inherit;
   text-decoration: none;
 }
+.partner.off > img,
+.partner.off > span {
+  opacity: 0.45;
+}
+.partner .grip {
+  flex: 0 0 auto;
+  cursor: grab;
+  color: var(--mute);
+  letter-spacing: -2px;
+}
+.partner .prow {
+  width: auto;
+  padding: 1px 4px;
+}

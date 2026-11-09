@@ -467,7 +467,16 @@
   "home_look": "Save as a look in this browser (style, effects, title flair)",
   "home_project": "Save the whole map as a project file (.json)",
   "home_leave": "Leave without saving",
-  "home_cancel": "Stay here"
+  "home_cancel": "Stay here",
+  "pt_rows": "Partner rows",
+  "pt_margin": "Side margin",
+  "pt_auto": "Scale logos to fit the margins",
+  "pt_auto_t": "Many partners: all logos shrink together so every row stays inside the side margins",
+  "pt_drag_t": "Drag to reorder – or drag the logo on the map (Ctrl: place freely)",
+  "pt_show_t": "Show on this map",
+  "pt_row": "Row",
+  "pt_up": "Move up",
+  "pt_down": "Move down"
  },
  "da": {
   "yes": "Ja",
@@ -937,7 +946,16 @@
   "home_look": "Gem som look i denne browser (stil, effekter, titeleffekt)",
   "home_project": "Gem hele kortet som projektfil (.json)",
   "home_leave": "Forlad uden at gemme",
-  "home_cancel": "Bliv her"
+  "home_cancel": "Bliv her",
+  "pt_rows": "Partnerrækker",
+  "pt_margin": "Sidemargen",
+  "pt_auto": "Skalér logoer, så de passer i margenerne",
+  "pt_auto_t": "Mange partnere: alle logoer skaleres ned sammen, så hver række holder sig inden for sidemargenerne",
+  "pt_drag_t": "Træk for at ændre rækkefølge – eller træk logoet på kortet (Ctrl: frit)",
+  "pt_show_t": "Vis på dette kort",
+  "pt_row": "Række",
+  "pt_up": "Flyt op",
+  "pt_down": "Flyt ned"
  },
  "de": {
   "yes": "Ja",
@@ -1407,7 +1425,16 @@
   "home_look": "Als Look in diesem Browser speichern (Stil, Effekte, Titel)",
   "home_project": "Ganze Karte als Projektdatei speichern (.json)",
   "home_leave": "Ohne Speichern verlassen",
-  "home_cancel": "Hier bleiben"
+  "home_cancel": "Hier bleiben",
+  "pt_rows": "Partnerzeilen",
+  "pt_margin": "Seitenrand",
+  "pt_auto": "Logos an die Ränder anpassen",
+  "pt_auto_t": "Viele Partner: alle Logos werden gemeinsam verkleinert, damit jede Zeile innerhalb der Ränder bleibt",
+  "pt_drag_t": "Ziehen zum Sortieren – oder das Logo auf der Karte ziehen (Strg: frei)",
+  "pt_show_t": "Auf dieser Karte zeigen",
+  "pt_row": "Zeile",
+  "pt_up": "Nach oben",
+  "pt_down": "Nach unten"
  },
  "fr": {
   "yes": "Oui",
@@ -1877,7 +1904,16 @@
   "home_look": "Enregistrer comme look dans ce navigateur (style, effets, titre)",
   "home_project": "Enregistrer toute la carte comme projet (.json)",
   "home_leave": "Quitter sans enregistrer",
-  "home_cancel": "Rester ici"
+  "home_cancel": "Rester ici",
+  "pt_rows": "Rangées de partenaires",
+  "pt_margin": "Marge latérale",
+  "pt_auto": "Adapter les logos aux marges",
+  "pt_auto_t": "Beaucoup de partenaires : tous les logos rétrécissent ensemble pour rester dans les marges",
+  "pt_drag_t": "Glisser pour réordonner – ou glisser le logo sur la carte (Ctrl : libre)",
+  "pt_show_t": "Afficher sur cette carte",
+  "pt_row": "Rangée",
+  "pt_up": "Monter",
+  "pt_down": "Descendre"
  },
  "es": {
   "yes": "Sí",
@@ -2347,7 +2383,16 @@
   "home_look": "Guardar como look en este navegador (estilo, efectos, título)",
   "home_project": "Guardar todo el mapa como proyecto (.json)",
   "home_leave": "Salir sin guardar",
-  "home_cancel": "Quedarse aquí"
+  "home_cancel": "Quedarse aquí",
+  "pt_rows": "Filas de socios",
+  "pt_margin": "Margen lateral",
+  "pt_auto": "Escalar logos a los márgenes",
+  "pt_auto_t": "Muchos socios: todos los logos se reducen juntos para que cada fila quede dentro de los márgenes",
+  "pt_drag_t": "Arrastra para ordenar, o arrastra el logo en el mapa (Ctrl: libre)",
+  "pt_show_t": "Mostrar en este mapa",
+  "pt_row": "Fila",
+  "pt_up": "Subir",
+  "pt_down": "Bajar"
  },
  "sv": {
   "yes": "Ja",
@@ -2817,7 +2862,16 @@
   "home_look": "Spara som look i den här webbläsaren (stil, effekter, titel)",
   "home_project": "Spara hela kartan som projektfil (.json)",
   "home_leave": "Lämna utan att spara",
-  "home_cancel": "Stanna kvar"
+  "home_cancel": "Stanna kvar",
+  "pt_rows": "Partnerrader",
+  "pt_margin": "Sidmarginal",
+  "pt_auto": "Skala logotyper efter marginalerna",
+  "pt_auto_t": "Många partner: alla logotyper krymper tillsammans så varje rad håller sig inom marginalerna",
+  "pt_drag_t": "Dra för att sortera – eller dra logotypen på kartan (Ctrl: fritt)",
+  "pt_show_t": "Visa på den här kartan",
+  "pt_row": "Rad",
+  "pt_up": "Flytta upp",
+  "pt_down": "Flytta ned"
  },
  "no": {
   "yes": "Ja",
@@ -3287,7 +3341,16 @@
   "home_look": "Lagre som look i denne nettleseren (stil, effekter, tittel)",
   "home_project": "Lagre hele kartet som prosjektfil (.json)",
   "home_leave": "Gå uten å lagre",
-  "home_cancel": "Bli her"
+  "home_cancel": "Bli her",
+  "pt_rows": "Partnerrader",
+  "pt_margin": "Sidemarg",
+  "pt_auto": "Skaler logoer etter margene",
+  "pt_auto_t": "Mange partnere: alle logoer krympes sammen slik at hver rad holder seg innenfor margene",
+  "pt_drag_t": "Dra for å sortere – eller dra logoen på kartet (Ctrl: fritt)",
+  "pt_show_t": "Vis på dette kartet",
+  "pt_row": "Rad",
+  "pt_up": "Flytt opp",
+  "pt_down": "Flytt ned"
  },
  "fi": {
   "yes": "Kyllä",
@@ -3757,7 +3820,16 @@
   "home_look": "Tallenna lookiksi tähän selaimeen (tyyli, tehosteet, otsikko)",
   "home_project": "Tallenna koko kartta projektitiedostoksi (.json)",
   "home_leave": "Poistu tallentamatta",
-  "home_cancel": "Pysy tässä"
+  "home_cancel": "Pysy tässä",
+  "pt_rows": "Kumppanirivit",
+  "pt_margin": "Sivumarginaali",
+  "pt_auto": "Skaalaa logot marginaaleihin",
+  "pt_auto_t": "Paljon kumppaneita: kaikki logot pienenevät yhdessä, jotta rivit pysyvät marginaalien sisällä",
+  "pt_drag_t": "Vedä järjestääksesi – tai vedä logoa kartalla (Ctrl: vapaasti)",
+  "pt_show_t": "Näytä tällä kartalla",
+  "pt_row": "Rivi",
+  "pt_up": "Siirrä ylös",
+  "pt_down": "Siirrä alas"
  },
  "nl": {
   "yes": "Ja",
@@ -4227,7 +4299,16 @@
   "home_look": "Bewaren als look in deze browser (stijl, effecten, titel)",
   "home_project": "De hele kaart als projectbestand bewaren (.json)",
   "home_leave": "Verlaten zonder opslaan",
-  "home_cancel": "Hier blijven"
+  "home_cancel": "Hier blijven",
+  "pt_rows": "Partnerrijen",
+  "pt_margin": "Zijmarge",
+  "pt_auto": "Logo’s schalen binnen de marges",
+  "pt_auto_t": "Veel partners: alle logo’s krimpen samen zodat elke rij binnen de marges blijft",
+  "pt_drag_t": "Sleep om te sorteren – of sleep het logo op de kaart (Ctrl: vrij)",
+  "pt_show_t": "Tonen op deze kaart",
+  "pt_row": "Rij",
+  "pt_up": "Omhoog",
+  "pt_down": "Omlaag"
  },
  "it": {
   "yes": "Sì",
@@ -4697,6 +4778,15 @@
   "home_look": "Salva come look in questo browser (stile, effetti, titolo)",
   "home_project": "Salva l’intera mappa come progetto (.json)",
   "home_leave": "Esci senza salvare",
-  "home_cancel": "Resta qui"
+  "home_cancel": "Resta qui",
+  "pt_rows": "Righe partner",
+  "pt_margin": "Margine laterale",
+  "pt_auto": "Adatta i loghi ai margini",
+  "pt_auto_t": "Molti partner: tutti i loghi si riducono insieme perché ogni riga resti nei margini",
+  "pt_drag_t": "Trascina per ordinare – o trascina il logo sulla mappa (Ctrl: libero)",
+  "pt_show_t": "Mostra su questa mappa",
+  "pt_row": "Riga",
+  "pt_up": "Sposta su",
+  "pt_down": "Sposta giù"
  }
 }
