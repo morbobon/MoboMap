@@ -261,11 +261,13 @@ function afterRender() {
 
 // ---- hide the side panel / looks strip, fullscreen (map only) ----
 const CHROME_KEY = 'mobomap.chrome';
+// first visit: map and side panel, the looks strip tucked away (︽ brings it up)
+const DEFAULT_CHROME = { panel: false, strip: true };
 let CHROME_LINK = null; // layout from a shared link (hp / hs), until the visitor toggles something
 function chromeState() {
   if (CHROME_LINK) return Object.assign({}, CHROME_LINK);
   try {
-    return JSON.parse(localStorage.getItem(CHROME_KEY) || '{}');
+    return JSON.parse(localStorage.getItem(CHROME_KEY) || JSON.stringify(DEFAULT_CHROME));
   } catch {
     return {};
   }
@@ -273,7 +275,11 @@ function chromeState() {
 // ?hp=1 hides the side panel, ?hs=1 the looks strip, ?full=1 shows only the map
 function chromeFromUrl(search) {
   const q = new URLSearchParams(search || '');
-  if (q.has('hp') || q.has('hs')) CHROME_LINK = { panel: q.get('hp') === '1', strip: q.get('hs') === '1' };
+  if (q.has('hp') || q.has('hs'))
+    CHROME_LINK = {
+      panel: q.has('hp') ? q.get('hp') === '1' : DEFAULT_CHROME.panel,
+      strip: q.has('hs') ? q.get('hs') === '1' : DEFAULT_CHROME.strip,
+    };
   if (q.get('full') === '1') document.body.classList.add('fs');
 }
 function applyChrome() {

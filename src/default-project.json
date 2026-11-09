@@ -25,5 +25,30 @@
     "showFooter": false,
     "showCities": false,
     "showNeighbours": false
+  },
+  "fx": {
+    "fx": [
+      "crumple",
+      "sepia",
+      "rhumb"
+    ],
+    "frame": "none",
+    "surface": "#e8e4dc",
+    "seed": 7,
+    "preset": "",
+    "amt": {
+      "sepia": 0,
+      "crumple": 0.75
+    },
+    "strength": 1,
+    "light": {
+      "dir": 250,
+      "warm": 0
+    }
+  },
+  "zoom": {
+    "k": 1.162,
+    "x": -104,
+    "y": -73
   }
 }

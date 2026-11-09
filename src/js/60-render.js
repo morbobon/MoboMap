@@ -775,10 +775,13 @@ function render(target) {
     if (relief) items.push(...reliefLegend(sp));
     if (items.length) {
       const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
-      let y = H - FOOT - (frame && !FOOT ? 34 : 14) - items.length * 18;
+      // with a frame line, picture frame, cut edges or map border the legend moves further into the map
+      const framed = frame || FXL.active || fxOn('border');
+      const inset = framed ? Math.round(Math.min(W, H) * 0.04) : 0;
+      let y = H - FOOT - (frame && !FOOT ? 34 : 14) - inset - items.length * 18;
       if (textTop[side] != null) y -= Math.max(0, H - FOOT - 2 - textTop[side]);
       const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
-      const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw : PAD.l - 20;
+      const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw - inset : PAD.l - 20 + inset;
       let lg = `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
       const legOut = out;
       out = '';

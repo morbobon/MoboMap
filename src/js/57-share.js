@@ -29,8 +29,15 @@ function shareParams() {
   put('fr', p.fx.frame, dfx.frame || 'none');
   put('sf', String(p.fx.surface || '').replace('#', ''), String(dfx.surface || '#e8e4dc').replace('#', ''));
   if (p.fx.seed !== (dfx.seed || 7)) q.set('seed', p.fx.seed);
-  const am = Object.entries(p.fx.amt || {}).filter(([k, v]) => p.fx.fx.includes(k) && Math.abs(v - 1) > 0.001);
-  if (am.length) q.set('fa', am.map(([k, v]) => k + ':' + Math.round(v * 100)).join('.'));
+  // intensities, compared with the start project's
+  const faOf = (fx) =>
+    Object.entries((fx && fx.amt) || {})
+      .filter(([k, v]) => (fx.fx || []).includes(k) && Math.abs(v - 1) > 0.001)
+      .map(([k, v]) => k + ':' + Math.round(v * 100))
+      .sort()
+      .join('.');
+  const fa = faOf(p.fx);
+  if (fa !== faOf(dfx)) q.set('fa', fa);
   if (p.fx.strength != null && Math.abs(p.fx.strength - 1) > 0.001) q.set('fs', Math.round(p.fx.strength * 100));
   const lt = p.fx.light || {};
   if (lt.dir != null && lt.dir !== 250) q.set('ld', lt.dir);
@@ -44,8 +51,10 @@ function shareParams() {
   if (drg.length) q.set('dg', drg.map(([k, v]) => k + '~' + Math.round(v[0]) + '~' + Math.round(v[1])).join('.'));
   // menu layout of this view
   const b = document.body;
-  if (b.classList.contains('no-panel')) q.set('hp', '1');
-  if (b.classList.contains('no-strip')) q.set('hs', '1');
+  if (b.classList.contains('no-panel') !== DEFAULT_CHROME.panel)
+    q.set('hp', b.classList.contains('no-panel') ? '1' : '0');
+  if (b.classList.contains('no-strip') !== DEFAULT_CHROME.strip)
+    q.set('hs', b.classList.contains('no-strip') ? '1' : '0');
   if (b.classList.contains('fs')) q.set('full', '1');
   const dsFooter = DS[p.designSystem] ? loc(DS[p.designSystem].footer.label) : '';
   if (p.footerLabel && p.footerLabel !== dsFooter) q.set('ft', p.footerLabel);
@@ -53,8 +62,10 @@ function shareParams() {
   if (!p.guard) q.set('gd', '0');
   if (p.focusHide) q.set('fh', '1');
   if (p.frame !== 'auto') q.set('fl', p.frame);
-  const z = p.zoom || { k: 1, x: 0, y: 0 };
-  if (z.k !== 1 || z.x || z.y) q.set('z', [z.k.toFixed(3), Math.round(z.x), Math.round(z.y)].join(','));
+  // zoom: written when it differs from the start project's view (z=1,0,0 = the whole map)
+  const zs = (z) => [(z || { k: 1 }).k.toFixed(3), Math.round((z && z.x) || 0), Math.round((z && z.y) || 0)].join(',');
+  const sameMap = (p.country || 'world') === (d.country || 'world') && (p.focus || '') === (d.focus || '');
+  if (zs(p.zoom) !== (sameMap ? zs(d.zoom) : zs(null))) q.set('z', zs(p.zoom));
   // checkboxes that differ from the start project
   const dck = d.checks || {};
   const ck = CK.filter((k) => k in p.checks && !!p.checks[k] !== !!(k in dck ? dck[k] : DEFAULT_CHECKS[k])).map(
@@ -198,6 +209,10 @@ function projectFromUrl(search) {
   if (q.has('gd')) p.guard = g('gd') !== '0';
   if (q.has('fh')) p.focusHide = g('fh') === '1';
   if (q.has('fl')) p.frame = g('fl');
+  // another map than the start project's: its zoom does not carry over
+  const D0 = DEFAULT_PROJECT || {};
+  if ((p.country || 'world') !== (D0.country || 'world') || (p.focus || '') !== (D0.focus || ''))
+    p.zoom = { k: 1, x: 0, y: 0 };
   if (q.has('z')) {
     const [k, x, y] = g('z').split(',').map(Number);
     if (Number.isFinite(k) && k > 0)
