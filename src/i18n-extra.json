@@ -483,7 +483,10 @@
   "al_left": "Left",
   "al_center": "Centre",
   "al_right": "Right",
-  "grp_fold": "Fold to one line"
+  "grp_fold": "Fold to one line",
+  "tab_brand": "Brand",
+  "sec_logo": "Logo",
+  "logo_note": "The logo comes from the design system (edit it under Design system). Drag it on the map to move it."
  },
  "da": {
   "yes": "Ja",
@@ -969,7 +972,10 @@
   "al_left": "Venstre",
   "al_center": "Midte",
   "al_right": "Højre",
-  "grp_fold": "Fold sammen til én linje"
+  "grp_fold": "Fold sammen til én linje",
+  "tab_brand": "Brand",
+  "sec_logo": "Logo",
+  "logo_note": "Logoet kommer fra designsystemet (redigér det under Designsystem). Træk i det på kortet for at flytte det."
  },
  "de": {
   "yes": "Ja",
@@ -1455,7 +1461,10 @@
   "al_left": "Links",
   "al_center": "Mitte",
   "al_right": "Rechts",
-  "grp_fold": "Auf eine Zeile einklappen"
+  "grp_fold": "Auf eine Zeile einklappen",
+  "tab_brand": "Marke",
+  "sec_logo": "Logo",
+  "logo_note": "Das Logo kommt aus dem Designsystem (unter Designsystem bearbeiten). Auf der Karte ziehen, um es zu verschieben."
  },
  "fr": {
   "yes": "Oui",
@@ -1941,7 +1950,10 @@
   "al_left": "Gauche",
   "al_center": "Centre",
   "al_right": "Droite",
-  "grp_fold": "Replier sur une ligne"
+  "grp_fold": "Replier sur une ligne",
+  "tab_brand": "Marque",
+  "sec_logo": "Logo",
+  "logo_note": "Le logo vient du système de design (à modifier sous Système de design). Glissez-le sur la carte pour le déplacer."
  },
  "es": {
   "yes": "Sí",
@@ -2427,7 +2439,10 @@
   "al_left": "Izquierda",
   "al_center": "Centro",
   "al_right": "Derecha",
-  "grp_fold": "Plegar en una línea"
+  "grp_fold": "Plegar en una línea",
+  "tab_brand": "Marca",
+  "sec_logo": "Logo",
+  "logo_note": "El logo viene del sistema de diseño (edítalo en Sistema de diseño). Arrástralo en el mapa para moverlo."
  },
  "sv": {
   "yes": "Ja",
@@ -2913,7 +2928,10 @@
   "al_left": "Vänster",
   "al_center": "Mitten",
   "al_right": "Höger",
-  "grp_fold": "Fäll ihop till en rad"
+  "grp_fold": "Fäll ihop till en rad",
+  "tab_brand": "Varumärke",
+  "sec_logo": "Logotyp",
+  "logo_note": "Logotypen kommer från designsystemet (redigera under Designsystem). Dra den på kartan för att flytta den."
  },
  "no": {
   "yes": "Ja",
@@ -3399,7 +3417,10 @@
   "al_left": "Venstre",
   "al_center": "Midten",
   "al_right": "Høyre",
-  "grp_fold": "Brett sammen til én linje"
+  "grp_fold": "Brett sammen til én linje",
+  "tab_brand": "Merkevare",
+  "sec_logo": "Logo",
+  "logo_note": "Logoen kommer fra designsystemet (rediger under Designsystem). Dra den på kartet for å flytte den."
  },
  "fi": {
   "yes": "Kyllä",
@@ -3885,7 +3906,10 @@
   "al_left": "Vasen",
   "al_center": "Keskellä",
   "al_right": "Oikea",
-  "grp_fold": "Taita yhdelle riville"
+  "grp_fold": "Taita yhdelle riville",
+  "tab_brand": "Brändi",
+  "sec_logo": "Logo",
+  "logo_note": "Logo tulee suunnittelujärjestelmästä (muokkaa kohdassa Suunnittelujärjestelmä). Siirrä sitä vetämällä kartalla."
  },
  "nl": {
   "yes": "Ja",
@@ -4371,7 +4395,10 @@
   "al_left": "Links",
   "al_center": "Midden",
   "al_right": "Rechts",
-  "grp_fold": "Inklappen tot één regel"
+  "grp_fold": "Inklappen tot één regel",
+  "tab_brand": "Merk",
+  "sec_logo": "Logo",
+  "logo_note": "Het logo komt uit het designsysteem (bewerken onder Designsysteem). Sleep het op de kaart om het te verplaatsen."
  },
  "it": {
   "yes": "Sì",
@@ -4857,6 +4884,9 @@
   "al_left": "Sinistra",
   "al_center": "Centro",
   "al_right": "Destra",
-  "grp_fold": "Comprimi in una riga"
+  "grp_fold": "Comprimi in una riga",
+  "tab_brand": "Brand",
+  "sec_logo": "Logo",
+  "logo_note": "Il logo viene dal design system (modificalo in Design system). Trascinalo sulla mappa per spostarlo."
  }
 }

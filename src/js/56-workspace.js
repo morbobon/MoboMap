@@ -1,7 +1,7 @@
 // Workspace: side-panel tabs, export menu, looks strip (presets + saved looks with live thumbnails), undo/redo.
 
 // ---- tabs (Map · Highlight · Look · Page) ----
-const TABS = ['map', 'highlight', 'look', 'page'];
+const TABS = ['map', 'highlight', 'look', 'page', 'brand'];
 function setTab(id) {
   if (!TABS.includes(id)) id = 'map';
   localStorage.setItem('mobomap.tab', id);

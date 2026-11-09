@@ -75,6 +75,7 @@
         </button>
         <button data-tab="look" onclick="setTab('look')"><b>✦</b><span data-i18n="tab_look"></span></button>
         <button data-tab="page" onclick="setTab('page')"><b>▭</b><span data-i18n="tab_page"></span></button>
+        <button data-tab="brand" onclick="setTab('brand')"><b>◆</b><span data-i18n="tab_brand"></span></button>
         <button class="railhide" onclick="toggleChrome('panel')" data-i18n-title="toggle_panel">«</button>
       </nav>
       <aside>
@@ -194,16 +195,6 @@
               <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
             </h2>
             <div class="body">
-              <label class="ck" data-i18n-title="ds_colours_t"
-                ><input
-                  type="checkbox"
-                  id="dsColours"
-                  onchange="
-                    S.dsColours = this.checked;
-                    render();
-                  " />
-                <span data-i18n="ds_colours"></span
-              ></label>
               <label class="ck" data-i18n-title="guard_t"
                 ><input
                   type="checkbox"
@@ -248,76 +239,6 @@
                 /></label>
                 <button class="chip" onclick="fxShuffle()" data-i18n="fx_shuffle"></button>
               </div>
-            </div>
-          </section>
-          <section class="sec" data-sec="ds">
-            <h2 onclick="toggleSec('ds')">
-              <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
-            </h2>
-            <div class="body">
-              <div class="row" id="dsSw"></div>
-              <button class="chip" onclick="dsEditOpen()"><span data-i18n="dse_open"></span></button>
-              <details id="dsEdit">
-                <summary data-i18n="dse_title"></summary>
-                <div id="dsEditBody"></div>
-                <input
-                  type="file"
-                  id="dseLogo"
-                  accept="image/*"
-                  hidden
-                  onchange="
-                    dsEditLogo(this.files[0]);
-                    this.value = '';
-                  "
-                />
-                <div class="row">
-                  <button class="chip on" onclick="dsEditSave()"><span data-i18n="save"></span></button>
-                  <button class="chip" onclick="dsEditCancel()"><span data-i18n="dse_cancel"></span></button>
-                </div>
-              </details>
-              <details id="manage">
-                <summary data-i18n="manage_profiles"></summary>
-                <div class="row">
-                  <button class="chip" onclick="document.getElementById('dsFile').click()">
-                    <span data-i18n="import"></span>
-                  </button>
-                  <button class="chip" onclick="openEditor()"><span data-i18n="edit_new"></span></button>
-                  <button class="chip" onclick="exportDS()"><span data-i18n="export_json"></span></button>
-                  <button class="chip" onclick="exportSidecar()">designsystems.js</button>
-                  <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete"></span></button>
-                  <input
-                    type="file"
-                    id="dsFile"
-                    accept=".json,.js,application/json"
-                    hidden
-                    onchange="
-                      importDSFile(this.files[0]);
-                      this.value = '';
-                    "
-                  />
-                </div>
-                <details id="editor">
-                  <summary data-i18n="editor_sum"></summary>
-                  <textarea id="dsJson" rows="12" class="mono"></textarea>
-                  <div class="row">
-                    <button class="chip" onclick="document.getElementById('logoFile').click()">
-                      <span data-i18n="pick_logo"></span>
-                    </button>
-                    <input
-                      type="file"
-                      id="logoFile"
-                      accept="image/*"
-                      hidden
-                      onchange="
-                        pickLogo(this.files[0]);
-                        this.value = '';
-                      "
-                    />
-                    <button class="chip on" onclick="applyEditor()"><span data-i18n="save"></span></button>
-                  </div>
-                  <p class="note" data-i18n="editor_note"></p>
-                </details>
-              </details>
             </div>
           </section>
         </div>
@@ -413,14 +334,103 @@
               <label class="ck"
                 ><input type="checkbox" id="legend" checked onchange="render()" /> <span data-i18n="show_legend"></span
               ></label>
-              <label class="ck"
-                ><input type="checkbox" id="showLogo" checked onchange="render()" /> <span data-i18n="show_logo"></span
-              ></label>
               <select id="frameSel" onchange="render()">
                 <option value="auto" data-i18n="frame_auto"></option>
                 <option value="on" data-i18n="frame_on"></option>
                 <option value="off" data-i18n="frame_off"></option>
               </select>
+            </div>
+          </section>
+        </div>
+        <div class="tab" data-tab="brand">
+          <section class="sec" data-sec="ds">
+            <h2 onclick="toggleSec('ds')">
+              <span class="chev"></span><span data-i18n="sec_ds"></span><span class="sum" id="dsName"></span>
+            </h2>
+            <div class="body">
+              <select id="ds2" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
+              <label class="ck" data-i18n-title="ds_colours_t"
+                ><input
+                  type="checkbox"
+                  id="dsColours"
+                  onchange="
+                    S.dsColours = this.checked;
+                    render();
+                  " />
+                <span data-i18n="ds_colours"></span
+              ></label>
+              <div class="row" id="dsSw"></div>
+              <button class="chip" onclick="dsEditOpen()"><span data-i18n="dse_open"></span></button>
+              <details id="dsEdit">
+                <summary data-i18n="dse_title"></summary>
+                <div id="dsEditBody"></div>
+                <input
+                  type="file"
+                  id="dseLogo"
+                  accept="image/*"
+                  hidden
+                  onchange="
+                    dsEditLogo(this.files[0]);
+                    this.value = '';
+                  "
+                />
+                <div class="row">
+                  <button class="chip on" onclick="dsEditSave()"><span data-i18n="save"></span></button>
+                  <button class="chip" onclick="dsEditCancel()"><span data-i18n="dse_cancel"></span></button>
+                </div>
+              </details>
+              <details id="manage">
+                <summary data-i18n="manage_profiles"></summary>
+                <div class="row">
+                  <button class="chip" onclick="document.getElementById('dsFile').click()">
+                    <span data-i18n="import"></span>
+                  </button>
+                  <button class="chip" onclick="openEditor()"><span data-i18n="edit_new"></span></button>
+                  <button class="chip" onclick="exportDS()"><span data-i18n="export_json"></span></button>
+                  <button class="chip" onclick="exportSidecar()">designsystems.js</button>
+                  <button class="chip" id="dsDel" onclick="deleteDS()"><span data-i18n="delete"></span></button>
+                  <input
+                    type="file"
+                    id="dsFile"
+                    accept=".json,.js,application/json"
+                    hidden
+                    onchange="
+                      importDSFile(this.files[0]);
+                      this.value = '';
+                    "
+                  />
+                </div>
+                <details id="editor">
+                  <summary data-i18n="editor_sum"></summary>
+                  <textarea id="dsJson" rows="12" class="mono"></textarea>
+                  <div class="row">
+                    <button class="chip" onclick="document.getElementById('logoFile').click()">
+                      <span data-i18n="pick_logo"></span>
+                    </button>
+                    <input
+                      type="file"
+                      id="logoFile"
+                      accept="image/*"
+                      hidden
+                      onchange="
+                        pickLogo(this.files[0]);
+                        this.value = '';
+                      "
+                    />
+                    <button class="chip on" onclick="applyEditor()"><span data-i18n="save"></span></button>
+                  </div>
+                  <p class="note" data-i18n="editor_note"></p>
+                </details>
+              </details>
+            </div>
+          </section>
+          <section class="sec" data-sec="logo">
+            <h2 onclick="toggleSec('logo')"><span class="chev"></span><span data-i18n="sec_logo"></span></h2>
+            <div class="body">
+              <label class="ck"
+                ><input type="checkbox" id="showLogo" checked onchange="render()" /> <span data-i18n="show_logo"></span
+              ></label>
+              <p class="note" data-i18n="logo_note"></p>
             </div>
           </section>
           <section class="sec" data-sec="footer">
@@ -463,13 +473,15 @@
                     oninput="setFooterOpt('margin', +this.value)"
                 /></label>
               </div>
-              <label
-                ><span data-i18n="pt_align"></span
-                ><select id="ptAlign" onchange="setFooterOpt('align', this.value)">
-                  <option value="left" data-i18n="al_left"></option>
-                  <option value="center" data-i18n="al_center"></option>
-                  <option value="right" data-i18n="al_right"></option></select
-              ></label>
+              <div class="row2">
+                <label
+                  ><span data-i18n="pt_align"></span
+                  ><select id="ptAlign" onchange="setFooterOpt('align', this.value)">
+                    <option value="left" data-i18n="al_left"></option>
+                    <option value="center" data-i18n="al_center"></option>
+                    <option value="right" data-i18n="al_right"></option></select
+                ></label>
+              </div>
               <label class="ck" data-i18n-title="pt_auto_t"
                 ><input type="checkbox" id="ptAuto" checked onchange="setFooterOpt('autoScale', this.checked)" />
                 <span data-i18n="pt_auto"></span

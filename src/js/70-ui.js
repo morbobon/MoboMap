@@ -15,6 +15,10 @@ function ui() {
     })
     .join('');
   sel.value = S.ds;
+  // the same picker in the Brand tab
+  const sel2 = document.getElementById('ds2');
+  sel2.innerHTML = sel.innerHTML;
+  sel2.value = S.ds;
   document.getElementById('dsSw').innerHTML =
     D.swatches.map((c) => `<span class="sw" style="background:${c}" title="${c}"></span>`).join('') +
     (D.company.link
