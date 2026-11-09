@@ -67,6 +67,8 @@ for (const id of idList('UI_MODES')) required.add('ui_' + id);
 for (const id of idList('FX_IDS')) required.add('fx_' + id);
 for (const id of idList('FXC_IDS')) required.add('fxc_' + id);
 for (const id of idList('FRAME_IDS')) required.add('fr_' + id);
+for (const id of idList('TITLE_FX')) required.add('tfx_' + id);
+for (const id of idList('SUB_FX')) required.add('sfx_' + id);
 for (const id of idList('FX_PRESET_IDS')) required.add('pre_' + id);
 for (const id of idList('UI_STYLE_IDS')) required.add('uis_' + id);
 for (const id of idList('DSE_COLOURS')) required.add('dse_c_' + id);

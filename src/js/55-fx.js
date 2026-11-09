@@ -196,6 +196,8 @@ const FX_PRESET_IDS = [
 const FX_PRESETS = {
   none: { fx: [], frame: 'none' },
   goldfoil: {
+    title: 'foil',
+    sub: 'ornament',
     fx: ['foil', 'speckle', 'grain'],
     frame: 'ash',
     style: 'blackgold',
@@ -203,12 +205,16 @@ const FX_PRESETS = {
     ownPalette: true,
   },
   pirate: {
+    title: 'cartouche',
+    sub: 'ornament',
     fx: ['paper', 'grain', 'crumple', 'coffee', 'burnt', 'vignette', 'compass', 'rhumb', 'sepia'],
     frame: 'none',
     style: 'vintage',
     surface: '#2c1f14',
   },
   treasure: {
+    title: 'stamp',
+    sub: 'italic',
     fx: ['paper', 'grain', 'dried', 'water', 'torn', 'compass', 'sepia'],
     frame: 'none',
     style: 'vintage',
@@ -221,6 +227,8 @@ const FX_PRESETS = {
     surface: '#d9d6d0',
   },
   portolan: {
+    title: 'cartouche',
+    sub: 'ornament',
     fx: ['paper', 'grain', 'rhumb', 'compass', 'folds', 'sepia', 'border'],
     frame: 'none',
     style: 'atlas',
@@ -238,8 +246,14 @@ const FX_PRESETS = {
     style: 'atlas',
     surface: '#e6e3de',
   },
-  gallery: { fx: ['spotlight', 'glass', 'shadow'], frame: 'oak', surface: '#ece9e3' },
-  museum: { fx: ['paper', 'grain', 'spotlight', 'glass'], frame: 'gold', surface: '#3a3f44' },
+  gallery: { title: 'plaque', sub: 'italic', fx: ['spotlight', 'glass', 'shadow'], frame: 'oak', surface: '#ece9e3' },
+  museum: {
+    title: 'plaque',
+    sub: 'italic',
+    fx: ['paper', 'grain', 'spotlight', 'glass'],
+    frame: 'gold',
+    surface: '#3a3f44',
+  },
   canvas: { fx: ['paper', 'grain', 'gradient', 'vignette'], frame: 'floater', surface: '#e9e6e0' },
   technoir: {
     fx: ['scanlines', 'chroma', 'glow', 'vignette', 'grain'],
@@ -247,19 +261,54 @@ const FX_PRESETS = {
     style: 'midnight',
     surface: '#05070c',
   },
-  synthwave: { fx: ['glow', 'scanlines', 'gradient'], frame: 'neon', style: 'neon', surface: '#0a0614' },
+  synthwave: {
+    title: 'neon',
+    sub: 'spaced',
+    fx: ['glow', 'scanlines', 'gradient'],
+    frame: 'neon',
+    style: 'neon',
+    surface: '#0a0614',
+  },
   crumpled: { fx: ['crumple', 'grain', 'coffee', 'shadow', 'torn'], frame: 'none', surface: '#4a4440' },
   rainy: { fx: ['water', 'dried', 'grain', 'paper'], frame: 'tape', surface: '#cfd3d6' },
-  letterpress: { fx: ['deboss', 'paper', 'grain'], frame: 'none', style: 'silhouette', surface: '#e8e4dc' },
-  embossed: { fx: ['emboss', 'shadow', 'gradient'], frame: 'card', style: 'silhouette', surface: '#d9dde1' },
+  letterpress: {
+    title: 'emboss',
+    sub: 'spaced',
+    fx: ['deboss', 'paper', 'grain'],
+    frame: 'none',
+    style: 'silhouette',
+    surface: '#e8e4dc',
+  },
+  embossed: {
+    title: 'emboss',
+    sub: 'spaced',
+    fx: ['emboss', 'shadow', 'gradient'],
+    frame: 'card',
+    style: 'silhouette',
+    surface: '#d9dde1',
+  },
   polaroid: { fx: ['grain', 'vignette', 'sepia', 'gradient'], frame: 'polaroid', surface: '#b9a993' },
   blueprint: { fx: ['folds', 'grain', 'curl', 'crumple'], frame: 'pins', style: 'blueprint', surface: '#c8c2b8' },
   poster: { fx: ['glass', 'gradient'], frame: 'snap', surface: '#e4e2df' },
-  stamp: { fx: ['halftone', 'sepia', 'grain'], frame: 'stamp', surface: '#d8cbb0' },
-  riso: { fx: ['halftone', 'chroma', 'grain', 'speckle'], frame: 'none', style: 'poster', surface: '#efe9dc' },
+  stamp: { title: 'stamp', sub: 'rules', fx: ['halftone', 'sepia', 'grain'], frame: 'stamp', surface: '#d8cbb0' },
+  riso: {
+    title: 'marker',
+    sub: 'tag',
+    fx: ['halftone', 'chroma', 'grain', 'speckle'],
+    frame: 'none',
+    style: 'poster',
+    surface: '#efe9dc',
+  },
   noir: { fx: ['mono', 'vignette', 'grain', 'spotlight'], frame: 'black', surface: '#1a1a1a' },
   coffeetable: { fx: ['paper', 'coffee', 'folds', 'curl', 'grain', 'shadow'], frame: 'none', surface: '#6b4b33' },
-  nautical: { fx: ['compass', 'rhumb', 'gradient', 'grain'], frame: 'double', style: 'atlas', surface: '#d9dee2' },
+  nautical: {
+    title: 'ribbon',
+    sub: 'ornament',
+    fx: ['compass', 'rhumb', 'gradient', 'grain'],
+    frame: 'double',
+    style: 'atlas',
+    surface: '#d9dee2',
+  },
   newsprint: { fx: ['halftone', 'mono', 'grain', 'folds'], frame: 'none', style: 'poster', surface: '#cfccc4' },
   scholar: { fx: ['paper', 'border', 'compass', 'grain'], frame: 'white', style: 'atlas', surface: '#e3dfd8' },
   chalkboard: {
@@ -271,14 +320,57 @@ const FX_PRESETS = {
   },
   concrete: { fx: ['spotlight', 'shadow', 'grain'], frame: 'snap', style: 'stone', surface: '#d6d3cf' },
   arctic: { fx: ['glass', 'gradient'], frame: 'white', style: 'ice', surface: '#eef3f6', ownPalette: true },
-  sunsetposter: { fx: ['gradient', 'grain'], frame: 'card', style: 'poster', surface: '#2b2d42' },
-  retrotravel: { fx: ['paper', 'grain', 'curl'], frame: 'tape', style: 'retro', surface: '#d8cfc2' },
-  midnightgold: { fx: ['speckle', 'glass'], frame: 'gold', style: 'midnight', surface: '#1c1c1f' },
-  arcade: { fx: ['scanlines', 'glow'], frame: 'neon', style: 'neon', surface: '#0c0a18', ownPalette: true },
-  doodlenote: { fx: ['paper', 'coffee', 'curl'], frame: 'pins', style: 'doodle', surface: '#c9b79c' },
+  sunsetposter: {
+    title: 'long',
+    sub: 'rules',
+    fx: ['gradient', 'grain'],
+    frame: 'card',
+    style: 'poster',
+    surface: '#2b2d42',
+  },
+  retrotravel: {
+    title: 'ribbon',
+    sub: 'spaced',
+    fx: ['paper', 'grain', 'curl'],
+    frame: 'tape',
+    style: 'retro',
+    surface: '#d8cfc2',
+  },
+  midnightgold: {
+    title: 'foil',
+    sub: 'ornament',
+    fx: ['speckle', 'glass'],
+    frame: 'gold',
+    style: 'midnight',
+    surface: '#1c1c1f',
+  },
+  arcade: {
+    title: 'neon',
+    sub: 'spaced',
+    fx: ['scanlines', 'glow'],
+    frame: 'neon',
+    style: 'neon',
+    surface: '#0c0a18',
+    ownPalette: true,
+  },
+  doodlenote: {
+    title: 'swash',
+    sub: 'italic',
+    fx: ['paper', 'coffee', 'curl'],
+    frame: 'pins',
+    style: 'doodle',
+    surface: '#c9b79c',
+  },
   flagwall: { fx: ['gradient'], frame: 'card', style: 'flag', surface: '#e7e4de' },
   tablet: { fx: ['emboss', 'grain', 'vignette'], frame: 'none', style: 'stone', surface: '#3a3530' },
-  cutoutkids: { fx: ['shadow', 'gradient'], frame: 'brutal', style: 'cutout', surface: '#ffd166' },
+  cutoutkids: {
+    title: 'extrude',
+    sub: 'pill',
+    fx: ['shadow', 'gradient'],
+    frame: 'brutal',
+    style: 'cutout',
+    surface: '#ffd166',
+  },
 };
 const fxOn = (id) => S.fx.fx.includes(id) && !(S.fx.amt && S.fx.amt[id] === 0) && S.fx.strength !== 0;
 // effects whose look is a shape, not a strength: on/off only
@@ -817,6 +909,9 @@ function applyFxPreset(id) {
   if (p.surface) S.fx.surface = p.surface;
   if (p.style) S.style = p.style;
   if (p.ownPalette) S.dsColours = false;
+  // a look brings its own title flair; one without goes back to auto (design system / map style)
+  S.fx.title = p.title || 'auto';
+  S.fx.sub = p.sub || 'auto';
   ui();
   render();
 }
@@ -916,6 +1011,8 @@ function randomLook() {
     surface,
     seed: 1 + Math.floor(r() * 9999),
     preset: 'random',
+    title: r() < 0.5 ? 'auto' : pick(TITLE_FX.filter((x) => x !== 'auto' && x !== 'none')),
+    sub: r() < 0.5 ? 'auto' : pick(SUB_FX.filter((x) => x !== 'auto' && x !== 'none')),
   });
   ui();
   render();

@@ -142,7 +142,7 @@ function render(target) {
   <pattern id="dotsBase" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="${bg}"/><circle cx="3.5" cy="3.5" r="2.3" fill="${land === 'none' ? stroke : land}"/></pattern>
   <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="${bpLine}" stroke-opacity=".25" stroke-width=".7"/><path d="M10 0V50M20 0V50M30 0V50M40 0V50M0 10H50M0 20H50M0 30H50M0 40H50" stroke="${bpLine}" stroke-opacity=".1" stroke-width=".4"/></pattern>
   <linearGradient id="glassg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
-  <linearGradient id="extrSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mix(land, '#000', 0.35)}"/><stop offset="1" stop-color="${mix(land, '#000', 0.6)}"/></linearGradient>
+  <linearGradient id="extrSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mix(isHex(land) ? land : '#888888', '#000', 0.35)}"/><stop offset="1" stop-color="${mix(isHex(land) ? land : '#888888', '#000', 0.6)}"/></linearGradient>
   <filter id="slatef" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.015" numOctaves="2" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="screen"/></filter>
   <filter id="hillshade" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.3  0 0 0 0 0.35  0 0 0 0 0.2  0 0 0 0.45 0" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="t"/><feBlend in="t" in2="SourceGraphic" mode="multiply"/></filter>
   <filter id="hand" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter>
@@ -739,10 +739,17 @@ function render(target) {
   const anc = (h) => (h === 'c' ? 'middle' : h === 'r' ? 'end' : 'start');
   const top = Math.round(ts * 2),
     bot = H - FOOT - Math.round(H * 0.035);
-  const ty = tp[0] === 't' ? top : sPos === 'under' && sub ? bot - 24 : bot;
+  // title / subtitle flair: the room it needs moves the texts (see 59-text-fx.js)
+  const tfx = textFxOf('title'),
+    sfx = textFxOf('sub');
+  const Lt = fxLight();
+  const tex = title ? titleFxExtent(tfx, ts, Lt) : { up: 0, down: 0, side: 0, bot: 0 };
+  // subtitle under the title: its usual 24 below the baseline, or clear of the decoration
+  const subDy = tex.down ? Math.max(24, tex.bot + 18) : 24;
+  const ty = tp[0] === 't' ? top + tex.up * 0.5 : sPos === 'under' && sub ? bot - subDy : bot - tex.down;
   const textTop = {}; // top edge of bottom-placed text per side
   if (showText) {
-    if (title && tp[0] === 'b') textTop[tp[1]] = ty - ts * 0.8;
+    if (title && tp[0] === 'b') textTop[tp[1]] = ty - ts * 0.8 - tex.up;
     if (sub && sPos !== 'under' && sPos[0] === 'b') textTop[sPos[1]] = Math.min(textTop[sPos[1]] ?? H, bot - 14);
   }
   if (document.getElementById('legend').checked) {
@@ -802,17 +809,58 @@ function render(target) {
   if (showText) {
     const t = sp.titleCaps ? title.toUpperCase() : title;
     const ls = sp.titleCaps ? 8 : -1;
+    const pick = (cands) => (guard ? readable(cands.filter(isHex), textBgs, 3) : cands.find(isHex) || ink);
+    // effects that reach past the text ends move it in from the page edge
+    const inward = (h, side) => (h === 'l' ? side : h === 'r' ? -side : 0);
     if (title)
       out += dragG(
         'title',
-        `<text x="${hx(tp[1])}" y="${ty}" text-anchor="${anc(tp[1])}" font-family="'${ds.head}'" font-weight="700" font-size="${ts}" letter-spacing="${ls}" fill="${hcol}" ${guard && isHex(bg) && (S.focus || S.zoom.k > 1.2) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"` : ''}>${esc(t)}</text>`,
+        titleSvg({
+          fx: tfx,
+          text: t,
+          x: hx(tp[1]) + inward(tp[1], tex.side),
+          y: ty,
+          anchor: anc(tp[1]),
+          size: ts,
+          font: ds.head,
+          weight: 700,
+          ls,
+          fill: hcol,
+          halo:
+            guard && isHex(bg) && (S.focus || S.zoom.k > 1.2)
+              ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"`
+              : '',
+          bg,
+          dark,
+          ds,
+          pick,
+          Lt,
+          guard,
+        }),
       );
     if (sub) {
       const sh = sPos === 'under' ? tp[1] : sPos[1];
-      const sy = sPos === 'under' ? ty + 24 : sPos[0] === 't' ? top : bot;
+      const sy = sPos === 'under' ? ty + subDy : sPos[0] === 't' ? top : bot;
+      const sx =
+        hx(sh) + (sh === 'l' ? 2 : 0) + (sPos === 'under' ? inward(sh, tex.side) : 0) + inward(sh, SFX_SIDE[sfx] || 0);
       out += dragG(
         'sub',
-        `<text x="${hx(sh) + (sh === 'l' ? 2 : 0)}" y="${sy}" text-anchor="${anc(sh)}" font-family="'${lf}'" font-weight="600" font-size="14" letter-spacing="${sp.titleCaps ? 3 : 0}" fill="${ink}" opacity=".9" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''}>${esc(sp.titleCaps ? sub.toUpperCase() : sub)}</text>`,
+        subSvg({
+          fx: sfx,
+          text: sp.titleCaps ? sub.toUpperCase() : sub,
+          x: sx,
+          y: sy,
+          anchor: anc(sh),
+          size: 14,
+          font: lf,
+          weight: 600,
+          ls: sp.titleCaps ? 3 : 0,
+          fill: ink,
+          halo: guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : '',
+          ds,
+          pick,
+          heading: ds.head,
+        }),
       );
     }
   }

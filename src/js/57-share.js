@@ -1,6 +1,6 @@
 // Share links: the current map as readable URL parameters, only where it differs from the start project.
 //   c=DNK  f=city:Aarhus  st=topo  ds=nordic  lay=wide  proj=robinson  attr=pop  l=da  fx=grain.glass  fr=oak
-//   sf=e8e4dc  t=Title  sub=Subtitle  tp=tl  sp=under  far=hide  dsc=1  gd=0  z=1.6,-250,-60  fh=1
+//   sf=e8e4dc  tfx=ribbon  sfx=rules  t=Title  sub=Subtitle  tp=tl  sp=under  far=hide  dsc=1  gd=0  z=1.6,-250,-60  fh=1
 //   ck=+labels.-showCities  g=e4573d*fill.glow*DNK.SWE*Nordics_3a86ff*hatch*NOR   (groups: colour*modes*codes*name)
 // The address bar follows the map (history.replaceState), and "Share link" copies it.
 const SHARE_DEMO = 'https://morbobon.github.io/MoboMap/';
@@ -27,6 +27,8 @@ function shareParams() {
   const dfx = d.fx || {};
   put('fx', p.fx.fx.join('.'), (dfx.fx || []).join('.'));
   put('fr', p.fx.frame, dfx.frame || 'none');
+  put('tfx', p.fx.title || 'auto', dfx.title || 'auto');
+  put('sfx', p.fx.sub || 'auto', dfx.sub || 'auto');
   put('sf', String(p.fx.surface || '').replace('#', ''), String(dfx.surface || '#e8e4dc').replace('#', ''));
   if (p.fx.seed !== (dfx.seed || 7)) q.set('seed', p.fx.seed);
   // intensities, compared with the start project's
@@ -140,6 +142,8 @@ function projectFromUrl(search) {
     'ft',
     'pr',
     'dg',
+    'tfx',
+    'sfx',
   ];
   if (!known.some((k) => q.has(k))) return null;
   const p = JSON.parse(JSON.stringify(DEFAULT_PROJECT || { format: 'mobomap-project', version: 1 }));
@@ -178,6 +182,8 @@ function projectFromUrl(search) {
           .filter((x) => FX_IDS.includes(x))
       : [];
   if (q.has('fr') && FRAME_IDS.includes(g('fr'))) p.fx.frame = g('fr');
+  if (q.has('tfx') && TITLE_FX.includes(g('tfx'))) p.fx.title = g('tfx');
+  if (q.has('sfx') && SUB_FX.includes(g('sfx'))) p.fx.sub = g('sfx');
   if (q.has('sf') && /^[0-9a-f]{3,6}$/i.test(g('sf'))) p.fx.surface = '#' + g('sf');
   if (q.has('seed')) p.fx.seed = +g('seed') || 7;
   if (q.has('fa'))

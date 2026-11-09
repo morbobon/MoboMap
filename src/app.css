@@ -1006,3 +1006,40 @@ body.fs .looksbar {
 .about a {
   color: var(--mute);
 }
+/* "MoboMap" goes home */
+header h1 .home {
+  cursor: pointer;
+}
+header h1 .home:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#homeDlg {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: inherit;
+  padding: 18px 20px;
+  max-width: 420px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+#homeDlg::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+#homeDlg h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+#homeDlg p {
+  margin: 0 0 14px;
+  opacity: 0.8;
+  font-size: 13px;
+}
+#homeDlg .col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#homeDlg .col button {
+  text-align: left;
+}

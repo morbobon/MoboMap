@@ -12,6 +12,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Far-away parts** – Alaska and Hawaii, the Canary Islands, Madeira and the Azores, Svalbard, French overseas regions, Bornholm …: shown in **inset boxes** (each in its own equal-area projection, placed in the emptiest corner), in place, or hidden (main part only). Detected automatically from distance to the main landmass and share of the area.
 - **Zoom and pan** – mouse wheel zooms around the cursor, drag to pan; "Reset zoom" or a new focus resets. Exports and saved projects keep the zoom.
 - **Effects & frames** – 34 effects (aged paper, grain, crumpled, coffee and water stains, burnt/torn edges, curled corner, papyrus roll, gallery spotlight, window light, blind shadows, dappled leaves, sunbeams, dusk, glass, emboss, gold foil, sepia, halftone, compass rose, rhumb lines, map border …) with an **intensity per effect**, an overall strength, **light direction** (shadows, relief, spotlight, glass and frame shading follow it) and warmth; 26 frames from realistic wood and metal (oak, walnut, driftwood, ebony, brushed steel, brass, copper, gold, floater …) to graphic ones (card, polaroid, stamp, tape, pins, neon).
+- **Title & subtitle flair** – optional title effects (drop shadow, long shadow, 3D block, retro outline, letterpress, soft glow, neon sign, gold foil, colour gradient, rubber stamp, highlighter, brush swash, ribbon banner, old-map cartouche, brass plaque) and subtitle effects (side rules, ornaments, pill, accent bar, underline, spaced capitals, italic serif). *Auto* follows the design system (`defaults.titleFx` / `subFx`), else the map style (vintage → cartouche, neon → neon sign …); choosing a design system, a style or a look sets them again, and the Page tab overrides them.
 - **Contrast guard** – title, text, labels and dividers pick the profile colour that stays readable on what is really behind them; **design-system colours** let styles with their own palette use the profile instead.
 - **Cities** – zoom to a city from Focus (31 Danish towns, Natural Earth cities elsewhere), with markers that avoid each other.
 - **Frame** – the thin frame around the page follows the map style or can be switched on/off for any style; the legend stays inside it.
@@ -106,13 +107,13 @@ Because a `file://` page cannot `fetch()` files from its own folder, logos and f
   "partners": [ { "name": "Partner", "link": "https://…", "logo": "acme/partners/p.png" } ],
   "footer": { "label": "In partnership with",
               "divider": { "style": "bar", "color": "#2F3E4E", "opacity": 0.8, "height": 5, "width": 0.18, "align": "left" } },
-  "defaults": { "title": "We are here", "sub": "" }
+  "defaults": { "title": "We are here", "sub": "", "titleFx": "ribbon", "subFx": "rules" }
 }
 ```
 
 Omitted fields are derived (`landAlt`, `accent2`, `dark`, `heading` …). `logo.box`: `auto` draws a box on light/uneven backgrounds, `always`, `never`. Divider styles: `bar` (rounded), `line`, `none`.
 
-**Translatable texts:** `name`, `note`, `company.name`, `company.logo.text`/`sub`, `footer.label` and `defaults.title`/`sub` accept either a plain string or an object per language, e.g. `{ "en": "In partnership with", "da": "I samarbejde med" }`. The UI language picks the entry; missing languages fall back to `en`, then to the first entry. An empty `company.name` (and no logo) means no logo is drawn. `defaults` only apply when "Auto" text is switched off.
+**Translatable texts:** `name`, `note`, `company.name`, `company.logo.text`/`sub`, `footer.label` and `defaults.title`/`sub` accept either a plain string or an object per language, e.g. `{ "en": "In partnership with", "da": "I samarbejde med" }`. The UI language picks the entry; missing languages fall back to `en`, then to the first entry. An empty `company.name` (and no logo) means no logo is drawn. `defaults.title`/`sub` only apply when "Auto" text is switched off. `defaults.titleFx`/`subFx` (optional) give the profile its own title and subtitle effect – ids as in the Page tab: `shadow`, `long`, `extrude`, `outline`, `emboss`, `glow`, `neon`, `foil`, `gradient`, `stamp`, `marker`, `swash`, `ribbon`, `cartouche`, `plaque` / `rules`, `ornament`, `pill`, `tag`, `underline`, `spaced`, `italic` (or `none`).
 
 ## Data
 

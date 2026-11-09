@@ -41,7 +41,13 @@ function applyLook(id) {
     applyFxPreset(id);
     if (id === 'none') S.fx.preset = 'none';
   } else {
-    S.fx = Object.assign({}, S.fx, { fx: l.fx.slice(), frame: l.frame, preset: id });
+    S.fx = Object.assign({}, S.fx, {
+      fx: l.fx.slice(),
+      frame: l.frame,
+      preset: id,
+      title: l.title || 'auto',
+      sub: l.sub || 'auto',
+    });
     if (l.surface) S.fx.surface = l.surface;
     if (l.style && STYLES.some((s) => s.id === l.style)) S.style = l.style;
     ui();
@@ -53,7 +59,16 @@ function saveLook() {
   if (!name) return;
   const id = 'u' + Date.now().toString(36);
   const looks = userLooks();
-  looks.push({ id, name, fx: S.fx.fx.slice(), frame: S.fx.frame, surface: S.fx.surface, style: S.style });
+  looks.push({
+    id,
+    name,
+    fx: S.fx.fx.slice(),
+    frame: S.fx.frame,
+    surface: S.fx.surface,
+    style: S.style,
+    title: S.fx.title || 'auto',
+    sub: S.fx.sub || 'auto',
+  });
   localStorage.setItem(LOOKS_KEY, JSON.stringify(looks));
   S.fx.preset = id;
   THUMB.key = '';
@@ -127,7 +142,13 @@ function nextThumb() {
   if (!thumbSvg) thumbSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   // apply the look temporarily, draw it off-page, restore
   const keep = { style: S.style, fx: S.fx, fxl: FXL };
-  S.fx = Object.assign({}, S.fx, { fx: l.fx.slice(), frame: l.frame, surface: l.surface || S.fx.surface });
+  S.fx = Object.assign({}, S.fx, {
+    fx: l.fx.slice(),
+    frame: l.frame,
+    surface: l.surface || S.fx.surface,
+    title: l.title || 'auto',
+    sub: l.sub || 'auto',
+  });
   if (l.style && STYLES.some((s) => s.id === l.style)) S.style = l.style;
   try {
     render(thumbSvg);

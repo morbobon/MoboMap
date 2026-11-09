@@ -50,6 +50,7 @@ function ui() {
     : `<option>${esc(t('projection'))}: UTM 32N</option>`;
   ps.disabled = !GEO.geo;
   fxUI();
+  textFxUI();
   document.getElementById('dsColours').checked = !!S.dsColours;
   document.getElementById('guard').checked = S.guard !== false;
   const far = document.getElementById('farSel');
@@ -114,7 +115,7 @@ function ui() {
   document.getElementById('styleNo').textContent = t('st_' + S.style);
   document.getElementById('styles').innerHTML = STYLES.map(
     (s) =>
-      `<button class="tile ${S.style === s.id ? 'on' : ''}" title="${esc(t('st_' + s.id + '_d'))}" onclick="S.style='${s.id}';ui();render()"><b>${esc(t('st_' + s.id))}</b></button>`,
+      `<button class="tile ${S.style === s.id ? 'on' : ''}" title="${esc(t('st_' + s.id + '_d'))}" onclick="setStyle('${s.id}')"><b>${esc(t('st_' + s.id))}</b></button>`,
   ).join('');
   const cols = D.highlight;
   // Groups: the active one fully expanded, the others as one compact line; none at all is allowed
@@ -160,6 +161,8 @@ function setDS(v) {
     });
   S.ds = v;
   const D = DS[v];
+  // the design system's title flair (or back to auto) – a later choice of map style or look can change it again
+  textFxFromDS(D);
   const d = D.defaults;
   if (d && !document.getElementById('autoText').checked) {
     if (d.title != null) document.getElementById('title').value = loc(d.title);

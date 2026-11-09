@@ -380,6 +380,16 @@
                     <option value="br" data-i18n="pos_br"></option></select
                 ></label>
               </div>
+              <div class="row2">
+                <label
+                  ><span data-i18n="tfx_l"></span
+                  ><select id="titleFx" onchange="setTextFx('title', this.value)"></select
+                ></label>
+                <label
+                  ><span data-i18n="sfx_l"></span
+                  ><select id="subFx" onchange="setTextFx('sub', this.value)"></select
+                ></label>
+              </div>
               <div class="row">
                 <button class="chip" onclick="resetDrag()" data-i18n-title="drag_reset_t">
                   <span data-i18n="drag_reset"></span>

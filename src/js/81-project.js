@@ -90,6 +90,8 @@ function loadProject(p, quiet) {
     p.fx || {},
   );
   S.fx.fx = (S.fx.fx || []).filter((id) => FX_IDS.includes(id));
+  if (!TITLE_FX.includes(S.fx.title)) S.fx.title = 'auto';
+  if (!SUB_FX.includes(S.fx.sub)) S.fx.sub = 'auto';
   if (!FRAME_IDS.includes(S.fx.frame)) S.fx.frame = 'none';
   setData(p.country != null ? p.country || 'world' : p.map === 'dk' ? 'DNK' : 'world');
   S.attr = p.attr || 'none';
