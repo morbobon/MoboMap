@@ -1455,3 +1455,46 @@ header h1 a.home {
     outline-offset: 6px;
   }
 }
+
+/* supergroups (33-group-tree.js): subgroup cards indented under theirs, a drag handle, drop targets */
+.grp.sub {
+  margin-left: 18px;
+}
+.grp .grip {
+  flex-shrink: 0;
+  cursor: grab;
+  color: var(--mute);
+  font-size: 12px;
+  letter-spacing: -2px;
+  user-select: none;
+}
+.grp.dropto,
+.grp-root.dropto {
+  outline: 2px dashed var(--accent2);
+  outline-offset: 2px;
+}
+.grp-root {
+  display: none;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--mute);
+  margin-bottom: 8px;
+}
+body.grpdrag .grp-root {
+  display: block;
+}
+.gopts {
+  margin-top: 8px;
+  gap: 4px 14px;
+}
+.gopt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--mute);
+  cursor: pointer;
+}

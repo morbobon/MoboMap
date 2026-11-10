@@ -569,7 +569,17 @@
   "ctx_reset_one": "Move back to its place",
   "ctx_shift": "Shift+click opens the first entry directly",
   "tip_shift": "Shift+click: settings · right-click: menu",
-  "ctx_legend": "Legend"
+  "ctx_legend": "Legend",
+  "subgroup": "Subgroup",
+  "add_sub": "+ Subgroup",
+  "add_sub_t": "A new subgroup of the active group (its areas move into the first one)",
+  "grp_drag_t": "Drag onto another group to make it a subgroup",
+  "grp_drop_root": "Drop here: a group of its own",
+  "grp_in_subs": "{n} areas in {m} subgroups",
+  "grp_legend": "Show in legend",
+  "grp_namelabel": "Use group name as label",
+  "grp_seplegend": "Separate legend",
+  "grp_nest_refused": "A group with subgroups can't become a subgroup"
  },
  "da": {
   "yes": "Ja",
@@ -1141,7 +1151,17 @@
   "ctx_reset_one": "Flyt tilbage på plads",
   "ctx_shift": "Shift+klik åbner det første punkt direkte",
   "tip_shift": "Shift+klik: indstillinger · højreklik: menu",
-  "ctx_legend": "Signaturforklaring"
+  "ctx_legend": "Signaturforklaring",
+  "subgroup": "Undergruppe",
+  "add_sub": "+ Undergruppe",
+  "add_sub_t": "En ny undergruppe til den aktive gruppe (dens områder flytter ind i den første)",
+  "grp_drag_t": "Træk over på en anden gruppe for at gøre den til undergruppe",
+  "grp_drop_root": "Slip her: en selvstændig gruppe",
+  "grp_in_subs": "{n} områder i {m} undergrupper",
+  "grp_legend": "Vis i signaturforklaring",
+  "grp_namelabel": "Brug gruppenavn som etiket",
+  "grp_seplegend": "Egen signaturforklaring",
+  "grp_nest_refused": "En gruppe med undergrupper kan ikke blive undergruppe"
  },
  "de": {
   "yes": "Ja",
@@ -1713,7 +1733,17 @@
   "ctx_reset_one": "An seinen Platz zurück",
   "ctx_shift": "Umschalt+Klick öffnet den ersten Eintrag direkt",
   "tip_shift": "Umschalt+Klick: Einstellungen · Rechtsklick: Menü",
-  "ctx_legend": "Legende"
+  "ctx_legend": "Legende",
+  "subgroup": "Untergruppe",
+  "add_sub": "+ Untergruppe",
+  "add_sub_t": "Eine neue Untergruppe der aktiven Gruppe (ihre Gebiete wandern in die erste)",
+  "grp_drag_t": "Auf eine andere Gruppe ziehen, um sie zur Untergruppe zu machen",
+  "grp_drop_root": "Hier ablegen: eine eigene Gruppe",
+  "grp_in_subs": "{n} Gebiete in {m} Untergruppen",
+  "grp_legend": "In der Legende zeigen",
+  "grp_namelabel": "Gruppenname als Beschriftung",
+  "grp_seplegend": "Eigene Legende",
+  "grp_nest_refused": "Eine Gruppe mit Untergruppen kann keine Untergruppe werden"
  },
  "fr": {
   "yes": "Oui",
@@ -2285,7 +2315,17 @@
   "ctx_reset_one": "Remettre à sa place",
   "ctx_shift": "Maj+clic ouvre directement la première entrée",
   "tip_shift": "Maj+clic : réglages · clic droit : menu",
-  "ctx_legend": "Légende"
+  "ctx_legend": "Légende",
+  "subgroup": "Sous-groupe",
+  "add_sub": "+ Sous-groupe",
+  "add_sub_t": "Un nouveau sous-groupe du groupe actif (ses zones passent dans le premier)",
+  "grp_drag_t": "Glisser sur un autre groupe pour en faire un sous-groupe",
+  "grp_drop_root": "Déposer ici : un groupe à part",
+  "grp_in_subs": "{n} zones dans {m} sous-groupes",
+  "grp_legend": "Afficher dans la légende",
+  "grp_namelabel": "Nom du groupe comme étiquette",
+  "grp_seplegend": "Légende séparée",
+  "grp_nest_refused": "Un groupe avec des sous-groupes ne peut pas devenir sous-groupe"
  },
  "es": {
   "yes": "Sí",
@@ -2857,7 +2897,17 @@
   "ctx_reset_one": "Volver a su sitio",
   "ctx_shift": "Mayús+clic abre directamente la primera opción",
   "tip_shift": "Mayús+clic: ajustes · clic derecho: menú",
-  "ctx_legend": "Leyenda"
+  "ctx_legend": "Leyenda",
+  "subgroup": "Subgrupo",
+  "add_sub": "+ Subgrupo",
+  "add_sub_t": "Un nuevo subgrupo del grupo activo (sus áreas pasan al primero)",
+  "grp_drag_t": "Arrastre sobre otro grupo para convertirlo en subgrupo",
+  "grp_drop_root": "Soltar aquí: un grupo propio",
+  "grp_in_subs": "{n} áreas en {m} subgrupos",
+  "grp_legend": "Mostrar en la leyenda",
+  "grp_namelabel": "Nombre del grupo como etiqueta",
+  "grp_seplegend": "Leyenda aparte",
+  "grp_nest_refused": "Un grupo con subgrupos no puede ser subgrupo"
  },
  "sv": {
   "yes": "Ja",
@@ -3429,7 +3479,17 @@
   "ctx_reset_one": "Flytta tillbaka",
   "ctx_shift": "Skift+klick öppnar första raden direkt",
   "tip_shift": "Skift+klick: inställningar · högerklick: meny",
-  "ctx_legend": "Teckenförklaring"
+  "ctx_legend": "Teckenförklaring",
+  "subgroup": "Undergrupp",
+  "add_sub": "+ Undergrupp",
+  "add_sub_t": "En ny undergrupp till den aktiva gruppen (dess områden flyttas till den första)",
+  "grp_drag_t": "Dra till en annan grupp för att göra den till undergrupp",
+  "grp_drop_root": "Släpp här: en egen grupp",
+  "grp_in_subs": "{n} områden i {m} undergrupper",
+  "grp_legend": "Visa i teckenförklaring",
+  "grp_namelabel": "Gruppnamn som etikett",
+  "grp_seplegend": "Egen teckenförklaring",
+  "grp_nest_refused": "En grupp med undergrupper kan inte bli undergrupp"
  },
  "no": {
   "yes": "Ja",
@@ -4001,7 +4061,17 @@
   "ctx_reset_one": "Flytt tilbake på plass",
   "ctx_shift": "Shift+klikk åpner det første punktet direkte",
   "tip_shift": "Shift+klikk: innstillinger · høyreklikk: meny",
-  "ctx_legend": "Tegnforklaring"
+  "ctx_legend": "Tegnforklaring",
+  "subgroup": "Undergruppe",
+  "add_sub": "+ Undergruppe",
+  "add_sub_t": "En ny undergruppe i den aktive gruppen (områdene flyttes til den første)",
+  "grp_drag_t": "Dra over på en annen gruppe for å gjøre den til undergruppe",
+  "grp_drop_root": "Slipp her: en egen gruppe",
+  "grp_in_subs": "{n} områder i {m} undergrupper",
+  "grp_legend": "Vis i tegnforklaring",
+  "grp_namelabel": "Gruppenavn som etikett",
+  "grp_seplegend": "Egen tegnforklaring",
+  "grp_nest_refused": "En gruppe med undergrupper kan ikke bli undergruppe"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4573,7 +4643,17 @@
   "ctx_reset_one": "Palauta paikalleen",
   "ctx_shift": "Vaihto+napsautus avaa ensimmäisen kohdan suoraan",
   "tip_shift": "Vaihto+napsautus: asetukset · oikea napsautus: valikko",
-  "ctx_legend": "Selite"
+  "ctx_legend": "Selite",
+  "subgroup": "Alaryhmä",
+  "add_sub": "+ Alaryhmä",
+  "add_sub_t": "Uusi alaryhmä aktiiviseen ryhmään (sen alueet siirtyvät ensimmäiseen)",
+  "grp_drag_t": "Vedä toisen ryhmän päälle tehdäksesi siitä alaryhmän",
+  "grp_drop_root": "Pudota tähän: oma ryhmä",
+  "grp_in_subs": "{n} aluetta {m} alaryhmässä",
+  "grp_legend": "Näytä selitteessä",
+  "grp_namelabel": "Ryhmän nimi tunnisteena",
+  "grp_seplegend": "Oma selite",
+  "grp_nest_refused": "Ryhmä, jolla on alaryhmiä, ei voi olla alaryhmä"
  },
  "nl": {
   "yes": "Ja",
@@ -5145,7 +5225,17 @@
   "ctx_reset_one": "Terug op zijn plaats",
   "ctx_shift": "Shift+klik opent direct het eerste item",
   "tip_shift": "Shift+klik: instellingen · rechtsklik: menu",
-  "ctx_legend": "Legenda"
+  "ctx_legend": "Legenda",
+  "subgroup": "Subgroep",
+  "add_sub": "+ Subgroep",
+  "add_sub_t": "Een nieuwe subgroep van de actieve groep (de gebieden gaan naar de eerste)",
+  "grp_drag_t": "Sleep op een andere groep om er een subgroep van te maken",
+  "grp_drop_root": "Hier neerzetten: een eigen groep",
+  "grp_in_subs": "{n} gebieden in {m} subgroepen",
+  "grp_legend": "Tonen in legenda",
+  "grp_namelabel": "Groepsnaam als label",
+  "grp_seplegend": "Aparte legenda",
+  "grp_nest_refused": "Een groep met subgroepen kan geen subgroep worden"
  },
  "it": {
   "yes": "Sì",
@@ -5717,7 +5807,17 @@
   "ctx_reset_one": "Rimetti al suo posto",
   "ctx_shift": "Maiusc+clic apre direttamente la prima voce",
   "tip_shift": "Maiusc+clic: impostazioni · clic destro: menu",
-  "ctx_legend": "Legenda"
+  "ctx_legend": "Legenda",
+  "subgroup": "Sottogruppo",
+  "add_sub": "+ Sottogruppo",
+  "add_sub_t": "Un nuovo sottogruppo del gruppo attivo (le sue aree passano nel primo)",
+  "grp_drag_t": "Trascina su un altro gruppo per renderlo sottogruppo",
+  "grp_drop_root": "Rilascia qui: un gruppo a sé",
+  "grp_in_subs": "{n} aree in {m} sottogruppi",
+  "grp_legend": "Mostra nella legenda",
+  "grp_namelabel": "Nome del gruppo come etichetta",
+  "grp_seplegend": "Legenda separata",
+  "grp_nest_refused": "Un gruppo con sottogruppi non può diventare sottogruppo"
  },
  "tr": {
   "yes": "Evet",
@@ -6289,6 +6389,16 @@
   "ctx_reset_one": "Yerine geri koy",
   "ctx_shift": "Shift+tık ilk öğeyi doğrudan açar",
   "tip_shift": "Shift+tık: ayarlar · sağ tık: menü",
-  "ctx_legend": "Gösterge"
+  "ctx_legend": "Gösterge",
+  "subgroup": "Alt grup",
+  "add_sub": "+ Alt grup",
+  "add_sub_t": "Etkin gruba yeni alt grup (alanları ilkine taşınır)",
+  "grp_drag_t": "Alt grup yapmak için başka bir grubun üzerine sürükleyin",
+  "grp_drop_root": "Buraya bırakın: ayrı bir grup",
+  "grp_in_subs": "{m} alt grupta {n} alan",
+  "grp_legend": "Göstergede göster",
+  "grp_namelabel": "Grup adını etiket yap",
+  "grp_seplegend": "Ayrı gösterge",
+  "grp_nest_refused": "Alt grupları olan bir grup alt grup olamaz"
  }
 }

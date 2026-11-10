@@ -129,8 +129,9 @@ function render(target) {
   // opacity for faint secondary text (sources, footer label, sea names): kept unless it costs readability
   const tOp = (o) =>
     guard && Math.min(...textBgs.filter(isHex).map((b) => contrast(mix(ink, b, 1 - o), b))) < 4.5 ? 1 : o;
-  const groups = S.groups.filter((g) => !g.off);
-  const shownOf = (c) => groups.find((g) => g.sel.has(c));
+  const groups = drawnGroups();
+  // the group a unit shows: the last drawn, i.e. a subgroup before its supergroup
+  const shownOf = (c) => groups.findLast((g) => g.sel.has(c));
   const selAll = new Set(groups.flatMap((g) => [...g.sel]));
   const AT = attrDef();
   const ATC = AT ? attrCats(AT) : [];
@@ -483,6 +484,9 @@ function render(target) {
   groups.forEach((g, gi) => {
     const col = g.color,
       hl = g.hl;
+    // a subgroup lying on its supergroup's fill does not need borders that set it off from the land
+    const sup = g.parent && groupById(g.parent);
+    const onFill = !!sup && ['fill', 'tint', 'hatch', 'dots'].some((m) => sup.hl.has(m));
     out += `<g id="g${gi}">`;
     for (const c of g.sel) {
       const k = GEO.units.find((k) => k.c === c);
@@ -500,10 +504,12 @@ function render(target) {
       else if (hl.has('dots')) fill = `url(#dots${gi})`;
       let strk = strokeBase,
         sw = swBase;
-      if (hl.has('outline')) {
+      if (hl.has('outline') && !g.sup) {
         strk = hl.has('fill') && !hl.has('hatch') && !hl.has('dots') ? onCol(col) : col;
         sw = 3.2;
-      } else if (guard && hl.has('fill') && contrast(col, unitBase(k)) < 1.4) {
+      } else if (g.sup) {
+        // a supergroup's outline goes round its whole area, below; inside it the ordinary borders
+      } else if (guard && hl.has('fill') && !onFill && contrast(col, unitBase(k)) < 1.4) {
         // stands out from the fill and from the ordinary borders
         strk = readable([ds.accent, D.colors.accent2, onCol(col)], isHex(strokeBase) ? [col, strokeBase] : [col], 2);
         sw = Math.max(swBase + 1.4, 2.4);
@@ -520,6 +526,18 @@ function render(target) {
       out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
     }
     out += '</g>';
+  });
+  // supergroup outlines: around the outer edge of the whole area, on top of its subgroups. A stroke twice the
+  // width, masked by the area itself, leaves only its outer half: borders inside the area disappear.
+  groups.forEach((g, gi) => {
+    if (!g.sup || !g.hl.has('outline') || !g.sel.size) return;
+    const d = [...g.sel]
+      .map((c) => GEO.units.find((k) => k.c === c))
+      .filter(Boolean)
+      .map((k) => kp(k, det))
+      .join('');
+    const tr = g.hl.has('emboss') ? ' transform="translate(0,-6)"' : '';
+    out += `<mask id="om${gi}" maskUnits="userSpaceOnUse" ${bgR}><rect ${bgR} fill="#fff"/><path d="${d}" fill="#000"${tr}/></mask><path d="${d}" fill="none" stroke="${g.color}" stroke-width="6.4" stroke-linejoin="round" mask="url(#om${gi})"${tr} pointer-events="none"/>`;
   });
   out += fxMap(allPath);
   // major cities (country views, or focused units in the world view)
@@ -621,12 +639,10 @@ function render(target) {
   let pillLeads = '';
   groups.forEach((g) => {
     if (!g.hl.has('label') || g.hl.has('callout')) return;
-    for (const c of g.sel) {
-      const k = GEO.units.find((u) => u.c === c);
-      if (!k || (S.focusHide && !inFocus(k))) continue;
+    for (const { k, text, key } of labelsOf(g)) {
       const [x, y0] = kc(k);
       const y = y0 - (g.hl.has('pin') ? 16 : 0);
-      const w = nm(k).length * 6.6 + 16;
+      const w = text.length * 6.6 + 16;
       // candidates: above, below, right, left, further up, further down (box = pill incl. a little air)
       const below = g.hl.has('pin') ? 16 : 0; // "below" spots start under the pin marker
       const cands = [
@@ -659,9 +675,9 @@ function render(target) {
         pick =
           cands.filter((o) => onPage(boxOf(o))).sort((a, b) => overlap(boxOf(a)) - overlap(boxOf(b)))[0] || cands[0];
       cityBoxes.push(boxOf(pick));
-      pillAt[c] = { x, y, ox: pick[0], oy: pick[1], w };
+      pillAt[key] = { x, y, ox: pick[0], oy: pick[1], w };
       // leader (follows a hand-dragged pill too), drawn under all pills with a halo
-      const [ddx, ddy] = dragOf('lb:' + k.c);
+      const [ddx, ddy] = dragOf('lb:' + key);
       if (pick[0] || pick[1] || ddx || ddy) {
         const lc = dark ? g.color : ds.primary;
         const d = `M${x.toFixed(1)} ${y0.toFixed(1)}L${(x + pick[0] + ddx).toFixed(1)} ${(y + pick[1] - 10 + ddy).toFixed(1)}`;
@@ -689,25 +705,31 @@ function render(target) {
   groups.forEach((g) => {
     const col = g.color,
       hl = g.hl;
-    for (const c of g.sel) {
-      const k = GEO.units.find((k) => k.c === c);
-      if (!k) continue;
-      const [x, y] = kc(k);
-      if (hl.has('pin'))
+    if (hl.has('pin'))
+      for (const c of g.sel) {
+        const k = GEO.units.find((k) => k.c === c);
+        if (!k) continue;
+        const [x, y] = kc(k);
         out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${col}" stroke-width="2.5" class="pulse"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" stroke="${onCol(col)}" stroke-width="1.6"/>`;
-      if (hl.has('label') && !hl.has('callout') && pillAt[c]) {
-        const q = pillAt[c],
+      }
+    if (!hl.has('label') && !hl.has('callout')) return;
+    for (const { k, text, key } of labelsOf(g)) {
+      const [x, y] = kc(k);
+      if (hl.has('label') && !hl.has('callout') && pillAt[key]) {
+        const q = pillAt[key],
           w = q.w;
         out += dragG(
-          'lb:' + k.c,
-          `<g transform="translate(${(q.x + q.ox).toFixed(1)},${(q.y + q.oy).toFixed(1)})"><rect x="${-w / 2}" y="-20" width="${w}" height="18" rx="4" fill="${dark ? col : ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark ? onCol(col) : onCol(ds.primary)}">${esc(nm(k))}</text></g>`,
+          'lb:' + key,
+          `<g transform="translate(${(q.x + q.ox).toFixed(1)},${(q.y + q.oy).toFixed(1)})"><rect x="${-w / 2}" y="-20" width="${w}" height="18" rx="4" fill="${dark ? col : ds.primary}"/><text y="-7" text-anchor="middle" font-family="'${lf}'" font-weight="700" font-size="10.5" fill="${dark ? onCol(col) : onCol(ds.primary)}">${esc(text)}</text></g>`,
         );
       }
       if (hl.has('callout')) {
         // the label column is chosen on the unzoomed page, so labels stay put relative to the map
         const bx = (x - S.zoom.x) / S.zoom.k,
           by = (y - S.zoom.y) / S.zoom.k;
-        (bx < W / 2 ? margin.l : margin.r).push({ k, x, y, bx, by, col });
+        // a group's name has no region line under it
+        const reg = key[0] === '#' ? '' : String(GEO.groups[k.r] || '');
+        (bx < W / 2 ? margin.l : margin.r).push({ k, x, y, bx, by, col, text, key, reg });
       }
     }
   });
@@ -721,13 +743,13 @@ function render(target) {
     const z = S.zoom;
     arr.forEach((o, i) => {
       // position on the unzoomed page, then moved with the map (zoom/pan), then by the user's drag
-      const [ddx, ddy] = dragOf('co:' + o.k.c);
+      const [ddx, ddy] = dragOf('co:' + o.key);
       // follows zoom/pan, but never leaves the page; the user's drag comes on top
       const tx = Math.min(W - 24, Math.max(24, (side === 'l' ? 24 : W - 24) * z.k + z.x)) + ddx,
         lab = Math.min(H - FOOT - 24, Math.max(PAD.t * 0.6, (y0 + i * step) * z.k + z.y)) + ddy;
-      const name = nm(o.k),
+      const name = o.text,
         nw = name.length * 15 * 0.6,
-        rw = String(GEO.groups[o.k.r] || '').length * (9 * 0.66 + 1.5) + 4,
+        rw = o.reg.length * (9 * 0.66 + 1.5) + 4,
         uw = Math.max(nw, rw);
       // the leader line meets the end of the underline that faces the map, never the text
       const ex = side === 'l' ? tx + uw : tx - uw;
@@ -735,7 +757,7 @@ function render(target) {
       const lc = o.col.toLowerCase() === land.toLowerCase() ? onCol(land) : o.col;
       out += `<path d="${ln}" fill="none" stroke="${bg}" stroke-width="4" stroke-linecap="round" opacity=".7"/><path d="${ln}" fill="none" stroke="${lc}" stroke-width="1.6" stroke-linecap="round"/><circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="4" fill="${lc}" stroke="${bg}" stroke-width="1.5"/>`;
       // the label (dragged as a whole; its offset is already in tx/lab)
-      out += `<g class="drg" data-drag="co:${esc(o.k.c)}" pointer-events="all"><path d="M${(side === 'l' ? tx : tx - uw).toFixed(1)} ${(lab + 1).toFixed(1)}h${uw.toFixed(1)}" stroke="${lc}" stroke-width="1.6"/><text x="${tx.toFixed(1)}" y="${(lab - 4).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}" stroke="${bg}" stroke-width="3" stroke-opacity=".8" paint-order="stroke">${esc(name)}</text><text x="${tx.toFixed(1)}" y="${(lab + 12).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".75" stroke="${bg}" stroke-width="2.5" stroke-opacity=".85" paint-order="stroke">${GEO.groups[o.k.r].toUpperCase()}</text></g>`;
+      out += `<g class="drg" data-drag="co:${esc(o.key)}" pointer-events="all"><path d="M${(side === 'l' ? tx : tx - uw).toFixed(1)} ${(lab + 1).toFixed(1)}h${uw.toFixed(1)}" stroke="${lc}" stroke-width="1.6"/><text x="${tx.toFixed(1)}" y="${(lab - 4).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}" stroke="${bg}" stroke-width="3" stroke-opacity=".8" paint-order="stroke">${esc(name)}</text><text x="${tx.toFixed(1)}" y="${(lab + 12).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".75" stroke="${bg}" stroke-width="2.5" stroke-opacity=".85" paint-order="stroke">${o.reg.toUpperCase()}</text></g>`;
     });
   }
   out += '</g>';
@@ -776,25 +798,34 @@ function render(target) {
     if (sub && sPos !== 'under' && sPos[0] === 'b') textTop[sPos[1]] = Math.min(textTop[sPos[1]] ?? H, bot - 14);
   }
   if (document.getElementById('legend').checked) {
-    const items = [];
-    const gs = groups.filter((g) => g.sel.size);
-    if (gs.length > 1 || (gs.length === 1 && gs[0].name))
-      gs.forEach((g) => {
-        const sw = g.hl.has('hatch')
-          ? `url(#hatch${groups.indexOf(g)})`
-          : g.hl.has('dots')
-            ? `url(#dots${groups.indexOf(g)})`
-            : g.hl.has('fill')
-              ? g.color
-              : g.hl.has('tint')
-                ? mix(baseLand, g.color, 0.5)
-                : baseLand;
-        items.push({
-          sw,
-          stroke: g.hl.has('outline') && !g.hl.has('fill') ? g.color : ink,
-          sw2: g.hl.has('outline') ? 2 : 0.6,
-          label: g.name + ' (' + g.sel.size + ')',
-        });
+    // groups: a row each; a supergroup is a bold headline with its subgroups indented under it, in the main legend
+    // or (sepLegend) in a legend of its own. "Show in legend" off leaves a group out (a supergroup with its subgroups).
+    const items = [],
+      apart = [];
+    const row = (g, ind) => ({
+      sw: g.hl.has('hatch')
+        ? `url(#hatch${groups.indexOf(g)})`
+        : g.hl.has('dots')
+          ? `url(#dots${groups.indexOf(g)})`
+          : g.hl.has('fill')
+            ? g.color
+            : g.hl.has('tint')
+              ? mix(baseLand, g.color, 0.5)
+              : baseLand,
+      stroke: g.hl.has('outline') && !g.hl.has('fill') ? g.color : ink,
+      sw2: g.hl.has('outline') ? 2 : 0.6,
+      label: g.name + ' (' + g.sel.size + ')',
+      ind: !!ind,
+      bold: !!g.sup,
+    });
+    const listed = (g) => g.sel.size && g.legend !== false;
+    const tops = groups.filter((g) => !g.parent && listed(g));
+    if (tops.length > 1 || (tops.length === 1 && (tops[0].name || tops[0].sup)))
+      tops.forEach((g) => {
+        if (!g.sup) return items.push(row(g));
+        const block = [row(g), ...groups.filter((s) => s.parent === g.id && listed(s)).map((s) => row(s, true))];
+        if (g.sepLegend) apart.push({ g, items: block });
+        else items.push(...block);
       });
     if (AT && !sp.patterns && !sp.text) {
       items.push({ head: true, label: t(AT.n) });
@@ -806,29 +837,35 @@ function render(target) {
       if (src) items.push({ src: true, label: src });
     }
     if (relief) items.push(...reliefLegend(sp));
-    if (items.length) {
-      const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
-      // with a frame line, picture frame, cut edges or map border the legend moves further into the map
-      const framed = frame || FXL.active || fxOn('border');
-      const inset = framed ? Math.round(Math.min(W, H) * 0.04) : 0;
-      let y = H - FOOT - (frame && !FOOT ? 34 : 14) - inset - items.length * 18;
-      if (textTop[side] != null) y -= Math.max(0, H - FOOT - 2 - textTop[side]);
-      const lw = Math.max(...items.map((o) => o.label.length * (o.src ? 5.2 : 6.2))) + 50;
+    const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
+    // with a frame line, picture frame, cut edges or map border the legend moves further into the map
+    const framed = frame || FXL.active || fxOn('border');
+    const inset = framed ? Math.round(Math.min(W, H) * 0.04) : 0;
+    let bottom = H - FOOT - (frame && !FOOT ? 34 : 14) - inset;
+    if (textTop[side] != null) bottom -= Math.max(0, H - FOOT - 2 - textTop[side]);
+    // one legend box above `bottom`; returns its top, where the next one stacks
+    const box = (list, key) => {
+      let y = bottom - list.length * 18;
+      const top = y - 8;
+      const lw =
+        Math.max(...list.map((o) => o.label.length * (o.src ? 5.2 : o.bold ? 6.8 : 6.2) + (o.ind ? 12 : 0))) + 50;
       const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw - inset : PAD.l - 20 + inset;
-      let lg = `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${items.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
-      const legOut = out;
-      out = '';
-      items.forEach((o) => {
+      let lg = `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${list.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
+      list.forEach((o) => {
+        const ix = x + (o.ind ? 12 : 0);
         if (o.head)
-          out += `<text x="${x}" y="${y + 11}" font-family="'${lf}'" font-size="11" font-weight="700" fill="${ink}">${esc(o.label)}</text>`;
+          lg += `<text x="${x}" y="${y + 11}" font-family="'${lf}'" font-size="11" font-weight="700" fill="${ink}">${esc(o.label)}</text>`;
         else if (o.src)
-          out += `<text x="${x}" y="${y + 10}" font-family="'${lf}'" font-size="9" fill="${ink}" opacity="${tOp(0.65)}">${esc(o.label)}</text>`;
+          lg += `<text x="${x}" y="${y + 10}" font-family="'${lf}'" font-size="9" fill="${ink}" opacity="${tOp(0.65)}">${esc(o.label)}</text>`;
         else
-          out += `<rect x="${x}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${x + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11" fill="${ink}">${esc(o.label)}</text>`;
+          lg += `<rect x="${ix}" y="${y}" width="14" height="14" rx="2" fill="${o.sw}" stroke="${o.stroke}" stroke-width="${o.sw2}"/><text x="${ix + 20}" y="${y + 11}" font-family="'${lf}'" font-size="11"${o.bold ? ' font-weight="700"' : ''} fill="${ink}">${esc(o.label)}</text>`;
         y += 18;
       });
-      out = legOut + dragG('legend', lg + out);
-    }
+      out += dragG(key, lg);
+      return top;
+    };
+    if (items.length) bottom = box(items, 'legend') - 16;
+    for (const a of apart) bottom = box(a.items, 'legend:#' + a.g.id) - 16;
   }
   out += '</g>';
   out += '<g pointer-events="none">';
@@ -987,6 +1024,8 @@ function render(target) {
     : document.getElementById('autoText').checked
       ? t('text_auto')
       : t('text_custom');
-  document.getElementById('count').textContent = t('count').replace('{n}', selAll.size).replace('{g}', groups.length);
+  document.getElementById('count').textContent = t('count')
+    .replace('{n}', selAll.size)
+    .replace('{g}', groups.filter((g) => !g.parent).length);
   afterRender();
 }

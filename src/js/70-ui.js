@@ -136,22 +136,37 @@ function ui() {
     `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>`;
   const onBox = (g, i) =>
     `<input type="checkbox" class="on" ${g.off ? '' : 'checked'} title="${esc(t('grp_on_t'))}" onclick="event.stopPropagation()" onchange="setGroupOn(${i},this.checked)">`;
-  const fullCard = (g, i) => `<div class="grp ${i === S.active ? 'active' : 'open'}${g.off ? ' off' : ''}">
-  <div class="hd"${i === S.active ? '' : ` onclick="if(event.target===this||event.target.type==='radio')activateGroup(${i})"`}><input type="radio" name="act" ${i === S.active ? 'checked' : ''} title="${esc(t('active_group'))}">${onBox(g, i)}<input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${i === S.active ? '' : `<button class="fold" title="${esc(t('grp_fold'))}" onclick="event.stopPropagation();foldGroup(${i})">▴</button>`}${removeBtn(i)}</div>
-  <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
-  <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>
+  // a card's drag handle: dropped on another card the group becomes its subgroup (33-group-tree.js)
+  const grip = (i) =>
+    `<span class="grip" draggable="true" title="${esc(t('grp_drag_t'))}" ondragstart="event.stopPropagation();document.body.classList.add('grpdrag');event.dataTransfer.setData('text/x-grp','${i}');event.dataTransfer.effectAllowed='move'">⋮⋮</span>`;
+  const drop = (i) =>
+    ` ondragover="if(event.dataTransfer.types.includes('text/x-grp')){event.preventDefault();this.classList.add('dropto')}" ondragleave="this.classList.remove('dropto')" ondrop="event.preventDefault();event.stopPropagation();this.classList.remove('dropto');nestGroup(+event.dataTransfer.getData('text/x-grp'),${i})"`;
+  const cls = (g) => (g.parent ? ' sub' : '') + (isSuper(g) ? ' super' : '') + (g.off ? ' off' : '');
+  const opt = (i, key, on, label) =>
+    `<label class="gopt"><input type="checkbox" ${on ? 'checked' : ''} onchange="S.groups[${i}].${key}=this.checked;render()"> ${esc(t(label))}</label>`;
+  const fullCard = (g, i) => `<div class="grp ${i === S.active ? 'active' : 'open'}${cls(g)}"${drop(i)}>
+  <div class="hd"${i === S.active ? '' : ` onclick="if(event.target===this||event.target.type==='radio')activateGroup(${i})"`}>${grip(i)}<input type="radio" name="act" ${i === S.active ? 'checked' : ''} title="${esc(t('active_group'))}">${onBox(g, i)}<input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${areasOf(g).size}</span>${i === S.active ? '' : `<button class="fold" title="${esc(t('grp_fold'))}" onclick="event.stopPropagation();foldGroup(${i})">▴</button>`}${removeBtn(i)}</div>
+  ${
+    isSuper(g)
+      ? `<div class="note">${esc(t('grp_in_subs').replace('{n}', areasOf(g).size).replace('{m}', subsOf(g).length))}</div>`
+      : `<textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
+  <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>`
+  }
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
   <label class="op" title="${esc(t('grp_opacity_t'))}" onclick="event.stopPropagation()"><span>${esc(t('grp_opacity'))}</span><input type="range" min="0.1" max="1" step="0.05" value="${g.op ?? 1}" oninput="S.groups[${i}].op=+this.value;this.nextElementSibling.textContent=Math.round(this.value*100)+'%';render()"><b>${Math.round((g.op ?? 1) * 100)}%</b></label>
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
+  <div class="row gopts">${opt(i, 'legend', g.legend !== false, 'grp_legend')}${isSuper(g) ? opt(i, 'sepLegend', g.sepLegend, 'grp_seplegend') : opt(i, 'nameLabel', g.nameLabel, 'grp_namelabel')}</div>
  </div>`;
   const compact = (g, i) =>
-    `<div class="grp compact${g.off ? ' off' : ''}" title="${esc(t('active_group'))}" onclick="activateGroup(${i})">${onBox(g, i)}<span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
+    `<div class="grp compact${cls(g)}" title="${esc(t('active_group'))}" onclick="activateGroup(${i})"${drop(i)}>${grip(i)}${onBox(g, i)}<span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${areasOf(g).size}</span>${removeBtn(i)}</div>`;
   // as many groups open as there is room for: the active one always, then the most recently opened;
   // the rest fold to one line only when the panel would otherwise scroll
   const gEl = document.getElementById('groups');
   const html = (open) =>
     S.groups.length
-      ? S.groups.map((g, i) => (open.has(i) ? fullCard(g, i) : compact(g, i))).join('')
+      ? S.groups.map((g, i) => (open.has(i) ? fullCard(g, i) : compact(g, i))).join('') +
+        // shown while a card is dragged: dropped here a subgroup becomes a group of its own
+        `<div class="grp-root" ondragover="event.preventDefault();this.classList.add('dropto')" ondragleave="this.classList.remove('dropto')" ondrop="event.preventDefault();this.classList.remove('dropto');nestGroup(+event.dataTransfer.getData('text/x-grp'),null)">${esc(t('grp_drop_root'))}</div>`
       : `<div class="groups-empty">${esc(t('no_groups'))}</div>`;
   const want = S.groups.map((_, i) => i).filter((i) => i === S.active || !S.groups[i].closed);
   const spare = want
@@ -168,6 +183,7 @@ function ui() {
   S.groups.forEach((g) => {
     if (!g.color) g.color = cols[Math.min(S.groups.indexOf(g), cols.length - 1)];
   });
+  document.getElementById('addSubBtn').disabled = !S.groups.length;
   partnersUI();
 }
 function setDS(v) {
@@ -212,6 +228,7 @@ function activateGroup(i) {
   const g = S.groups[i];
   if (!g) return;
   S.active = i;
+  if (g.parent) groupById(g.parent).lastSub = g.id;
   g.closed = false;
   g.openedAt = Date.now();
   ui();
@@ -238,7 +255,7 @@ function addGroup() {
   const defaults = [['fill', 'glow'], ['hatch'], ['dots'], ['tint', 'outline'], ['outline']];
   S.groups.push(
     newGroup(
-      t('group') + ' ' + (i + 1),
+      t('group') + ' ' + (S.groups.filter((g) => !g.parent).length + 1), // subgroups do not count
       defaults[i % defaults.length],
       D.highlight[Math.min(i, D.highlight.length - 1)],
     ),
@@ -248,9 +265,11 @@ function addGroup() {
   ui();
   render();
 }
+// a removed supergroup's subgroups become groups of their own
 function removeGroup(i) {
   S.groups.splice(i, 1);
   S.active = Math.max(0, Math.min(S.active, S.groups.length - 1));
+  orderGroups();
   ui();
   render();
 }
@@ -308,7 +327,15 @@ function setMap(id) {
         ? 'local'
         : S.proj;
   // keep the user's groups (names, colours, modes – possibly none) but clear selections: unit codes differ per map
-  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color, g.op, g.off));
+  S.groups = S.groups.map((g) =>
+    Object.assign(newGroup(g.name, [...g.hl], g.color, g.op, g.off), {
+      id: g.id,
+      parent: g.parent,
+      legend: g.legend,
+      nameLabel: g.nameLabel,
+      sepLegend: g.sepLegend,
+    }),
+  );
   // example selection only the first time a map is opened in this session
   const key = S.country || 'world';
   if (!S.visited.has(key) && S.groups.length) MAPS[S.map].defaults.forEach((c) => S.groups[0].sel.add(c));
@@ -324,7 +351,7 @@ function activeGroup() {
     S.groups.push(newGroup(t('group') + ' 1', ['fill'], D.highlight[0]));
     S.active = 0;
   }
-  return S.groups[Math.min(S.active, S.groups.length - 1)];
+  return leafOf(S.groups[Math.min(S.active, S.groups.length - 1)]);
 }
 function clearGroups() {
   S.groups = [];
@@ -590,7 +617,7 @@ function showTip(target, cx, cy) {
   const nav =
     (touch ? 'tip_dbl_' : 'tip_ctrl_') +
     (S.map === 'world' && hasDetail(k.c) ? 'open' : S.focus === k.c ? 'out' : 'zoom');
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}${touch ? '' : '<br>' + esc(t('tip_shift'))}</span>`;
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc((S.groups[gi].parent ? groupById(S.groups[gi].parent).name + ' › ' : '') + S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}${touch ? '' : '<br>' + esc(t('tip_shift'))}</span>`;
   tip.style.display = 'block';
   // kept on screen (a finger sits near the edge as often as not)
   tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';

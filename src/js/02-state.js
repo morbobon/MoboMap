@@ -35,12 +35,20 @@ const S = {
   visited: new Set(), // maps opened this session (example selection only on first visit)
 };
 // off: hidden from the map (kept in the panel, projects and links)
+// id: stable within the session; parent: the supergroup's id for a subgroup (33-group-tree.js);
+// legend: shown in the legend; nameLabel: Label/Callout show the group's name once; sepLegend: own legend box
+let GROUP_SEQ = 0;
 const newGroup = (name, hl, color, op = 1, off = false) => ({
+  id: ++GROUP_SEQ,
+  parent: null,
   name,
   sel: new Set(),
   hl: new Set(hl),
   color,
   op,
   off,
+  legend: true,
+  nameLabel: false,
+  sepLegend: false,
   bad: [],
 });

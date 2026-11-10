@@ -29,19 +29,32 @@ function ctxItems(target) {
   const drg = target.closest && target.closest('.drg');
   const key = drg ? drg.dataset.drag : '';
   const unit = target.closest && target.closest('.k');
-  // labels and callouts belong to their unit
-  const c = unit ? unit.dataset.c : /^(lb|co):/.test(key) ? key.slice(3) : '';
+  // labels and callouts belong to their unit, or (#id) to a group showing its name; so does a group's own legend
+  const ref = unit
+    ? unit.dataset.c
+    : /^(lb|co):/.test(key)
+      ? key.slice(3)
+      : key.startsWith('legend:')
+        ? key.slice(7)
+        : '';
+  const named = ref[0] === '#' ? groupById(+ref.slice(1)) : null;
+  const c = named ? '' : ref;
+  const card = (g) => () => {
+    activateGroup(S.groups.indexOf(g));
+    jumpTo('#groups .grp.active');
+  };
   let title = '';
-  if (c) {
+  if (named) {
+    title = named.name;
+    add(t('ctx_group').replace('{g}', named.name), card(named));
+  } else if (c) {
     const k = GEO.units.find((k) => k.c === c);
     title = k ? nm(k) : c;
     const gi = groupOf(c),
       g = S.groups[gi];
     if (g) {
-      add(t('ctx_group').replace('{g}', g.name), () => {
-        activateGroup(gi);
-        jumpTo('#groups .grp.active');
-      });
+      add(t('ctx_group').replace('{g}', g.name), card(g));
+      if (g.parent) add(t('ctx_group').replace('{g}', groupById(g.parent).name), card(groupById(g.parent)));
       add(t('ctx_remove').replace('{g}', g.name), () => {
         g.sel.delete(c);
         syncText();

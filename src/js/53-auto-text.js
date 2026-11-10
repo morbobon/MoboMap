@@ -11,7 +11,8 @@ function autoText() {
       : S.country
         ? countryName(S.country)
         : t('world');
-  const gs = S.groups.filter((g) => !g.off && g.sel.size);
+  // the groups as drawn, a supergroup standing for its subgroups
+  const gs = drawnGroups().filter((g) => !g.parent && g.sel.size);
   const tot = gs.reduce((n, g) => n + g.sel.size, 0);
   let sub = '';
   if (tot && tot <= 4) {

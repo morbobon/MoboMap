@@ -43,6 +43,10 @@ function projectState() {
       hl: [...g.hl],
       ...(g.op < 1 ? { opacity: g.op } : {}),
       ...(g.off ? { off: true } : {}),
+      ...(g.parent ? { parent: S.groups.findIndex((o) => o.id === g.parent) } : {}),
+      ...(g.legend === false ? { legend: false } : {}),
+      ...(g.nameLabel ? { nameLabel: true } : {}),
+      ...(g.sepLegend ? { sepLegend: true } : {}),
       kommuner: [...g.sel],
     })),
     title: document.getElementById('title').value,
@@ -153,9 +157,18 @@ function loadProject(p, quiet, noDraw) {
       const code = byName[String(c).toLowerCase()] || byName[c];
       if (code) n.sel.add(code);
     });
+    n.legend = g.legend !== false;
+    n.nameLabel = !!g.nameLabel;
+    n.sepLegend = !!g.sepLegend;
     return n;
   });
+  // subgroups: parent is the supergroup's place in the list
+  (p.groups || []).forEach((g, gi) => {
+    const sup = Number.isInteger(g.parent) && g.parent !== gi ? S.groups[g.parent] : null;
+    if (sup && !(p.groups[g.parent] || {}).parent) S.groups[gi].parent = sup.id;
+  });
   S.active = Math.min(p.active || 0, S.groups.length - 1);
+  orderGroups();
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',
     link: q.link || '',
