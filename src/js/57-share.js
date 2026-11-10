@@ -1,7 +1,7 @@
 // Share links: the current map as readable URL parameters, only where it differs from the start project.
 //   c=DNK  f=city:Aarhus  st=topo  ds=nordic  lay=wide  proj=robinson  attr=pop  l=da  fx=grain.glass  fr=oak
 //   sf=e8e4dc  tfx=ribbon  sfx=rules  t=Title  sub=Subtitle  tp=tl  sp=under  far=hide  dsc=1  gd=0  z=1.6,-250,-60  fh=1
-//   ck=+labels.-showCities  g=e4573d*fill.glow*DNK.SWE*Nordics_3a86ff*hatch*NOR   (groups: colour*modes*codes*name)
+//   ck=+labels.-showCities  g=e4573d*fill.glow*DNK.SWE*Nordics_3a86ff*hatch*NOR   (groups: colour*modes*codes*name[*opacity %])
 // The address bar follows the map (history.replaceState), and "Share link" copies it.
 const SHARE_DEMO = 'https://morbobon.github.io/MoboMap/';
 function shareBase() {
@@ -118,6 +118,7 @@ function shareParams() {
       g.name === t('group') + ' ' + (i + 1)
         ? ''
         : encodeURIComponent(g.name).replace(/\*/g, '%2A').replace(/_/g, '%5F'),
+      ...(g.opacity < 1 ? [Math.round(g.opacity * 100)] : []),
     ].join('*'),
   );
   const dg = (d.groups || []).length;
@@ -296,12 +297,13 @@ function projectFromUrl(search) {
       ? g('g')
           .split('_')
           .map((s, i) => {
-            const [col, hl, codes, name] = s.split('*');
+            const [col, hl, codes, name, op] = s.split('*');
             return {
               name: name ? safeDecode(name) : '',
               color: /^[0-9a-f]{3,6}$/i.test(col || '') ? '#' + col : undefined,
               hl: hl ? hl.split('.').filter((h) => HLS.some((x) => x.id === h)) : ['fill'],
               kommuner: codes ? codes.split('.') : [],
+              ...(op ? { opacity: +op / 100 } : {}),
             };
           })
       : [];

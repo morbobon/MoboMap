@@ -137,6 +137,7 @@ function ui() {
   <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
   <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
+  <label class="op" title="${esc(t('grp_opacity_t'))}" onclick="event.stopPropagation()"><span>${esc(t('grp_opacity'))}</span><input type="range" min="0.1" max="1" step="0.05" value="${g.op ?? 1}" oninput="S.groups[${i}].op=+this.value;this.nextElementSibling.textContent=Math.round(this.value*100)+'%';render()"><b>${Math.round((g.op ?? 1) * 100)}%</b></label>
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
  </div>`;
   const compact = (g, i) =>
@@ -298,7 +299,7 @@ function setMap(id) {
         ? 'local'
         : S.proj;
   // keep the user's groups (names, colours, modes – possibly none) but clear selections: unit codes differ per map
-  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color));
+  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color, g.op));
   // example selection only the first time a map is opened in this session
   const key = S.country || 'world';
   if (!S.visited.has(key) && S.groups.length) MAPS[S.map].defaults.forEach((c) => S.groups[0].sel.add(c));

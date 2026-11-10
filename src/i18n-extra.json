@@ -516,7 +516,9 @@
   "scope_only": "Colour only",
   "scope_t": "Where the statistic colours the map; everything else keeps the map style",
   "pt_size_t": "Size in % – or hold Alt and scroll over the logo on the map",
-  "al_common": "Same as footer"
+  "al_common": "Same as footer",
+  "grp_opacity": "Opacity",
+  "grp_opacity_t": "How solid the highlight colour is; borders stay solid"
  },
  "da": {
   "yes": "Ja",
@@ -1035,7 +1037,9 @@
   "scope_only": "Farv kun",
   "scope_t": "Hvor statistikken farver kortet; resten beholder kortstilen",
   "pt_size_t": "Størrelse i % – eller hold Alt nede og scroll over logoet på kortet",
-  "al_common": "Som sidefoden"
+  "al_common": "Som sidefoden",
+  "grp_opacity": "Gennemsigtighed",
+  "grp_opacity_t": "Hvor dækkende fremhævningsfarven er; grænser forbliver tydelige"
  },
  "de": {
   "yes": "Ja",
@@ -1554,7 +1558,9 @@
   "scope_only": "Nur färben",
   "scope_t": "Wo die Statistik die Karte färbt; der Rest behält den Kartenstil",
   "pt_size_t": "Größe in % – oder Alt halten und über dem Logo auf der Karte scrollen",
-  "al_common": "Wie Fußzeile"
+  "al_common": "Wie Fußzeile",
+  "grp_opacity": "Deckkraft",
+  "grp_opacity_t": "Wie deckend die Hervorhebungsfarbe ist; Grenzen bleiben kräftig"
  },
  "fr": {
   "yes": "Oui",
@@ -2073,7 +2079,9 @@
   "scope_only": "Colorer seulement",
   "scope_t": "Où la statistique colore la carte ; le reste garde le style",
   "pt_size_t": "Taille en % – ou maintenez Alt et faites défiler sur le logo",
-  "al_common": "Comme le pied de page"
+  "al_common": "Comme le pied de page",
+  "grp_opacity": "Opacité",
+  "grp_opacity_t": "Opacité de la couleur de mise en évidence ; les frontières restent nettes"
  },
  "es": {
   "yes": "Sí",
@@ -2592,7 +2600,9 @@
   "scope_only": "Colorear solo",
   "scope_t": "Dónde colorea la estadística; el resto mantiene el estilo",
   "pt_size_t": "Tamaño en % – o mantén Alt y desplaza sobre el logo en el mapa",
-  "al_common": "Igual que el pie"
+  "al_common": "Igual que el pie",
+  "grp_opacity": "Opacidad",
+  "grp_opacity_t": "Opacidad del color de resaltado; los bordes se mantienen sólidos"
  },
  "sv": {
   "yes": "Ja",
@@ -3111,7 +3121,9 @@
   "scope_only": "Färga bara",
   "scope_t": "Var statistiken färgar kartan; resten behåller kartstilen",
   "pt_size_t": "Storlek i % – eller håll Alt och scrolla över logotypen på kartan",
-  "al_common": "Som sidfoten"
+  "al_common": "Som sidfoten",
+  "grp_opacity": "Opacitet",
+  "grp_opacity_t": "Hur täckande markeringsfärgen är; gränser förblir tydliga"
  },
  "no": {
   "yes": "Ja",
@@ -3630,7 +3642,9 @@
   "scope_only": "Farg bare",
   "scope_t": "Hvor statistikken farger kartet; resten beholder kartstilen",
   "pt_size_t": "Størrelse i % – eller hold Alt og rull over logoen på kartet",
-  "al_common": "Som bunnteksten"
+  "al_common": "Som bunnteksten",
+  "grp_opacity": "Dekkevne",
+  "grp_opacity_t": "Hvor dekkende uthevingsfargen er; grenser forblir tydelige"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4149,7 +4163,9 @@
   "scope_only": "Väritä vain",
   "scope_t": "Missä tilasto värittää kartan; muu säilyttää tyylin",
   "pt_size_t": "Koko %:na – tai pidä Alt pohjassa ja vieritä logon päällä",
-  "al_common": "Kuten alatunniste"
+  "al_common": "Kuten alatunniste",
+  "grp_opacity": "Peittävyys",
+  "grp_opacity_t": "Korostusvärin peittävyys; rajat pysyvät selkeinä"
  },
  "nl": {
   "yes": "Ja",
@@ -4668,7 +4684,9 @@
   "scope_only": "Alleen kleuren",
   "scope_t": "Waar de statistiek kleurt; de rest houdt de kaartstijl",
   "pt_size_t": "Grootte in % – of houd Alt ingedrukt en scroll over het logo",
-  "al_common": "Zoals voettekst"
+  "al_common": "Zoals voettekst",
+  "grp_opacity": "Dekking",
+  "grp_opacity_t": "Hoe dekkend de markeerkleur is; grenzen blijven scherp"
  },
  "it": {
   "yes": "Sì",
@@ -5187,7 +5205,9 @@
   "scope_only": "Colora solo",
   "scope_t": "Dove la statistica colora; il resto mantiene lo stile",
   "pt_size_t": "Dimensione in % – o tieni premuto Alt e scorri sul logo",
-  "al_common": "Come il piè di pagina"
+  "al_common": "Come il piè di pagina",
+  "grp_opacity": "Opacità",
+  "grp_opacity_t": "Quanto è coprente il colore di evidenziazione; i confini restano netti"
  },
  "tr": {
   "yes": "Evet",
@@ -5706,6 +5726,8 @@
   "scope_only": "Yalnızca renklendir",
   "scope_t": "İstatistiğin haritayı renklendirdiği yer; geri kalanı harita stilini korur",
   "pt_size_t": "Boyut % olarak – veya Alt tuşunu basılı tutup haritadaki logonun üzerinde kaydırın",
-  "al_common": "Altbilgiyle aynı"
+  "al_common": "Altbilgiyle aynı",
+  "grp_opacity": "Opaklık",
+  "grp_opacity_t": "Vurgu renginin ne kadar opak olduğu; sınırlar net kalır"
  }
 }

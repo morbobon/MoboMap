@@ -491,12 +491,14 @@ function render(target) {
       }
       const tr = hl.has('emboss') ? 'transform="translate(0,-6)"' : '';
       const f = hl.has('emboss') ? 'filter="url(#emboss)"' : '';
-      const fillAttr = sp.pixel
-        ? 'fill-opacity="0"'
-        : st === 'outline' && !hl.has('fill') && !hl.has('hatch') && !hl.has('dots') && !hl.has('tint')
-          ? 'fill-opacity="0"'
-          : '';
-      out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity=".85" pointer-events="none"/>` : ''}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
+      const clear =
+        sp.pixel || (st === 'outline' && !hl.has('fill') && !hl.has('hatch') && !hl.has('dots') && !hl.has('tint'));
+      // group opacity fades the highlight fill over the unit's normal fill; borders stay solid
+      const op = g.op ?? 1,
+        fade = !clear && op < 1 && fill !== baseFill(k);
+      const fillAttr = clear ? 'fill-opacity="0"' : fade ? `fill-opacity="${op}"` : '';
+      const under = fade ? `<path d="${kp(k, det)}" fill="${baseFill(k)}" stroke="none" pointer-events="none"/>` : '';
+      out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}${under}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
     }
     out += '</g>';
   });

@@ -36,7 +36,13 @@ function projectState() {
     layout: S.layout,
     style: S.style,
     active: S.active,
-    groups: S.groups.map((g) => ({ name: g.name, color: g.color, hl: [...g.hl], kommuner: [...g.sel] })),
+    groups: S.groups.map((g) => ({
+      name: g.name,
+      color: g.color,
+      hl: [...g.hl],
+      ...(g.op < 1 ? { opacity: g.op } : {}),
+      kommuner: [...g.sel],
+    })),
     title: document.getElementById('title').value,
     sub: document.getElementById('sub').value,
     titlePos: document.getElementById('titlePos').value,
@@ -130,7 +136,13 @@ function loadProject(p, quiet) {
   S.layout = LAYOUTS.some((l) => l.id === p.layout) ? p.layout : 'land';
   S.style = STYLES.some((s) => s.id === p.style) ? p.style : 'flat';
   S.groups = (p.groups || []).map((g, gi) => {
-    const n = newGroup(g.name || t('group') + ' ' + (gi + 1), g.hl || ['fill'], g.color || D.highlight[0]);
+    const op = +g.opacity;
+    const n = newGroup(
+      g.name || t('group') + ' ' + (gi + 1),
+      g.hl || ['fill'],
+      g.color || D.highlight[0],
+      op > 0 && op < 1 ? op : 1,
+    );
     (g.kommuner || []).forEach((c) => {
       const code = byName[String(c).toLowerCase()] || byName[c];
       if (code) n.sel.add(code);

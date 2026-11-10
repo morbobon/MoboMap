@@ -33,4 +33,4 @@ const S = {
   partners: [],
   visited: new Set(), // maps opened this session (example selection only on first visit)
 };
-const newGroup = (name, hl, color) => ({ name, sel: new Set(), hl: new Set(hl), color, bad: [] });
+const newGroup = (name, hl, color, op = 1) => ({ name, sel: new Set(), hl: new Set(hl), color, op, bad: [] });

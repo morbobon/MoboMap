@@ -291,6 +291,22 @@ label.ck {
   font-size: 12px;
   line-height: 1;
 }
+.grp .op {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--mute);
+}
+.grp .op input {
+  flex: 1;
+}
+.grp .op b {
+  min-width: 34px;
+  text-align: right;
+  font-weight: 600;
+}
 .grp textarea {
   font-size: 12px;
   padding: 6px 8px;
