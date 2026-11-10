@@ -1026,6 +1026,10 @@ body.fs .looksbar,
 body.strip-min .looksbar {
   display: none;
 }
+/* the strip's buttons stay at the right edge, however few looks there are */
+.looksbar .striphide {
+  margin-left: auto;
+}
 /* the strip's second fold (names → nothing but a button) and that button */
 .stripmin,
 .stripshow {
@@ -1037,8 +1041,7 @@ body.no-strip:not(.strip-min) .stripmin {
 .stripshow {
   position: absolute;
   bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 12px;
   z-index: 5;
 }
 body.strip-min:not(.fs) .stripshow {

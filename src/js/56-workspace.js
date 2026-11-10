@@ -313,7 +313,7 @@ function afterRender() {
 // ---- hide the side panel / looks strip, fullscreen (map only) ----
 const CHROME_KEY = 'mobomap.chrome';
 // first visit: map and side panel, the looks strip tucked away (︽ brings it up)
-const DEFAULT_CHROME = { panel: false, strip: true };
+const DEFAULT_CHROME = { panel: true, strip: 'min' };
 let CHROME_LINK = null; // layout from a shared link (hp / hs), until the visitor toggles something
 function chromeState() {
   if (CHROME_LINK) return Object.assign({}, CHROME_LINK);
