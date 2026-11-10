@@ -396,21 +396,33 @@ function svgPoint(e) {
 }
 let zoomRaf = 0,
   zoomIdle = 0;
-function zoomChanged() {
+// gesture (wheel, drag, pinch): the drawn map is moved and scaled at once and drawn again when the view settles;
+// otherwise (buttons, auto-detail) it is drawn on the next frame
+function zoomChanged(gesture) {
   const z = S.zoom;
   document.getElementById('wrap').classList.toggle('zoomed', z.k !== 1 || !!z.x || !!z.y);
-  // the middle detail level only once the view has settled
-  zoomMoving = true;
   clearTimeout(zoomIdle);
-  zoomIdle = setTimeout(() => {
-    zoomMoving = false;
-    if (GEO.mid && S.zoom.k > MID_ZOOM) render();
-  }, 180);
+  if (gesture && zoomPreview()) {
+    zoomIdle = setTimeout(render, 180);
+    return;
+  }
   if (!zoomRaf)
     zoomRaf = requestAnimationFrame(() => {
       zoomRaf = 0;
       render();
     });
+}
+// moves and scales the last drawing of the same map to the current zoom; false when there is none
+function zoomPreview() {
+  const g = document.getElementById('mapz');
+  if (!g || !DRAWN || DRAWN.view !== S.map + '|' + S.country + '|' + S.focus) return false;
+  // screen = unzoomed * k + offset, so from the drawn zoom z0 to z: scale k/k0, then shift
+  const z0 = DRAWN.zoom,
+    z = S.zoom,
+    s = z.k / z0.k;
+  g.setAttribute('transform', `translate(${z.x - z0.x * s} ${z.y - z0.y * s}) scale(${s})`);
+  hoverLine(null);
+  return true;
 }
 function resetZoom() {
   S.zoom = { k: 1, x: 0, y: 0 };
@@ -435,8 +447,8 @@ svg.addEventListener(
     S.zoom = { k: k2, x: sx - bx * k2, y: sy - by * k2 };
     // auto-detail: a country filling the page opens its regions, a small map steps up a level
     const under = e.target.closest && e.target.closest('.k');
-    if (typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c)) return;
-    zoomChanged();
+    if (typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c, k2 > z.k)) return;
+    zoomChanged(true);
   },
   { passive: false },
 );
@@ -457,7 +469,7 @@ window.addEventListener('pointermove', (e) => {
   tip.style.display = 'none';
   document.getElementById('wrap').classList.add('panning');
   S.zoom = { k: drag.z.k, x: drag.z.x + dx, y: drag.z.y + dy };
-  zoomChanged();
+  zoomChanged(true);
 });
 window.addEventListener('pointerup', () => {
   drag = null;

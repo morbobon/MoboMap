@@ -142,8 +142,8 @@ function pathLines(ls) {
 }
 const isBH = (k) => !!insOf(k);
 const MID_ZOOM = 3; // world map zoom above which the middle detail level is drawn
-// true while the user wheels or drags: the faster level is drawn until the view settles (zoomChanged)
-let zoomMoving = false;
+// the view the page was last drawn for (render): a gesture on the same map only moves and scales that drawing
+let DRAWN = null;
 // Detail levels: 0 simple, 1 detail, 2 middle (world map zoomed in: admin-1 country outlines, decoded on
 // first use; see tools/prepare-world-mid.mjs)
 function ringsAt(k, det) {

@@ -12,7 +12,7 @@ function render(target) {
   const D = DS[S.ds],
     st = S.style,
     det =
-      GEO.mid && S.zoom.k > MID_ZOOM && !zoomMoving
+      GEO.mid && S.zoom.k > MID_ZOOM && !target
         ? 2
         : document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
     all = document.getElementById('labels').checked;
@@ -216,8 +216,12 @@ function render(target) {
   const frame = fsel === 'on' || (fsel !== 'off' && !!sp.frame);
   if (frame)
     out += `<rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="${ink0}" stroke-opacity=".6" stroke-width="1.5"/>`;
+  // the map itself (not page, title, legend, footer) goes in <g id="mapz">: during a wheel or drag gesture it is
+  // only moved and scaled (zoomPreview), and drawn again once the view settles
+  const mapStart = out.length;
   const relief = reliefOn(sp);
-  if (relief) out += reliefSea(sp, bg, dark);
+  // 'hide the rest' also drops the sea around the map: depths and sea names
+  if (relief && !S.focusHide) out += reliefSea(sp, bg, dark);
   // with 'hide outside focus' the land outline (glow, extrusion, shadows) is only the focus
   const allPath =
     S.focusHide && S.focus
@@ -439,7 +443,7 @@ function render(target) {
     }
     out += '</g>';
   }
-  if (sp.sea) {
+  if (sp.sea && !S.focusHide) {
     const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
     out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
     for (const [fx, fy, t] of sea)
@@ -457,7 +461,7 @@ function render(target) {
       const [x, y] = P(REGC[r][0], REGC[r][1]);
       out += `<text x="${x.toFixed(0)}" y="${(y + 3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`;
     }
-    if (st === 'atlas') {
+    if (st === 'atlas' && !S.focusHide) {
       const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
       for (const [fx, fy, t] of sea)
         out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`;
@@ -732,6 +736,8 @@ function render(target) {
       out += `<g class="drg" data-drag="co:${esc(o.k.c)}" pointer-events="all"><path d="M${(side === 'l' ? tx : tx - uw).toFixed(1)} ${(lab + 1).toFixed(1)}h${uw.toFixed(1)}" stroke="${lc}" stroke-width="1.6"/><text x="${tx.toFixed(1)}" y="${(lab - 4).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${ds.head}'" font-weight="700" font-size="15" fill="${ink}" stroke="${bg}" stroke-width="3" stroke-opacity=".8" paint-order="stroke">${esc(name)}</text><text x="${tx.toFixed(1)}" y="${(lab + 12).toFixed(1)}" text-anchor="${side === 'l' ? 'start' : 'end'}" font-family="'${lf}'" font-size="9" letter-spacing="1.5" fill="${ink}" opacity=".75" stroke="${bg}" stroke-width="2.5" stroke-opacity=".85" paint-order="stroke">${GEO.groups[o.k.r].toUpperCase()}</text></g>`;
     });
   }
+  out += '</g>';
+  out = out.slice(0, mapStart) + '<g id="mapz">' + out.slice(mapStart) + '</g><g pointer-events="none">';
   // signaturforklaring
   // Title/subtitle text and positions (computed before the legend, which moves up to make room).
   // Positions: t/b (top/bottom) + l/c/r. Title "auto" follows the map style; subtitle "under" sits below the title.
@@ -970,6 +976,7 @@ function render(target) {
     return;
   }
   document.getElementById('svg').innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
+  DRAWN = { view: S.map + '|' + S.country + '|' + S.focus, zoom: Object.assign({}, S.zoom) };
   const wrap = document.getElementById('wrap');
   wrap.style.background = FXL.active ? S.fx.surface : bg;
   wrap.style.setProperty('--hl', (groups[S.active] || groups[0] || { color: ds.accent }).color);

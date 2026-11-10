@@ -84,11 +84,13 @@ function deleteLook(id, e) {
   THUMB.key = '';
   renderLooks();
 }
+const stripOpen = () => !document.body.classList.contains('no-strip');
+// only while the strip is open, and only when its buttons changed (not on every redraw of the map)
 function renderLooks() {
   const el = document.getElementById('looks');
-  if (!el) return;
+  if (!el || !stripOpen()) return;
   const dice = `<button class="look rnd ${S.fx.preset === 'random' ? 'on' : ''}" onclick="randomLook()" title="${esc(t('look_random_t'))}"><span class="lthumb">🎲</span><span class="lname">${esc(t('look_random'))}</span></button>`;
-  el.innerHTML =
+  const html =
     allLooks()
       .map(
         (l) =>
@@ -97,6 +99,7 @@ function renderLooks() {
       .join('')
       .replace('</button>', '</button>' + dice) +
     `<button class="look add" onclick="saveLook()"><span class="lthumb">＋</span><span class="lname">${esc(t('look_save'))}</span></button>`;
+  if (html !== el._html) el.innerHTML = el._html = html;
 }
 // Thumbnails show the current map (area, groups, profile, format) in each look. They are rendered into a
 // detached SVG one by one, so the page never flickers, and redone when the map content changes.
@@ -126,6 +129,7 @@ function thumbKey() {
   ]);
 }
 function scheduleThumbs() {
+  if (!stripOpen()) return;
   const k = thumbKey();
   if (k === THUMB.key) return;
   THUMB.key = k;

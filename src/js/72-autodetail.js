@@ -100,13 +100,14 @@ function countryLabel(c) {
   const u = DATA.world.units.find((k) => k.c === c);
   return u ? nm(u) : c;
 }
-// called after every wheel step; true when it switched
-function autoDetailCheck(cursorC) {
+// called after every wheel step; true when it switched. Only the rule for the step's direction applies:
+// on the way out a large country still filling half the page must not open its regions
+function autoDetailCheck(cursorC, zoomingIn) {
   if (!autoDetailOn() || Date.now() < AUTO_COOL) return false;
   setLayout(S.layout); // sc/ox/oy for the new zoom
   const page = pageArea();
   // zoom in: a country with regions that fills more than half of the page
-  if (S.map === 'world') {
+  if (zoomingIn && S.map === 'world') {
     let best = null,
       bf = 0;
     for (const u of GEO.units) {
@@ -125,7 +126,7 @@ function autoDetailCheck(cursorC) {
     }
   }
   // zoom out: the current focus, or the whole country, fills less than a quarter
-  if (S.zoom.k < Math.sqrt(AUTO_OUT) && (S.focus || S.map !== 'world')) {
+  if (!zoomingIn && S.zoom.k < Math.sqrt(AUTO_OUT) && (S.focus || S.map !== 'world')) {
     const A = rectOfMain();
     if (S.focus) {
       // focus -> whole map, the focused part stays where it is
