@@ -163,6 +163,17 @@
               <label class="ck"
                 ><input type="checkbox" id="detail" checked onchange="render()" /> <span data-i18n="detail_coast"></span
               ></label>
+              <label class="lvl" data-i18n-title="detail_level_t"
+                ><span data-i18n="detail_level"></span
+                ><input
+                  type="range"
+                  id="detailLevel"
+                  min="0"
+                  max="3"
+                  step="1"
+                  value="0"
+                  oninput="setDetailLevel(+this.value)" /><b id="detailLevelV"></b
+              ></label>
             </div>
           </section>
         </div>

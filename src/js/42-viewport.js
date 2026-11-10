@@ -142,6 +142,19 @@ function pathLines(ls) {
 }
 const isBH = (k) => !!insOf(k);
 const MID_ZOOM = 3; // world map zoom above which the middle detail level is drawn
+// Display → Detail: 0 auto, or always 1 simple, 2 detailed, 3 fine; "Detailed coastline" only counts in auto
+const DETAIL_LEVELS = ['detail_auto', 'detail_simple', 'detail_detailed', 'detail_fine'];
+function syncDetailLevel() {
+  const v = S.detailLevel || 0;
+  document.getElementById('detailLevel').value = v;
+  document.getElementById('detailLevelV').textContent = t(DETAIL_LEVELS[v]);
+  document.getElementById('detail').disabled = v > 0;
+}
+function setDetailLevel(v) {
+  S.detailLevel = v;
+  syncDetailLevel();
+  render();
+}
 // the view the page was last drawn for (render): a gesture on the same map only moves and scales that drawing
 let DRAWN = null;
 // Detail levels: 0 simple, 1 detail, 2 middle (world map zoomed in: admin-1 country outlines, decoded on

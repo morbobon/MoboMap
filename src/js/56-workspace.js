@@ -139,6 +139,7 @@ function thumbKey() {
     S.partners.length,
     S.zoom,
     S.focusHide,
+    S.detailLevel,
     S.dsColours,
     S.guard,
     S.drag,

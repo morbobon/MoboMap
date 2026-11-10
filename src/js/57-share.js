@@ -95,6 +95,7 @@ function shareParams() {
   if (p.fx.preset && (p.fx.preset === 'random' || FX_PRESETS[p.fx.preset])) q.set('pr', p.fx.preset);
   if (!p.guard) q.set('gd', '0');
   if (p.focusHide) q.set('fh', '1');
+  if (p.detailLevel) q.set('dl', p.detailLevel);
   if (p.frame !== 'auto') q.set('fl', p.frame);
   // zoom: written when it differs from the start project's view (z=1,0,0 = the whole map)
   const zs = (z) => [(z || { k: 1 }).k.toFixed(3), Math.round((z && z.x) || 0), Math.round((z && z.y) || 0)].join(',');
@@ -163,6 +164,7 @@ function projectFromUrl(search) {
     'dsc',
     'gd',
     'fh',
+    'dl',
     'fl',
     'z',
     'ck',
@@ -272,6 +274,7 @@ function projectFromUrl(search) {
   if (q.has('dsc')) p.dsColours = g('dsc') === '1';
   if (q.has('gd')) p.guard = g('gd') !== '0';
   if (q.has('fh')) p.focusHide = g('fh') === '1';
+  if (q.has('dl')) p.detailLevel = +g('dl');
   if (q.has('fl')) p.frame = g('fl');
   // another map than the start project's: its zoom does not carry over
   const D0 = DEFAULT_PROJECT || {};

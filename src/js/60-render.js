@@ -11,8 +11,10 @@ function render(target) {
   fxLayout();
   const D = DS[S.ds],
     st = S.style,
-    det =
-      GEO.mid && S.zoom.k > MID_ZOOM && !target
+    det = S.detailLevel
+      ? // forced (Display → Detail); the fine level exists on the world map only, and thumbnails stop below it
+        Math.min(S.detailLevel - 1, GEO.mid && !target ? 2 : 1)
+      : GEO.mid && S.zoom.k > MID_ZOOM && !target
         ? 2
         : document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
     all = document.getElementById('labels').checked;

@@ -23,6 +23,7 @@ function projectState() {
     proj: S.proj,
     focus: S.focus,
     focusHide: !!S.focusHide,
+    detailLevel: S.detailLevel || 0,
     far: S.far,
     drag: S.drag,
     dsColours: !!S.dsColours,
@@ -126,6 +127,8 @@ function loadProject(p, quiet, noDraw) {
     }
   }
   S.focusHide = !!p.focusHide;
+  S.detailLevel = [1, 2, 3].includes(+p.detailLevel) ? +p.detailLevel : 0;
+  syncDetailLevel();
   if (p.zoom && Number.isFinite(+p.zoom.k) && p.zoom.k > 0)
     S.zoom = {
       k: Math.min(40, Math.max(0.5, +p.zoom.k)),

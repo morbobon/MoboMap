@@ -257,6 +257,25 @@ select:focus {
   margin-top: 6px;
   display: none;
 }
+/* Display → Detail: name, slider, the level's name */
+label.lvl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+label.lvl input {
+  flex: 1;
+}
+label.lvl b {
+  min-width: 62px;
+  font-weight: 600;
+}
+label.ck:has(input:disabled) {
+  opacity: 0.5;
+  cursor: default;
+}
 label.ck {
   display: flex;
   align-items: center;

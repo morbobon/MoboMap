@@ -24,6 +24,7 @@ const S = {
   drag: {}, // texts moved by hand: { title | sub | legend | logo | co:<unit> | lb:<unit>: [dx, dy] }
   far: 'inset', // far-away parts (Alaska, Bornholm …): 'inset' | 'show' | 'hide'
   focusHide: false, // hide units outside the focus
+  detailLevel: 0, // 0 auto (by zoom), else always 1 simple, 2 detailed, 3 fine (Display → Detail)
   worldProj: DEFAULT_PROJ, // remembered world projection while viewing a country
   lang: 'en',
   layout: 'land',

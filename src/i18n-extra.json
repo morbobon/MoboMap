@@ -532,7 +532,13 @@
   "tip_dbl_zoom": "Double-tap: zoom in",
   "lbl_reset": "Reset map",
   "home_noask": "Don't ask again",
-  "home_ask": "Ask before resetting the map"
+  "home_ask": "Ask before resetting the map",
+  "detail_level": "Detail",
+  "detail_level_t": "Always draw coasts and borders at this level; Auto picks it from the zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Simple",
+  "detail_detailed": "Detailed",
+  "detail_fine": "Fine"
  },
  "da": {
   "yes": "Ja",
@@ -1067,7 +1073,13 @@
   "tip_dbl_zoom": "Dobbelttryk: zoom ind",
   "lbl_reset": "Nulstil kort",
   "home_noask": "Spørg ikke igen",
-  "home_ask": "Spørg før kortet nulstilles"
+  "home_ask": "Spørg før kortet nulstilles",
+  "detail_level": "Detaljer",
+  "detail_level_t": "Tegn altid kyster og grænser i dette niveau; Auto vælger efter zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Enkel",
+  "detail_detailed": "Detaljeret",
+  "detail_fine": "Fin"
  },
  "de": {
   "yes": "Ja",
@@ -1602,7 +1614,13 @@
   "tip_dbl_zoom": "Doppeltippen: hineinzoomen",
   "lbl_reset": "Karte zurücksetzen",
   "home_noask": "Nicht mehr fragen",
-  "home_ask": "Vor dem Zurücksetzen der Karte fragen"
+  "home_ask": "Vor dem Zurücksetzen der Karte fragen",
+  "detail_level": "Detailgrad",
+  "detail_level_t": "Küsten und Grenzen immer in dieser Stufe zeichnen; Auto wählt nach Zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Einfach",
+  "detail_detailed": "Detailliert",
+  "detail_fine": "Fein"
  },
  "fr": {
   "yes": "Oui",
@@ -2137,7 +2155,13 @@
   "tip_dbl_zoom": "Double toucher : zoomer",
   "lbl_reset": "Réinitialiser la carte",
   "home_noask": "Ne plus demander",
-  "home_ask": "Demander avant de réinitialiser la carte"
+  "home_ask": "Demander avant de réinitialiser la carte",
+  "detail_level": "Détail",
+  "detail_level_t": "Toujours dessiner côtes et frontières à ce niveau ; Auto choisit selon le zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Simple",
+  "detail_detailed": "Détaillé",
+  "detail_fine": "Fin"
  },
  "es": {
   "yes": "Sí",
@@ -2672,7 +2696,13 @@
   "tip_dbl_zoom": "Doble toque: acercar",
   "lbl_reset": "Restablecer mapa",
   "home_noask": "No volver a preguntar",
-  "home_ask": "Preguntar antes de restablecer el mapa"
+  "home_ask": "Preguntar antes de restablecer el mapa",
+  "detail_level": "Detalle",
+  "detail_level_t": "Dibujar siempre costas y fronteras con este nivel; Auto lo elige según el zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Simple",
+  "detail_detailed": "Detallado",
+  "detail_fine": "Fino"
  },
  "sv": {
   "yes": "Ja",
@@ -3207,7 +3237,13 @@
   "tip_dbl_zoom": "Dubbeltryck: zooma in",
   "lbl_reset": "Återställ karta",
   "home_noask": "Fråga inte igen",
-  "home_ask": "Fråga innan kartan återställs"
+  "home_ask": "Fråga innan kartan återställs",
+  "detail_level": "Detaljer",
+  "detail_level_t": "Rita alltid kuster och gränser på denna nivå; Auto väljer efter zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Enkel",
+  "detail_detailed": "Detaljerad",
+  "detail_fine": "Fin"
  },
  "no": {
   "yes": "Ja",
@@ -3742,7 +3778,13 @@
   "tip_dbl_zoom": "Dobbelttrykk: zoom inn",
   "lbl_reset": "Tilbakestill kart",
   "home_noask": "Ikke spør igjen",
-  "home_ask": "Spør før kartet tilbakestilles"
+  "home_ask": "Spør før kartet tilbakestilles",
+  "detail_level": "Detaljer",
+  "detail_level_t": "Tegn alltid kyster og grenser på dette nivået; Auto velger etter zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Enkel",
+  "detail_detailed": "Detaljert",
+  "detail_fine": "Fin"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4277,7 +4319,13 @@
   "tip_dbl_zoom": "Kaksoisnapautus: lähennä",
   "lbl_reset": "Palauta kartta",
   "home_noask": "Älä kysy uudelleen",
-  "home_ask": "Kysy ennen kartan palauttamista"
+  "home_ask": "Kysy ennen kartan palauttamista",
+  "detail_level": "Tarkkuus",
+  "detail_level_t": "Piirrä rannikot ja rajat aina tällä tasolla; Auto valitsee zoomin mukaan",
+  "detail_auto": "Auto",
+  "detail_simple": "Yksinkert.",
+  "detail_detailed": "Tarkka",
+  "detail_fine": "Hieno"
  },
  "nl": {
   "yes": "Ja",
@@ -4812,7 +4860,13 @@
   "tip_dbl_zoom": "Dubbeltik: inzoomen",
   "lbl_reset": "Kaart resetten",
   "home_noask": "Niet meer vragen",
-  "home_ask": "Vragen voordat de kaart wordt gereset"
+  "home_ask": "Vragen voordat de kaart wordt gereset",
+  "detail_level": "Detail",
+  "detail_level_t": "Kusten en grenzen altijd op dit niveau tekenen; Auto kiest op basis van zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Eenvoudig",
+  "detail_detailed": "Gedetailleerd",
+  "detail_fine": "Fijn"
  },
  "it": {
   "yes": "Sì",
@@ -5347,7 +5401,13 @@
   "tip_dbl_zoom": "Doppio tocco: aumenta zoom",
   "lbl_reset": "Reimposta mappa",
   "home_noask": "Non chiedere più",
-  "home_ask": "Chiedi prima di reimpostare la mappa"
+  "home_ask": "Chiedi prima di reimpostare la mappa",
+  "detail_level": "Dettaglio",
+  "detail_level_t": "Disegna sempre coste e confini a questo livello; Auto lo sceglie in base allo zoom",
+  "detail_auto": "Auto",
+  "detail_simple": "Semplice",
+  "detail_detailed": "Dettagliato",
+  "detail_fine": "Fine"
  },
  "tr": {
   "yes": "Evet",
@@ -5882,6 +5942,12 @@
   "tip_dbl_zoom": "Çift dokun: yakınlaştır",
   "lbl_reset": "Haritayı sıfırla",
   "home_noask": "Bir daha sorma",
-  "home_ask": "Haritayı sıfırlamadan önce sor"
+  "home_ask": "Haritayı sıfırlamadan önce sor",
+  "detail_level": "Ayrıntı",
+  "detail_level_t": "Kıyıları ve sınırları her zaman bu düzeyde çiz; Otomatik yakınlaştırmaya göre seçer",
+  "detail_auto": "Otomatik",
+  "detail_simple": "Basit",
+  "detail_detailed": "Ayrıntılı",
+  "detail_fine": "İnce"
  }
 }
