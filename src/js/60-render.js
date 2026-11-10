@@ -566,7 +566,9 @@ function render(target) {
     S.map !== 'world'
       ? citiesToDraw()
       : S.focus && GEO.cities
-        ? (focusUnits() || []).flatMap((u) => (GEO.cities[u.c] || []).filter((c) => !GEO.groups[S.focus] || c.cap))
+        ? (focusUnits() || []).flatMap((u) =>
+            (S.cityMin ? citiesFrom(u.c) : GEO.cities[u.c] || []).filter((c) => !GEO.groups[S.focus] || c.cap),
+          )
         : [];
   const cityBoxes = [];
   const boxHit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
@@ -856,6 +858,9 @@ function render(target) {
       if (src) items.push({ src: true, label: src });
     }
     if (relief) items.push(...reliefLegend(sp));
+    // the population list is CC BY: credited whenever its cities are on the map
+    if (S.cityMin && CL.length && document.getElementById('showCities').checked)
+      items.push({ src: true, label: t('cities_src') });
     const side = margin.l.length ? (margin.r.length ? 'c' : 'r') : 'l';
     // with a frame line, picture frame, cut edges or map border the legend moves further into the map
     const framed = frame || FXL.active || fxOn('border');

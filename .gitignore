@@ -17,6 +17,7 @@ Thumbs.db
 assets/geo/source-admin1.geojson
 assets/geo/source-etopo.csv
 assets/geo/source-nuts.geojson
+assets/geo/source-cities5000.zip
 
 # local Claude Code / editor settings
 .claude/

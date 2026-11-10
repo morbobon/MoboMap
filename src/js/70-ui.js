@@ -2,6 +2,7 @@ function ui() {
   if (!DS[S.ds]) S.ds = DSORDER[0];
   applyTheme();
   syncDetailLevel();
+  syncCityMin();
   const D = DS[S.ds];
   const sel = document.getElementById('ds');
   const grp = { builtin: t('grp_builtin'), private: t('grp_private'), file: t('grp_file'), user: t('grp_user') };

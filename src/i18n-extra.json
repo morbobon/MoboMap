@@ -591,7 +591,11 @@
   "hl_bevel": "Bevel",
   "hl_bevel_t": "Lit, bevelled edges",
   "hl_block": "3D block",
-  "hl_block_t": "An extruded slab with visible thickness"
+  "hl_block_t": "An extruded slab with visible thickness",
+  "city_min": "Cities",
+  "city_min_t": "Which cities to show: the major ones, or every city above a population (below 50,000 only in Denmark)",
+  "city_major": "Major",
+  "cities_src": "Cities: GeoNames (CC BY 4.0)"
  },
  "da": {
   "yes": "Ja",
@@ -1185,7 +1189,11 @@
   "hl_bevel": "Fas",
   "hl_bevel_t": "Belyste, affasede kanter",
   "hl_block": "3D-blok",
-  "hl_block_t": "En ekstruderet blok med synlig tykkelse"
+  "hl_block_t": "En ekstruderet blok med synlig tykkelse",
+  "city_min": "Byer",
+  "city_min_t": "Hvilke byer der vises: de største, eller alle byer over et indbyggertal (under 50.000 kun i Danmark)",
+  "city_major": "Største",
+  "cities_src": "Byer: GeoNames (CC BY 4.0)"
  },
  "de": {
   "yes": "Ja",
@@ -1779,7 +1787,11 @@
   "hl_bevel": "Fase",
   "hl_bevel_t": "Beleuchtete, abgeschrägte Kanten",
   "hl_block": "3D-Block",
-  "hl_block_t": "Ein extrudierter Block mit sichtbarer Dicke"
+  "hl_block_t": "Ein extrudierter Block mit sichtbarer Dicke",
+  "city_min": "Städte",
+  "city_min_t": "Welche Städte erscheinen: die größten oder alle ab einer Einwohnerzahl (unter 50.000 nur in Dänemark)",
+  "city_major": "Größte",
+  "cities_src": "Städte: GeoNames (CC BY 4.0)"
  },
  "fr": {
   "yes": "Oui",
@@ -2373,7 +2385,11 @@
   "hl_bevel": "Biseau",
   "hl_bevel_t": "Bords biseautés et éclairés",
   "hl_block": "Bloc 3D",
-  "hl_block_t": "Une dalle extrudée à l'épaisseur visible"
+  "hl_block_t": "Une dalle extrudée à l'épaisseur visible",
+  "city_min": "Villes",
+  "city_min_t": "Quelles villes afficher : les principales, ou toutes au-dessus d'une population (sous 50 000 seulement au Danemark)",
+  "city_major": "Principales",
+  "cities_src": "Villes : GeoNames (CC BY 4.0)"
  },
  "es": {
   "yes": "Sí",
@@ -2967,7 +2983,11 @@
   "hl_bevel": "Bisel",
   "hl_bevel_t": "Bordes biselados e iluminados",
   "hl_block": "Bloque 3D",
-  "hl_block_t": "Una losa extruida con grosor visible"
+  "hl_block_t": "Una losa extruida con grosor visible",
+  "city_min": "Ciudades",
+  "city_min_t": "Qué ciudades mostrar: las principales o todas por encima de una población (por debajo de 50.000 solo en Dinamarca)",
+  "city_major": "Principales",
+  "cities_src": "Ciudades: GeoNames (CC BY 4.0)"
  },
  "sv": {
   "yes": "Ja",
@@ -3561,7 +3581,11 @@
   "hl_bevel": "Fasning",
   "hl_bevel_t": "Belysta, fasade kanter",
   "hl_block": "3D-block",
-  "hl_block_t": "Ett extruderat block med synlig tjocklek"
+  "hl_block_t": "Ett extruderat block med synlig tjocklek",
+  "city_min": "Städer",
+  "city_min_t": "Vilka städer som visas: de största, eller alla över ett invånarantal (under 50 000 bara i Danmark)",
+  "city_major": "Största",
+  "cities_src": "Städer: GeoNames (CC BY 4.0)"
  },
  "no": {
   "yes": "Ja",
@@ -4155,7 +4179,11 @@
   "hl_bevel": "Fas",
   "hl_bevel_t": "Belyste, avfasede kanter",
   "hl_block": "3D-blokk",
-  "hl_block_t": "En ekstrudert blokk med synlig tykkelse"
+  "hl_block_t": "En ekstrudert blokk med synlig tykkelse",
+  "city_min": "Byer",
+  "city_min_t": "Hvilke byer som vises: de største, eller alle over et innbyggertall (under 50 000 bare i Danmark)",
+  "city_major": "Største",
+  "cities_src": "Byer: GeoNames (CC BY 4.0)"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4749,7 +4777,11 @@
   "hl_bevel": "Viiste",
   "hl_bevel_t": "Valaistut, viistetyt reunat",
   "hl_block": "3D-lohko",
-  "hl_block_t": "Pursotettu laatta, jossa näkyy paksuus"
+  "hl_block_t": "Pursotettu laatta, jossa näkyy paksuus",
+  "city_min": "Kaupungit",
+  "city_min_t": "Mitkä kaupungit näytetään: suurimmat tai kaikki tietyn asukasluvun ylittävät (alle 50 000 vain Tanskassa)",
+  "city_major": "Suurimmat",
+  "cities_src": "Kaupungit: GeoNames (CC BY 4.0)"
  },
  "nl": {
   "yes": "Ja",
@@ -5343,7 +5375,11 @@
   "hl_bevel": "Afschuining",
   "hl_bevel_t": "Belichte, afgeschuinde randen",
   "hl_block": "3D-blok",
-  "hl_block_t": "Een geëxtrudeerd blok met zichtbare dikte"
+  "hl_block_t": "Een geëxtrudeerd blok met zichtbare dikte",
+  "city_min": "Steden",
+  "city_min_t": "Welke steden: de grootste, of alle steden boven een inwonertal (onder 50.000 alleen in Denemarken)",
+  "city_major": "Grootste",
+  "cities_src": "Steden: GeoNames (CC BY 4.0)"
  },
  "it": {
   "yes": "Sì",
@@ -5937,7 +5973,11 @@
   "hl_bevel": "Smusso",
   "hl_bevel_t": "Bordi smussati e illuminati",
   "hl_block": "Blocco 3D",
-  "hl_block_t": "Una lastra estrusa con spessore visibile"
+  "hl_block_t": "Una lastra estrusa con spessore visibile",
+  "city_min": "Città",
+  "city_min_t": "Quali città mostrare: le principali o tutte sopra una popolazione (sotto 50.000 solo in Danimarca)",
+  "city_major": "Principali",
+  "cities_src": "Città: GeoNames (CC BY 4.0)"
  },
  "tr": {
   "yes": "Evet",
@@ -6531,6 +6571,10 @@
   "hl_bevel": "Eğim",
   "hl_bevel_t": "Işıklı, eğimli kenarlar",
   "hl_block": "3B blok",
-  "hl_block_t": "Görünür kalınlıkta ekstrüde bir blok"
+  "hl_block_t": "Görünür kalınlıkta ekstrüde bir blok",
+  "city_min": "Şehirler",
+  "city_min_t": "Hangi şehirler gösterilir: büyükler veya belirli nüfusun üzerindekiler (50.000 altı yalnızca Danimarka)",
+  "city_major": "Büyükler",
+  "cities_src": "Şehirler: GeoNames (CC BY 4.0)"
  }
 }

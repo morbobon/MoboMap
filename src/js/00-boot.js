@@ -1,10 +1,10 @@
 /*__DATA__*/
-// DATA.adm1 (provinces) and DATA.elev (terrain) stay packed in DATA_Z until first read
-for (const k of ['adm1', 'elev'])
+// DATA.adm1 (provinces), DATA.elev (terrain) and DATA.cities stay packed in DATA_Z until first read
+for (const k of ['adm1', 'elev', 'cities'])
   Object.defineProperty(DATA, k, {
     configurable: true,
     get() {
-      const v = DATA_Z[k] ? unpackJSON(DATA_Z[k]) : k === 'adm1' ? {} : null;
+      const v = DATA_Z[k] ? unpackJSON(DATA_Z[k]) : k === 'elev' ? null : {};
       Object.defineProperty(DATA, k, { value: v });
       return v;
     },

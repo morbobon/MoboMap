@@ -30,6 +30,7 @@ Third-party content bundled in builds:
 - Municipality boundaries: DAGI (Danish Agency for Data Supply and Infrastructure),
   via github.com/magnuslarsen/geoJSON-Danish-municipalities – open public data.
 - Country boundaries and populated places: Natural Earth (naturalearthdata.com) – public domain.
+- Cities by population (Display → Cities): GeoNames (geonames.org) – CC BY 4.0.
 - Country statistics: Our World in Data (ourworldindata.org) – CC BY 4.0, with data from UCDP, V-Dem,
   World Bank, FAO, WHO, UN WPP, UNDP, ITU, Global Carbon Project, Ember and the Energy Institute.
 - Regional statistics: Statistics Denmark (statbank.dk, CC BY 4.0); Eurostat regional statistics and

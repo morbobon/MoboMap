@@ -1,10 +1,32 @@
 // Cities: markers and "zoom to a city" focus (S.focus = 'city:<name>') for country views.
 // Denmark has its own town list (tools/build.mjs); other countries use Natural Earth's major cities.
 const CITY_PREFIX = 'city:';
+// Display → Cities: 0 = the major cities (a country's own list), else every city with at least that many people
+// (DATA.cities: 50,000+ worldwide, 5,000+ in Denmark)
+const CITY_STEPS = [0, 1e6, 5e5, 2.5e5, 1e5, 5e4, 2e4, 1e4, 5e3];
+const CITIES = {};
+function citiesOf(iso) {
+  return (CITIES[iso] ||= (DATA.cities[iso] || []).map(([n, x, y, pop, cap]) => ({ n, x, y, pop, cap })));
+}
+const citiesFrom = (iso) => citiesOf(iso).filter((c) => c.pop >= S.cityMin);
+function syncCityMin() {
+  const v = S.cityMin || 0;
+  document.getElementById('cityMin').value = Math.max(0, CITY_STEPS.indexOf(v));
+  document.getElementById('cityMinV').textContent = v ? '≥ ' + v.toLocaleString(S.lang) : t('city_major');
+}
+function setCityMin(i) {
+  S.cityMin = CITY_STEPS[i] || 0;
+  // asking for cities shows them
+  if (S.cityMin) document.getElementById('showCities').checked = true;
+  ui();
+  render();
+}
 const cityList = () =>
   S.map === 'world'
     ? []
-    : (GEO.cityList || []).filter((c) => (S.map === 'dk' ? !(S.far === 'hide' && c.x - 180 > 14.5) : !!cityUnit(c)));
+    : (S.cityMin ? citiesFrom(S.country || 'DNK') : GEO.cityList || []).filter((c) =>
+        S.map === 'dk' ? !(S.far === 'hide' && c.x - 180 > 14.5) : !!cityUnit(c),
+      );
 // point in polygon (flat [x, y, …] rings, even-odd)
 function pipRings(x, y, rings) {
   let inside = false;
@@ -127,10 +149,11 @@ function citiesToDraw() {
       return p.x >= w[0] - pad && p.x <= w[2] + pad && p.y >= w[1] - pad && p.y <= w[3] + pad;
     });
   }
+  // the major cities: the biggest eight; from the slider: all of them, biggest first (they get a label first)
   return all
     .slice()
     .sort((a, b) => b.cap - a.cap || b.pop - a.pop)
-    .slice(0, 8);
+    .slice(0, S.cityMin ? Infinity : 8);
 }
 
 // a unit really reaches into the window (one of its vertices or its centre inside), not only its bbox

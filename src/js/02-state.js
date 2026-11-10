@@ -25,6 +25,7 @@ const S = {
   far: 'inset', // far-away parts (Alaska, Bornholm …): 'inset' | 'show' | 'hide'
   focusHide: false, // hide units outside the focus
   detailLevel: 0, // 0 auto (by zoom), else always 1 simple, 2 detailed, 3 fine (Display → Detail)
+  cityMin: 0, // Display → Cities: 0 the major cities, else the smallest population shown (45-cities.js)
   worldProj: DEFAULT_PROJ, // remembered world projection while viewing a country
   lang: 'en',
   layout: 'land',

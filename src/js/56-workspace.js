@@ -140,6 +140,7 @@ function thumbKey() {
     S.zoom,
     S.focusHide,
     S.detailLevel,
+    S.cityMin,
     S.dsColours,
     S.guard,
     S.drag,

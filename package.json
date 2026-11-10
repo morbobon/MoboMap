@@ -13,7 +13,8 @@
     "export-ds": "node tools/export-ds.mjs",
     "elevation": "node tools/prepare-elevation.mjs",
     "examples": "node tools/examples.mjs",
-    "regional": "node tools/prepare-regional-stats.mjs"
+    "regional": "node tools/prepare-regional-stats.mjs",
+    "cities": "node tools/prepare-cities.mjs"
   },
   "devDependencies": {
     "d3-contour": "^4.0.3",

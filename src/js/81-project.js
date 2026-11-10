@@ -24,6 +24,7 @@ function projectState() {
     focus: S.focus,
     focusHide: !!S.focusHide,
     detailLevel: S.detailLevel || 0,
+    cityMin: S.cityMin || 0,
     far: S.far,
     drag: S.drag,
     dsColours: !!S.dsColours,
@@ -132,6 +133,7 @@ function loadProject(p, quiet, noDraw) {
   }
   S.focusHide = !!p.focusHide;
   S.detailLevel = [1, 2, 3].includes(+p.detailLevel) ? +p.detailLevel : 0;
+  S.cityMin = CITY_STEPS.includes(+p.cityMin) ? +p.cityMin : 0;
   syncDetailLevel();
   if (p.zoom && Number.isFinite(+p.zoom.k) && p.zoom.k > 0)
     S.zoom = {

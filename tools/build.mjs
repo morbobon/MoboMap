@@ -409,6 +409,21 @@ if (fs.existsSync(A('geo/regional-stats.json'))) {
 // Provinces and terrain are packed apart and unpacked in the page on first use (src/js/00-boot.js);
 // adm1i (iso -> name) lists the countries with provinces without unpacking them
 const adm1i = Object.fromEntries(Object.entries(adm1).map(([iso, c]) => [iso, c.n]));
+// Cities by population (tools/prepare-cities.mjs) for Display → Cities, packed apart as well:
+// { ISO3: [[name, x, y, population, capital]] } with x = lon+180, y = 90-lat; Danish towns keep the names of
+// the hand-made list above: each listed town names the one place nearest to it (within ~5 km)
+let cities = null;
+if (fs.existsSync(A('geo/cities.json'))) {
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  cities = {};
+  for (const [c, arr] of Object.entries(readJSON('geo/cities.json')))
+    cities[c] = arr.map(([n, lon, lat, pop, cap]) => [n, r3(lon + 180), r3(90 - lat), pop, cap]);
+  for (const o of dk.cityList) {
+    const d = (p) => Math.hypot(p[1] - o.x, p[2] - o.y);
+    const near = (cities.DNK || []).reduce((a, p) => (!a || d(p) < d(a) ? p : a), null);
+    if (near && d(near) < 0.05) [near[0], near[4]] = [o.n, o.cap];
+  }
+}
 const data = { dk, world, adm1i, regionMeta };
 
 // ---------- Fonte ----------
@@ -516,6 +531,8 @@ html = html
       pack(JSON.stringify(adm1)) +
       '", elev: ' +
       (elev ? '"' + pack(JSON.stringify(elev)) + '"' : 'null') +
+      ', cities: ' +
+      (cities ? '"' + pack(JSON.stringify(cities)) + '"' : 'null') +
       ' };',
   )
   .replace('/*__FONTS__*/', () => 'const FONTS = ' + JSON.stringify(fonts) + ';')
