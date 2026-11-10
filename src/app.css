@@ -1074,6 +1074,7 @@ header h1 .home:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+#printDlg,
 #homeDlg {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -1083,13 +1084,51 @@ header h1 .home:hover {
   max-width: 420px;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
+#printDlg::backdrop,
 #homeDlg::backdrop {
   background: rgba(0, 0, 0, 0.45);
 }
+/* Export → Print…: paper size, resolution, file */
+#printDlg {
+  width: min(380px, calc(100vw - 32px));
+  box-sizing: border-box;
+}
+#printDlg label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--mute);
+  margin-bottom: 10px;
+}
+#printDlg input[type='number'] {
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 8px 10px;
+  background: var(--field);
+  color: var(--ink);
+}
+#printDlg .prsum {
+  font-size: 12.5px;
+  margin: 4px 0 6px;
+}
+#printDlg .prwarn {
+  font-size: 12px;
+  color: var(--accent);
+  min-height: 1em;
+  margin-bottom: 12px;
+}
+#printDlg .prbtns {
+  justify-content: flex-end;
+}
+#printDlg h3,
 #homeDlg h3 {
   margin: 0 0 6px;
   font-size: 16px;
 }
+#printDlg p,
 #homeDlg p {
   margin: 0 0 14px;
   opacity: 0.8;

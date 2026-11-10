@@ -80,6 +80,7 @@
             <button onclick="exportMap('png')">PNG</button>
             <button onclick="exportMap('jpg')">JPG</button>
             <button onclick="exportMap('pdf')">PDF · A4</button>
+            <button onclick="openPrint()" data-i18n="print_menu"></button>
           </span>
         </span>
       </div>
@@ -575,6 +576,39 @@
     </main>
     <div id="tip"></div>
     <div id="toast"></div>
+    <dialog id="printDlg">
+      <h3 data-i18n="print_title"></h3>
+      <p data-i18n="print_info"></p>
+      <label
+        ><span data-i18n="print_size"></span
+        ><select id="prSize" onchange="printUpdate()"></select
+      ></label>
+      <label id="prCustomL"
+        ><span data-i18n="print_width"></span
+        ><input type="number" id="prWidth" min="20" max="5000" step="1" oninput="printUpdate()"
+      /></label>
+      <label
+        ><span data-i18n="print_dpi"></span
+        ><select id="prDpi" onchange="printUpdate()">
+          <option value="150" data-i18n="print_dpi150"></option>
+          <option value="300" data-i18n="print_dpi300"></option>
+          <option value="600" data-i18n="print_dpi600"></option></select
+      ></label>
+      <label
+        ><span data-i18n="print_fmt"></span
+        ><select id="prFmt" onchange="printUpdate()">
+          <option value="pdf">PDF</option>
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+        </select></label
+      >
+      <div class="prsum" id="prSum"></div>
+      <div class="prwarn" id="prWarn"></div>
+      <div class="row prbtns">
+        <button class="exp" id="prGo" onclick="printGo()" data-i18n="print_go"></button>
+        <button onclick="document.getElementById('printDlg').close()" data-i18n="home_cancel"></button>
+      </div>
+    </dialog>
     <dialog id="homeDlg">
       <h3 data-i18n="home_q"></h3>
       <p data-i18n="home_info"></p>
