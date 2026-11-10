@@ -14,14 +14,15 @@ function setTab(id) {
 
 // ---- phones (narrow screens): the panel is a bottom sheet over the map, opened from the tab bar ----
 const isPhone = () => matchMedia('(max-width: 760px)').matches;
-// a tab button: on a phone the active tab's button opens and closes the sheet; elsewhere it only switches tab
+// a tab button: on a phone the active tab's button opens and closes the sheet; elsewhere it switches tab,
+// opening the panel when it is folded to its rail
 function railTap(id) {
   const b = document.body;
   if (isPhone()) {
     const same = localStorage.getItem('mobomap.tab') === id;
     b.classList.toggle('sheet-open', !(same && b.classList.contains('sheet-open')));
     b.classList.remove('more-open');
-  }
+  } else if (b.classList.contains('no-panel')) toggleChrome('panel');
   setTab(id);
 }
 // the header's other buttons, folded behind ⋯ on a phone
@@ -106,10 +107,10 @@ function deleteLook(id, e) {
   renderLooks();
 }
 const stripOpen = () => !document.body.classList.contains('no-strip');
-// only while the strip is open, and only when its buttons changed (not on every redraw of the map)
+// open or folded (names only), and only when its buttons changed (not on every redraw of the map)
 function renderLooks() {
   const el = document.getElementById('looks');
-  if (!el || !stripOpen()) return;
+  if (!el || document.body.classList.contains('fs')) return;
   const dice = `<button class="look rnd ${S.fx.preset === 'random' ? 'on' : ''}" onclick="randomLook()" title="${esc(t('look_random_t'))}"><span class="lthumb">🎲</span><span class="lname">${esc(t('look_random'))}</span></button>`;
   const html =
     allLooks()

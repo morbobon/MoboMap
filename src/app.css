@@ -844,11 +844,9 @@ body {
   --chrome: 250px;
 }
 body.no-strip {
-  --chrome: 120px;
+  --chrome: 160px;
 }
 body.no-panel aside,
-body.no-panel .rail,
-body.no-strip .looks,
 body.fs header,
 body.fs aside,
 body.fs .rail,
@@ -1003,9 +1001,7 @@ header .btns {
   flex: 1;
   min-width: 0;
 }
-.striphide,
-.showpanel,
-.showstrip {
+.striphide {
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--ink);
@@ -1016,34 +1012,33 @@ header .btns {
   opacity: 0.75;
 }
 .striphide:hover,
-.showpanel:hover,
-.showstrip:hover,
 .rail .railhide:hover {
   opacity: 1;
 }
-.showpanel,
-.showstrip {
-  position: absolute;
-  display: none;
-  z-index: 5;
-}
-.showpanel {
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.showstrip {
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-body.no-panel:not(.fs) .showpanel,
-body.no-strip:not(.fs) .showstrip {
-  display: block;
-}
-body.no-strip .looksbar,
 body.fs .looksbar {
   display: none;
+}
+/* folded: the panel leaves its icon rail (« turns »), the looks strip a slim row of names (︾ turns ︽) */
+body.no-panel .rail .railhide,
+body.no-strip .striphide {
+  transform: rotate(180deg);
+}
+body.no-strip .looks {
+  gap: 6px;
+  padding: 2px 2px 4px;
+}
+body.no-strip .look {
+  width: auto;
+  max-width: 170px;
+  border-radius: 999px;
+  box-shadow: none;
+  border-width: 1px;
+}
+body.no-strip .look .lthumb {
+  display: none;
+}
+body.no-strip .look .lname {
+  padding: 5px 12px;
 }
 
 /* draggable texts on the map */
@@ -1307,9 +1302,7 @@ header h1 a.home {
   body.sheet-open .stage {
     justify-content: flex-start;
   }
-  .looksbar,
-  .showpanel,
-  .showstrip {
+  .looksbar {
     display: none !important;
   }
   #tip {
