@@ -45,11 +45,13 @@ html[data-ui='dark'] {
   box-sizing: border-box;
 }
 body {
+  /* the visible height: on phones 100vh includes the part under the browser's address bar */
+  --vh: 100vh;
   margin: 0;
   font-family: var(--fb), 'Work Sans', system-ui, sans-serif;
   background: var(--bg);
   color: var(--ink);
-  height: 100vh;
+  height: var(--vh);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1106,4 +1108,138 @@ header h1 a.home {
 }
 .rowaligns:empty {
   display: none;
+}
+
+@supports (height: 100dvh) {
+  body {
+    --vh: 100dvh;
+  }
+}
+/* the map takes every touch: one finger pans, two pinch (70-ui.js) */
+#svg {
+  touch-action: none;
+}
+#moreBtn {
+  display: none;
+}
+
+/* ---- phones: one-row header (⋯ for the rest), the map, a tab bar at the bottom and the panel as a
+   bottom sheet over the map (railTap) ---- */
+@media (max-width: 760px) {
+  body,
+  body.no-strip {
+    --tabbar: calc(58px + env(safe-area-inset-bottom));
+    --chrome: calc(76px + var(--tabbar));
+  }
+  header {
+    position: relative;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  header h1 {
+    font-size: 15px;
+    line-height: 1.15;
+  }
+  header .btns {
+    flex-wrap: nowrap;
+  }
+  header .btns > * {
+    display: none;
+  }
+  header .btns > .expwrap,
+  header #moreBtn {
+    display: inline-flex;
+    align-items: center;
+  }
+  header #moreBtn {
+    font-size: 18px;
+    padding: 6px 12px;
+  }
+  body.more-open header .btns {
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    z-index: 40;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px #0006;
+  }
+  body.more-open header .btns > * {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  main {
+    flex-direction: column;
+    padding-bottom: var(--tabbar);
+  }
+  .rail,
+  body.no-panel .rail {
+    display: flex !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    width: auto;
+    height: var(--tabbar);
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: 4px 4px env(safe-area-inset-bottom);
+    box-sizing: border-box;
+  }
+  .rail button {
+    flex: 1;
+    width: auto;
+    min-height: 50px;
+  }
+  .rail button.on {
+    box-shadow: inset 0 3px 0 var(--accent);
+  }
+  .rail .railhide {
+    display: none;
+  }
+  aside,
+  body.no-panel aside {
+    display: none !important;
+  }
+  body.sheet-open aside {
+    display: block !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--tabbar);
+    z-index: 25;
+    width: auto;
+    height: 58%;
+    box-sizing: border-box;
+    border-right: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -10px 30px #0006;
+  }
+  .stage {
+    padding: 8px;
+    gap: 8px;
+  }
+  /* the map moves up, clear of the sheet */
+  body.sheet-open .stage {
+    justify-content: flex-start;
+  }
+  .looksbar,
+  .showpanel,
+  .showstrip {
+    display: none !important;
+  }
+  #tip {
+    white-space: normal;
+    max-width: 80vw;
+  }
 }

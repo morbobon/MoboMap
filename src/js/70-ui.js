@@ -454,12 +454,63 @@ svg.addEventListener(
 );
 let drag = null,
   dragged = false;
+// touch: every finger on the map by pointerId; two of them pinch (zoom around their midpoint, and pan)
+const fingers = new Map();
+let pinch = null,
+  pressT = 0;
 svg.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return;
+  if (e.pointerType === 'touch') {
+    fingers.set(e.pointerId, e);
+    clearTimeout(pressT);
+    if (fingers.size === 2) return startPinch();
+    // long press: the tooltip, and no selection when the finger lifts
+    const target = e.target,
+      cx = e.clientX,
+      cy = e.clientY;
+    pressT = setTimeout(() => {
+      if (!drag || dragged || fingers.size !== 1) return;
+      showTip(target, cx, cy);
+      dragged = true;
+    }, 500);
+  }
+  tip.style.display = 'none';
   drag = { p: svgPoint(e), z: Object.assign({}, S.zoom) };
   dragged = false;
 });
+const midOf = () => {
+  const [a, b] = [...fingers.values()];
+  return {
+    p: svgPoint({ clientX: (a.clientX + b.clientX) / 2, clientY: (a.clientY + b.clientY) / 2 }),
+    d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY),
+  };
+};
+function startPinch() {
+  const m = midOf();
+  pinch = { p: m.p, d: Math.max(m.d, 1), z: Object.assign({}, S.zoom) };
+  drag = null;
+  dragged = true;
+}
 window.addEventListener('pointermove', (e) => {
+  if (fingers.has(e.pointerId)) fingers.set(e.pointerId, e);
+  if (pinch && fingers.size >= 2) {
+    const m = midOf(),
+      z0 = pinch.z,
+      kMax = autoDetailOn() && S.map === 'world' ? 400 : 40;
+    const k = Math.min(kMax, Math.max(0.3, (z0.k * m.d) / pinch.d));
+    // the map point under the first midpoint stays under the current one
+    const bx = (pinch.p[0] - z0.x) / z0.k,
+      by = (pinch.p[1] - z0.y) / z0.k,
+      prev = S.zoom.k;
+    S.zoom = { k, x: m.p[0] - bx * k, y: m.p[1] - by * k };
+    if (typeof autoDetailCheck === 'function' && Math.abs(k - prev) > 1e-3 && autoDetailCheck(null, k > prev)) {
+      // another map now: the fingers start over from here
+      pinch = null;
+      return;
+    }
+    zoomChanged(true);
+    return;
+  }
   if (!drag) return;
   const [x, y] = svgPoint(e);
   const dx = x - drag.p[0],
@@ -471,10 +522,22 @@ window.addEventListener('pointermove', (e) => {
   S.zoom = { k: drag.z.k, x: drag.z.x + dx, y: drag.z.y + dy };
   zoomChanged(true);
 });
-window.addEventListener('pointerup', () => {
+function pointerEnd(e) {
+  fingers.delete(e.pointerId);
+  clearTimeout(pressT);
+  if (pinch && fingers.size < 2) {
+    pinch = null;
+    // one finger left: it pans on from where it is
+    const f = [...fingers.values()][0];
+    drag = f ? { p: svgPoint(f), z: Object.assign({}, S.zoom) } : null;
+    if (!f) document.getElementById('wrap').classList.remove('panning');
+    return;
+  }
   drag = null;
   document.getElementById('wrap').classList.remove('panning');
-});
+}
+window.addEventListener('pointerup', pointerEnd);
+window.addEventListener('pointercancel', pointerEnd);
 // a drag is not a click (capture phase: runs before the selection handler)
 svg.addEventListener(
   'click',
@@ -486,8 +549,10 @@ svg.addEventListener(
   },
   true,
 );
-svg.addEventListener('mousemove', (e) => {
-  const p = e.target.closest('.k');
+svg.addEventListener('mousemove', (e) => showTip(e.target, e.clientX, e.clientY));
+// the unit's tooltip at a screen point (mouse hover, or a long press on touch screens)
+function showTip(target, cx, cy) {
+  const p = target.closest && target.closest('.k');
   if (!p) {
     tip.style.display = 'none';
     return;
@@ -498,9 +563,10 @@ svg.addEventListener('mousemove', (e) => {
     S.map === 'world' && hasDetail(k.c) ? 'tip_ctrl_open' : S.focus === k.c ? 'tip_ctrl_out' : 'tip_ctrl_zoom';
   tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
   tip.style.display = 'block';
-  tip.style.left = e.clientX + 14 + 'px';
-  tip.style.top = e.clientY - 10 + 'px';
-});
+  // kept on screen (a finger sits near the edge as often as not)
+  tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';
+  tip.style.top = Math.max(4, cy - 10 - (cx + 14 + tip.offsetWidth > innerWidth ? 40 : 0)) + 'px';
+}
 // The hover outline is a separate, non-clickable overlay. Never move the hovered path in the DOM:
 // mousedown and mouseup would then hit different elements and the click would never fire.
 function hoverLine(p) {

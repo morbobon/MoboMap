@@ -519,7 +519,8 @@
   "al_common": "Same as footer",
   "grp_opacity": "Opacity",
   "grp_opacity_t": "How solid the highlight colour is; borders stay solid",
-  "grp_on_t": "Show this group on the map"
+  "grp_on_t": "Show this group on the map",
+  "more_t": "More"
  },
  "da": {
   "yes": "Ja",
@@ -1041,7 +1042,8 @@
   "al_common": "Som sidefoden",
   "grp_opacity": "Gennemsigtighed",
   "grp_opacity_t": "Hvor dækkende fremhævningsfarven er; grænser forbliver tydelige",
-  "grp_on_t": "Vis gruppen på kortet"
+  "grp_on_t": "Vis gruppen på kortet",
+  "more_t": "Mere"
  },
  "de": {
   "yes": "Ja",
@@ -1563,7 +1565,8 @@
   "al_common": "Wie Fußzeile",
   "grp_opacity": "Deckkraft",
   "grp_opacity_t": "Wie deckend die Hervorhebungsfarbe ist; Grenzen bleiben kräftig",
-  "grp_on_t": "Diese Gruppe auf der Karte zeigen"
+  "grp_on_t": "Diese Gruppe auf der Karte zeigen",
+  "more_t": "Mehr"
  },
  "fr": {
   "yes": "Oui",
@@ -2085,7 +2088,8 @@
   "al_common": "Comme le pied de page",
   "grp_opacity": "Opacité",
   "grp_opacity_t": "Opacité de la couleur de mise en évidence ; les frontières restent nettes",
-  "grp_on_t": "Afficher ce groupe sur la carte"
+  "grp_on_t": "Afficher ce groupe sur la carte",
+  "more_t": "Plus"
  },
  "es": {
   "yes": "Sí",
@@ -2607,7 +2611,8 @@
   "al_common": "Igual que el pie",
   "grp_opacity": "Opacidad",
   "grp_opacity_t": "Opacidad del color de resaltado; los bordes se mantienen sólidos",
-  "grp_on_t": "Mostrar este grupo en el mapa"
+  "grp_on_t": "Mostrar este grupo en el mapa",
+  "more_t": "Más"
  },
  "sv": {
   "yes": "Ja",
@@ -3129,7 +3134,8 @@
   "al_common": "Som sidfoten",
   "grp_opacity": "Opacitet",
   "grp_opacity_t": "Hur täckande markeringsfärgen är; gränser förblir tydliga",
-  "grp_on_t": "Visa gruppen på kartan"
+  "grp_on_t": "Visa gruppen på kartan",
+  "more_t": "Mer"
  },
  "no": {
   "yes": "Ja",
@@ -3651,7 +3657,8 @@
   "al_common": "Som bunnteksten",
   "grp_opacity": "Dekkevne",
   "grp_opacity_t": "Hvor dekkende uthevingsfargen er; grenser forblir tydelige",
-  "grp_on_t": "Vis gruppen på kartet"
+  "grp_on_t": "Vis gruppen på kartet",
+  "more_t": "Mer"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4173,7 +4180,8 @@
   "al_common": "Kuten alatunniste",
   "grp_opacity": "Peittävyys",
   "grp_opacity_t": "Korostusvärin peittävyys; rajat pysyvät selkeinä",
-  "grp_on_t": "Näytä ryhmä kartalla"
+  "grp_on_t": "Näytä ryhmä kartalla",
+  "more_t": "Lisää"
  },
  "nl": {
   "yes": "Ja",
@@ -4695,7 +4703,8 @@
   "al_common": "Zoals voettekst",
   "grp_opacity": "Dekking",
   "grp_opacity_t": "Hoe dekkend de markeerkleur is; grenzen blijven scherp",
-  "grp_on_t": "Deze groep op de kaart tonen"
+  "grp_on_t": "Deze groep op de kaart tonen",
+  "more_t": "Meer"
  },
  "it": {
   "yes": "Sì",
@@ -5217,7 +5226,8 @@
   "al_common": "Come il piè di pagina",
   "grp_opacity": "Opacità",
   "grp_opacity_t": "Quanto è coprente il colore di evidenziazione; i confini restano netti",
-  "grp_on_t": "Mostra questo gruppo sulla mappa"
+  "grp_on_t": "Mostra questo gruppo sulla mappa",
+  "more_t": "Altro"
  },
  "tr": {
   "yes": "Evet",
@@ -5739,6 +5749,7 @@
   "al_common": "Altbilgiyle aynı",
   "grp_opacity": "Opaklık",
   "grp_opacity_t": "Vurgu renginin ne kadar opak olduğu; sınırlar net kalır",
-  "grp_on_t": "Bu grubu haritada göster"
+  "grp_on_t": "Bu grubu haritada göster",
+  "more_t": "Daha fazla"
  }
 }

@@ -90,7 +90,7 @@ function setLayout(id) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const wrap = document.getElementById('wrap');
   wrap.style.aspectRatio = W + '/' + H;
-  wrap.style.width = `min(100%,calc((100vh - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`;
+  wrap.style.width = `min(100%,calc((var(--vh, 100vh) - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`;
 }
 // ins: the inset a point belongs to (insOf) – Bornholm is shifted, adm1 insets have their own projection
 const P = (x, y, ins) => {

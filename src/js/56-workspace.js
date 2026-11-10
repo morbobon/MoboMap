@@ -12,6 +12,27 @@ function setTab(id) {
   if (id === 'highlight' && window.MOBOMAP_READY) ui(); // not during start-up: profiles and map are not loaded yet
 }
 
+// ---- phones (narrow screens): the panel is a bottom sheet over the map, opened from the tab bar ----
+const isPhone = () => matchMedia('(max-width: 760px)').matches;
+// a tab button: on a phone the active tab's button opens and closes the sheet; elsewhere it only switches tab
+function railTap(id) {
+  const b = document.body;
+  if (isPhone()) {
+    const same = localStorage.getItem('mobomap.tab') === id;
+    b.classList.toggle('sheet-open', !(same && b.classList.contains('sheet-open')));
+    b.classList.remove('more-open');
+  }
+  setTab(id);
+}
+// the header's other buttons, folded behind ⋯ on a phone
+function toggleMore(e) {
+  e.stopPropagation();
+  document.body.classList.toggle('more-open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('header .btns')) document.body.classList.remove('more-open');
+});
+
 // ---- export menu ----
 function toggleExportMenu(e) {
   e.stopPropagation();
