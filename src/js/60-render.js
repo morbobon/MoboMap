@@ -142,6 +142,9 @@ function render(target) {
   const FR = `filterUnits="userSpaceOnUse" x="-50" y="-50" width="${W + 100}" height="${H + 100}"`;
   let defs = `<defs>
   <filter id="glow" ${FR}><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="hlshadow" ${FR}><feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="${dark ? 0.75 : 0.45}"/></filter>
+  <filter id="hlinset" ${FR}><feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur stdDeviation="3"/><feOffset dx="1.5" dy="3" result="ob"/><feFlood flood-color="#000" flood-opacity="${dark ? 0.85 : 0.6}"/><feComposite in2="ob" operator="in"/><feComposite in2="SourceAlpha" operator="in" result="sh"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/></feMerge></filter>
+  <filter id="hlbevel" ${FR}><feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="b"/><feSpecularLighting in="b" surfaceScale="4" specularConstant=".8" specularExponent="16" lighting-color="#fff" result="s"><feDistantLight azimuth="225" elevation="42"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/><feDiffuseLighting in="b" surfaceScale="4" diffuseConstant="1" lighting-color="#fff" result="d"><feDistantLight azimuth="225" elevation="42"/></feDiffuseLighting><feComposite in="d" in2="SourceAlpha" operator="in" result="d2"/><feBlend in="SourceGraphic" in2="d2" mode="multiply" result="lit"/><feComposite in="lit" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".6" k4="0"/></filter>
   <filter id="emboss" ${FR}><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="${dark ? 0.7 : 0.4}"/><feDropShadow dx="-1" dy="-1" stdDeviation="0.6" flood-color="#fff" flood-opacity="0.5"/></filter>
   <filter id="paper" ${FR}><feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.22"/></filter>
   <filter id="neonf" ${FR}><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -186,7 +189,8 @@ function render(target) {
       base = g.hl.has('fill') ? c : g.hl.has('tint') ? mix(baseLand, c, 0.5) : baseLand,
       lineCol = g.hl.has('fill') ? onCol(c) : c;
     defs += `<pattern id="hatch${i}" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="${base}"/><line x1="0" y1="0" x2="0" y2="9" stroke="${lineCol}" stroke-width="3" stroke-opacity=".85"/></pattern>
-  <pattern id="dots${i}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="4" cy="4" r="2.2" fill="${lineCol}" fill-opacity=".9"/></pattern>`;
+  <pattern id="dots${i}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="4" cy="4" r="2.2" fill="${lineCol}" fill-opacity=".9"/></pattern>
+  <pattern id="cross${i}" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="${base}"/><path d="M0 0V9M0 0H9" stroke="${lineCol}" stroke-width="2" stroke-opacity=".85"/></pattern>`;
   });
   defs += fxDefs() + '</defs>';
   // the area the sheet covers, in content coordinates (larger than W x H inside a frame)
@@ -305,8 +309,7 @@ function render(target) {
   const strokeBase = st === 'silhouette' ? 'none' : stroke;
   out += `<g id="unsel"${st === 'paper' ? ' filter="url(#paper)"' : sp.filter ? ' filter="url(#' + sp.filter + ')"' : ''}>`;
   // a faded group shows the map through it: its units get their normal land fill here, under relief and land fx
-  const clearHL = (hl) =>
-    sp.pixel || (st === 'outline' && !hl.has('fill') && !hl.has('hatch') && !hl.has('dots') && !hl.has('tint'));
+  const clearHL = (hl) => sp.pixel || (st === 'outline' && !HL_FILLS.some((m) => hl.has(m)));
   const faded = (g) => (g.op ?? 1) < 1 && !clearHL(g.hl);
   for (const g of groups.filter(faded))
     for (const c of g.sel) {
@@ -486,8 +489,10 @@ function render(target) {
       hl = g.hl;
     // a subgroup lying on its supergroup's fill does not need borders that set it off from the land
     const sup = g.parent && groupById(g.parent);
-    const onFill = !!sup && ['fill', 'tint', 'hatch', 'dots'].some((m) => sup.hl.has(m));
-    out += `<g id="g${gi}">`;
+    const onFill = !!sup && HL_FILLS.some((m) => sup.hl.has(m));
+    // 3D block: every area's sides first, then the tops, so a neighbour's side never covers a top
+    let sides = '',
+      body = '';
     for (const c of g.sel) {
       const k = GEO.units.find((k) => k.c === c);
       if (!k) continue;
@@ -500,12 +505,12 @@ function render(target) {
               0.5,
             )
           : baseFill(k);
-      if (hl.has('hatch')) fill = `url(#hatch${gi})`;
-      else if (hl.has('dots')) fill = `url(#dots${gi})`;
+      const pat = HL_PATTERNS.find((m) => hl.has(m));
+      if (pat) fill = `url(#${pat}${gi})`;
       let strk = strokeBase,
         sw = swBase;
       if (hl.has('outline') && !g.sup) {
-        strk = hl.has('fill') && !hl.has('hatch') && !hl.has('dots') ? onCol(col) : col;
+        strk = hl.has('fill') ? onCol(col) : col;
         sw = 3.2;
       } else if (g.sup) {
         // a supergroup's outline goes round its whole area, below; inside it the ordinary borders
@@ -513,6 +518,18 @@ function render(target) {
         // stands out from the fill and from the ordinary borders
         strk = readable([ds.accent, D.colors.accent2, onCol(col)], isHex(strokeBase) ? [col, strokeBase] : [col], 2);
         sw = Math.max(swBase + 1.4, 2.4);
+      }
+      // dashed: the border dashed in the group colour (on a solid fill in the colour that reads on it)
+      let dash = '';
+      if (hl.has('dashed')) {
+        strk = hl.has('fill') ? onCol(col) : col;
+        sw = Math.max(sw, 2.6);
+        dash = 'stroke-dasharray="7 4"';
+      }
+      if (hl.has('block')) {
+        const side = mix(isHex(fill) ? fill : isHex(col) ? col : '#888888', '#000000', 0.45);
+        for (let n = 7; n >= 1; n--)
+          sides += `<path d="${kp(k, det)}" transform="translate(${(n * 0.7).toFixed(1)},${(n * 1.1).toFixed(1)})" fill="${side}" stroke="${mix(side, '#000000', 0.2)}" stroke-width=".6" pointer-events="none"/>`;
       }
       const tr = hl.has('emboss') ? 'transform="translate(0,-6)"' : '';
       const f = hl.has('emboss') ? 'filter="url(#emboss)"' : '';
@@ -523,9 +540,13 @@ function render(target) {
         : faded(g)
           ? `fill-opacity="${fill === baseFill(k) ? 0 : op}"`
           : '';
-      out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
+      body += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${dash} ${f}/></g>`;
     }
-    out += '</g>';
+    // shadow, pressed and bevel shade the group's whole area at once
+    const fx = HL_GROUP_FX.filter((m) => hl.has(m));
+    let inner = sides + body;
+    for (const m of fx) inner = `<g filter="url(#hl${m})">${inner}</g>`;
+    out += `<g id="g${gi}">${inner}</g>`;
   });
   // supergroup outlines: around the outer edge of the whole area, on top of its subgroups. A stroke twice the
   // width, masked by the area itself, leaves only its outer half: borders inside the area disappear.
@@ -803,15 +824,13 @@ function render(target) {
     const items = [],
       apart = [];
     const row = (g, ind) => ({
-      sw: g.hl.has('hatch')
-        ? `url(#hatch${groups.indexOf(g)})`
-        : g.hl.has('dots')
-          ? `url(#dots${groups.indexOf(g)})`
-          : g.hl.has('fill')
-            ? g.color
-            : g.hl.has('tint')
-              ? mix(baseLand, g.color, 0.5)
-              : baseLand,
+      sw: HL_PATTERNS.some((m) => g.hl.has(m))
+        ? `url(#${HL_PATTERNS.find((m) => g.hl.has(m))}${groups.indexOf(g)})`
+        : g.hl.has('fill')
+          ? g.color
+          : g.hl.has('tint')
+            ? mix(baseLand, g.color, 0.5)
+            : baseLand,
       stroke: g.hl.has('outline') && !g.hl.has('fill') ? g.color : ink,
       sw2: g.hl.has('outline') ? 2 : 0.6,
       label: g.name + ' (' + g.sel.size + ')',

@@ -129,9 +129,11 @@ function ui() {
   const swatch = (g) =>
     g.hl.has('hatch')
       ? `repeating-linear-gradient(45deg,${g.color} 0 3px,transparent 3px 6px)`
-      : g.hl.has('fill') || g.hl.has('tint') || g.hl.has('dots')
-        ? g.color
-        : 'transparent';
+      : g.hl.has('cross')
+        ? `repeating-linear-gradient(45deg,${g.color} 0 2px,transparent 2px 6px),repeating-linear-gradient(-45deg,${g.color} 0 2px,transparent 2px 6px)`
+        : g.hl.has('fill') || g.hl.has('tint') || g.hl.has('dots')
+          ? g.color
+          : 'transparent';
   const removeBtn = (i) =>
     `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>`;
   const onBox = (g, i) =>
@@ -218,8 +220,7 @@ function toggleHL(i, id) {
     else return toast(t('ts_min_one'));
   } else {
     g.hl.add(id);
-    const ex = ['fill', 'hatch', 'dots', 'tint'];
-    if (ex.includes(id)) ex.filter((x) => x !== id).forEach((x) => g.hl.delete(x));
+    if (HL_FILLS.includes(id)) HL_FILLS.filter((x) => x !== id).forEach((x) => g.hl.delete(x));
   }
   ui();
   render();
