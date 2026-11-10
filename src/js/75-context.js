@@ -66,7 +66,7 @@ function ctxItems(target) {
     title = document.getElementById(key).value || t('sec_text');
     add(t('sec_text'), () => jumpTo('#' + key));
   } else if (key === 'legend') {
-    title = t('show_legend');
+    title = t('ctx_legend');
     add(t('sec_pageel'), () => jumpTo('#legend'));
   } else if (key === 'logo') {
     title = t('sec_logo');
@@ -102,7 +102,7 @@ function showCtx(target, cx, cy) {
   const { title, items } = ctxItems(target);
   const m = document.getElementById('ctx');
   m.innerHTML =
-    `<div class="ctxhd">${esc(title)}</div>` +
+    `<button class="ctxhd" data-i="0">${esc(title)}</button>` +
     items.map((it, i) => `<button data-i="${i}"${i ? '' : ' class="first"'}>${esc(it.label)}</button>`).join('') +
     `<div class="ctxhint">${esc(t('ctx_shift'))}</div>`;
   m._items = items;

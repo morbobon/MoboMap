@@ -568,7 +568,8 @@
   "ctx_out": "Zoom out",
   "ctx_reset_one": "Move back to its place",
   "ctx_shift": "Shift+click opens the first entry directly",
-  "tip_shift": "Shift+click: settings · right-click: menu"
+  "tip_shift": "Shift+click: settings · right-click: menu",
+  "ctx_legend": "Legend"
  },
  "da": {
   "yes": "Ja",
@@ -1139,7 +1140,8 @@
   "ctx_out": "Zoom ud",
   "ctx_reset_one": "Flyt tilbage på plads",
   "ctx_shift": "Shift+klik åbner det første punkt direkte",
-  "tip_shift": "Shift+klik: indstillinger · højreklik: menu"
+  "tip_shift": "Shift+klik: indstillinger · højreklik: menu",
+  "ctx_legend": "Signaturforklaring"
  },
  "de": {
   "yes": "Ja",
@@ -1710,7 +1712,8 @@
   "ctx_out": "Herauszoomen",
   "ctx_reset_one": "An seinen Platz zurück",
   "ctx_shift": "Umschalt+Klick öffnet den ersten Eintrag direkt",
-  "tip_shift": "Umschalt+Klick: Einstellungen · Rechtsklick: Menü"
+  "tip_shift": "Umschalt+Klick: Einstellungen · Rechtsklick: Menü",
+  "ctx_legend": "Legende"
  },
  "fr": {
   "yes": "Oui",
@@ -2281,7 +2284,8 @@
   "ctx_out": "Dézoomer",
   "ctx_reset_one": "Remettre à sa place",
   "ctx_shift": "Maj+clic ouvre directement la première entrée",
-  "tip_shift": "Maj+clic : réglages · clic droit : menu"
+  "tip_shift": "Maj+clic : réglages · clic droit : menu",
+  "ctx_legend": "Légende"
  },
  "es": {
   "yes": "Sí",
@@ -2852,7 +2856,8 @@
   "ctx_out": "Alejar",
   "ctx_reset_one": "Volver a su sitio",
   "ctx_shift": "Mayús+clic abre directamente la primera opción",
-  "tip_shift": "Mayús+clic: ajustes · clic derecho: menú"
+  "tip_shift": "Mayús+clic: ajustes · clic derecho: menú",
+  "ctx_legend": "Leyenda"
  },
  "sv": {
   "yes": "Ja",
@@ -3423,7 +3428,8 @@
   "ctx_out": "Zooma ut",
   "ctx_reset_one": "Flytta tillbaka",
   "ctx_shift": "Skift+klick öppnar första raden direkt",
-  "tip_shift": "Skift+klick: inställningar · högerklick: meny"
+  "tip_shift": "Skift+klick: inställningar · högerklick: meny",
+  "ctx_legend": "Teckenförklaring"
  },
  "no": {
   "yes": "Ja",
@@ -3994,7 +4000,8 @@
   "ctx_out": "Zoom ut",
   "ctx_reset_one": "Flytt tilbake på plass",
   "ctx_shift": "Shift+klikk åpner det første punktet direkte",
-  "tip_shift": "Shift+klikk: innstillinger · høyreklikk: meny"
+  "tip_shift": "Shift+klikk: innstillinger · høyreklikk: meny",
+  "ctx_legend": "Tegnforklaring"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4565,7 +4572,8 @@
   "ctx_out": "Loitonna",
   "ctx_reset_one": "Palauta paikalleen",
   "ctx_shift": "Vaihto+napsautus avaa ensimmäisen kohdan suoraan",
-  "tip_shift": "Vaihto+napsautus: asetukset · oikea napsautus: valikko"
+  "tip_shift": "Vaihto+napsautus: asetukset · oikea napsautus: valikko",
+  "ctx_legend": "Selite"
  },
  "nl": {
   "yes": "Ja",
@@ -5136,7 +5144,8 @@
   "ctx_out": "Uitzoomen",
   "ctx_reset_one": "Terug op zijn plaats",
   "ctx_shift": "Shift+klik opent direct het eerste item",
-  "tip_shift": "Shift+klik: instellingen · rechtsklik: menu"
+  "tip_shift": "Shift+klik: instellingen · rechtsklik: menu",
+  "ctx_legend": "Legenda"
  },
  "it": {
   "yes": "Sì",
@@ -5707,7 +5716,8 @@
   "ctx_out": "Riduci",
   "ctx_reset_one": "Rimetti al suo posto",
   "ctx_shift": "Maiusc+clic apre direttamente la prima voce",
-  "tip_shift": "Maiusc+clic: impostazioni · clic destro: menu"
+  "tip_shift": "Maiusc+clic: impostazioni · clic destro: menu",
+  "ctx_legend": "Legenda"
  },
  "tr": {
   "yes": "Evet",
@@ -6278,6 +6288,7 @@
   "ctx_out": "Uzaklaştır",
   "ctx_reset_one": "Yerine geri koy",
   "ctx_shift": "Shift+tık ilk öğeyi doğrudan açar",
-  "tip_shift": "Shift+tık: ayarlar · sağ tık: menü"
+  "tip_shift": "Shift+tık: ayarlar · sağ tık: menü",
+  "ctx_legend": "Gösterge"
  }
 }

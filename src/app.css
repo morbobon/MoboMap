@@ -1299,6 +1299,10 @@ header h1 a.home {
     padding: 8px;
     gap: 8px;
   }
+  /* tile grids fit the sheet's width (no sideways scrolling) */
+  .grid4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
   /* the map moves up, clear of the sheet */
   body.sheet-open .stage {
     justify-content: flex-start;
@@ -1399,10 +1403,22 @@ header h1 a.home {
   border-radius: 10px;
   box-shadow: 0 14px 36px #0005;
 }
+/* the item's name: a heading (clicking it does the first entry, its own settings) */
 #ctx .ctxhd {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mute);
   padding: 6px 8px 4px;
+  min-height: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  margin-bottom: 4px;
+}
+#ctx .ctxhd:hover {
+  background: none;
+  color: var(--ink);
 }
 #ctx button {
   display: block;
