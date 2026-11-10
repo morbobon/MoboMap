@@ -11,7 +11,10 @@ function render(target) {
   fxLayout();
   const D = DS[S.ds],
     st = S.style,
-    det = document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
+    det =
+      GEO.mid && S.zoom.k > MID_ZOOM && !zoomMoving
+        ? 2
+        : document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
     all = document.getElementById('labels').checked;
   const ds = Object.assign({ head: D.fonts.heading, body: D.fonts.body }, D.colors);
   let sp = SP[st] || {};
@@ -387,11 +390,11 @@ function render(target) {
     !guard || regWorst(rlOrig, 0.8) >= 2 ? rlOrig : readable([rlOrig, ink, '#222222', '#ffffff'], regBgs, 2, 0.8);
   const rlCasing = guard && regWorst(rlCol, 0.8) < 2;
   if (sp.regionLines) {
-    const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
+    const rl = rlPath(det);
     out += `<path d="${rl}" fill="none" stroke="${ink}" stroke-width="1.4" stroke-dasharray="6 3" pointer-events="none" opacity=".7"/>`;
   }
   if (sp.dotted) {
-    const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
+    const rl = rlPath(det);
     out += `<path d="${rl}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`;
   }
   if (sp.text) {
@@ -444,7 +447,7 @@ function render(target) {
     out += '</g>';
   }
   if (st === 'atlas' || st === 'regions') {
-    const rl = cache['rl' + det] || (cache['rl' + det] = pathLines(det ? GEO.rlines.d : GEO.rlines.s));
+    const rl = rlPath(det);
     if (rlCasing)
       out += `<path d="${rl}" fill="none" stroke="${light(rlCol) ? '#000000' : '#ffffff'}" stroke-opacity=".45" stroke-width="2.6" pointer-events="none"/>`;
     out += `<path d="${rl}" fill="none" stroke="${rlCol}" stroke-width="1.2" stroke-dasharray="5 3" pointer-events="none" opacity=".8"/>`;

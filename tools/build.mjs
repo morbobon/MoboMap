@@ -383,6 +383,16 @@ const adm1 = {};
         r: c.rlines.length ? enc(linesOfGeo(c.rlines)) : '',
       };
     }
+    // Middle world detail level (tools/prepare-world-mid.mjs): country outlines are the adm1 land above,
+    // plus the land outline, continent lines and the rings adm1 lacks, in the same encoding
+    if (fs.existsSync(A('geo/wland_mid.json'))) {
+      const x = readJSON('geo/wextra_mid.json');
+      world.mid = {
+        l: enc(geoms(readJSON('geo/wland_mid.json')).flatMap(ringsOfGeo)),
+        r: enc(linesOfGeo(geoms(readJSON('geo/wregionlines_mid.json')))),
+        x: Object.fromEntries(Object.entries(x).map(([iso, gs]) => [iso, enc(gs.flatMap(ringsOfGeo))])),
+      };
+    }
   }
 }
 // Elevation contours for the terrain relief (tools/prepare-elevation.mjs)

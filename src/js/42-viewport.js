@@ -106,14 +106,27 @@ const P = (x, y, ins) => {
   }
   return [x * sc + ox, y * sc + oy];
 };
-function pathOf(rings, ins) {
+// cull: leave out rings well outside the page (the middle level zoomed in: most of the world is off-page)
+function pathOf(rings, ins, cull) {
+  const m = Math.max(W, H) / 2;
   let s = '';
   for (const r of rings) {
+    let p = '',
+      x0 = Infinity,
+      y0 = Infinity,
+      x1 = -Infinity,
+      y1 = -Infinity;
     for (let i = 0; i < r.length; i += 2) {
       const [x, y] = P(r[i], r[i + 1], ins);
-      s += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+      p += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+      if (cull) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
     }
-    s += 'Z';
+    if (!cull || (x1 > -m && x0 < W + m && y1 > -m && y0 < H + m)) s += p + 'Z';
   }
   return s;
 }
@@ -128,15 +141,34 @@ function pathLines(ls) {
   return s;
 }
 const isBH = (k) => !!insOf(k);
+const MID_ZOOM = 3; // world map zoom above which the middle detail level is drawn
+// true while the user wheels or drags: the faster level is drawn until the view settles (zoomChanged)
+let zoomMoving = false;
+// Detail levels: 0 simple, 1 detail, 2 middle (world map zoomed in: admin-1 country outlines, decoded on
+// first use; see tools/prepare-world-mid.mjs)
+function ringsAt(k, det) {
+  if (det !== 2) return det ? k.d : k.s;
+  if (!k.m) {
+    const a = DATA.adm1[k.c];
+    k.m = [...decRings(a && a.l), ...decRings(GEO.mid.x[k.c])];
+    if (!k.m.length) k.m = k.d;
+  }
+  return k.m;
+}
 function kp(k, det) {
-  const key = k.c + (det ? 'd' : 's');
-  return cache[key] || (cache[key] = pathOf(det ? k.d : k.s, insOf(k)));
+  const key = k.c + (det === 2 ? 'm' : det ? 'd' : 's');
+  return cache[key] || (cache[key] = pathOf(ringsAt(k, det), insOf(k), det === 2));
 }
 function kc(k) {
   return P(k.p[0], k.p[1], insOf(k));
 }
 function landPath(det) {
-  return cache['land' + det] || (cache['land' + det] = pathOf(det ? GEO.land.d : GEO.land.s, false));
+  const m = det === 2 && (GEO.mid.land ||= decRings(GEO.mid.l));
+  return cache['land' + det] || (cache['land' + det] = pathOf(m || (det ? GEO.land.d : GEO.land.s), false, !!m));
+}
+function rlPath(det) {
+  const m = det === 2 && (GEO.mid.rl ||= decRings(GEO.mid.r));
+  return cache['rl' + det] || (cache['rl' + det] = pathLines(m || (det ? GEO.rlines.d : GEO.rlines.s)));
 }
 const bhRect = () => {
   const [a, b] = P(I.box[0], I.box[1]),

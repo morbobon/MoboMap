@@ -18,19 +18,33 @@ function reliefPath(i) {
   const key = 'elev' + i + '|' + S.focus;
   if (cache[key] != null) return cache[key];
   const win = reliefWindow();
+  // the zoomed-in world view: leave out rings well outside the page, as pathOf does
+  const cull = !win && S.zoom.k > 1,
+    m = Math.max(W, H) / 2;
   let d = '';
   for (const { r, b } of elevRings(i)) {
     if (win && (b[2] < win[0] || b[0] > win[2] || b[3] < win[1] || b[1] > win[3])) continue;
+    let p = '',
+      x0 = Infinity,
+      y0 = Infinity,
+      x1 = -Infinity,
+      y1 = -Infinity;
     for (let j = 0; j < r.length; j += 2) {
       // long segments (e.g. along the map edge) are densified so they follow the projection's curve
       const n = j ? Math.min(40, Math.ceil(Math.hypot(r[j] - r[j - 2], r[j + 1] - r[j - 1]) / 2)) : 1;
       for (let s = n - 1; s >= 0; s--) {
         const f = s / n;
         const [x, y] = worldPt(r[j] - (r[j] - (r[j - 2] ?? 0)) * f, r[j + 1] - (r[j + 1] - (r[j - 1] ?? 0)) * f);
-        d += (j || s < n - 1 ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        p += (j || s < n - 1 ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        if (cull) {
+          if (x < x0) x0 = x;
+          if (x > x1) x1 = x;
+          if (y < y0) y0 = y;
+          if (y > y1) y1 = y;
+        }
       }
     }
-    d += 'Z';
+    if (!cull || (x1 > -m && x0 < W + m && y1 > -m && y0 < H + m)) d += p + 'Z';
   }
   return (cache[key] = d);
 }

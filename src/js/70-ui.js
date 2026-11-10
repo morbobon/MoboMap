@@ -394,10 +394,18 @@ function svgPoint(e) {
   if (!r.width || !r.height) return [W / 2, H / 2];
   return fxToContent([((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H]);
 }
-let zoomRaf = 0;
+let zoomRaf = 0,
+  zoomIdle = 0;
 function zoomChanged() {
   const z = S.zoom;
   document.getElementById('wrap').classList.toggle('zoomed', z.k !== 1 || !!z.x || !!z.y);
+  // the middle detail level only once the view has settled
+  zoomMoving = true;
+  clearTimeout(zoomIdle);
+  zoomIdle = setTimeout(() => {
+    zoomMoving = false;
+    if (GEO.mid && S.zoom.k > MID_ZOOM) render();
+  }, 180);
   if (!zoomRaf)
     zoomRaf = requestAnimationFrame(() => {
       zoomRaf = 0;
