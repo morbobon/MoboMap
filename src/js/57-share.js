@@ -87,8 +87,8 @@ function shareParams() {
   const b = document.body;
   if (b.classList.contains('no-panel') !== DEFAULT_CHROME.panel)
     q.set('hp', b.classList.contains('no-panel') ? '1' : '0');
-  if (b.classList.contains('no-strip') !== DEFAULT_CHROME.strip)
-    q.set('hs', b.classList.contains('no-strip') ? '1' : '0');
+  const hs = b.classList.contains('strip-min') ? '2' : b.classList.contains('no-strip') ? '1' : '0';
+  if (hs !== (DEFAULT_CHROME.strip ? '1' : '0')) q.set('hs', hs);
   if (b.classList.contains('fs')) q.set('full', '1');
   const dsFooter = DS[p.designSystem] ? loc(DS[p.designSystem].footer.label) : '';
   if (p.footerLabel && p.footerLabel !== dsFooter) q.set('ft', p.footerLabel);

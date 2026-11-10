@@ -595,7 +595,8 @@
   "city_min": "Cities",
   "city_min_t": "Which cities to show: the major ones, or every city above a population (below 50,000 only in Denmark)",
   "city_major": "Major",
-  "cities_src": "Cities: GeoNames (CC BY 4.0)"
+  "cities_src": "Cities: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Hide the looks completely (one button brings them back)"
  },
  "da": {
   "yes": "Ja",
@@ -1193,7 +1194,8 @@
   "city_min": "Byer",
   "city_min_t": "Hvilke byer der vises: de største, eller alle byer over et indbyggertal (under 50.000 kun i Danmark)",
   "city_major": "Største",
-  "cities_src": "Byer: GeoNames (CC BY 4.0)"
+  "cities_src": "Byer: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Skjul looks helt (én knap henter dem tilbage)"
  },
  "de": {
   "yes": "Ja",
@@ -1791,7 +1793,8 @@
   "city_min": "Städte",
   "city_min_t": "Welche Städte erscheinen: die größten oder alle ab einer Einwohnerzahl (unter 50.000 nur in Dänemark)",
   "city_major": "Größte",
-  "cities_src": "Städte: GeoNames (CC BY 4.0)"
+  "cities_src": "Städte: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Looks ganz ausblenden (eine Schaltfläche holt sie zurück)"
  },
  "fr": {
   "yes": "Oui",
@@ -2389,7 +2392,8 @@
   "city_min": "Villes",
   "city_min_t": "Quelles villes afficher : les principales, ou toutes au-dessus d'une population (sous 50 000 seulement au Danemark)",
   "city_major": "Principales",
-  "cities_src": "Villes : GeoNames (CC BY 4.0)"
+  "cities_src": "Villes : GeoNames (CC BY 4.0)",
+  "strip_min_t": "Masquer complètement les styles (un bouton les fait revenir)"
  },
  "es": {
   "yes": "Sí",
@@ -2987,7 +2991,8 @@
   "city_min": "Ciudades",
   "city_min_t": "Qué ciudades mostrar: las principales o todas por encima de una población (por debajo de 50.000 solo en Dinamarca)",
   "city_major": "Principales",
-  "cities_src": "Ciudades: GeoNames (CC BY 4.0)"
+  "cities_src": "Ciudades: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Ocultar los estilos por completo (un botón los recupera)"
  },
  "sv": {
   "yes": "Ja",
@@ -3585,7 +3590,8 @@
   "city_min": "Städer",
   "city_min_t": "Vilka städer som visas: de största, eller alla över ett invånarantal (under 50 000 bara i Danmark)",
   "city_major": "Största",
-  "cities_src": "Städer: GeoNames (CC BY 4.0)"
+  "cities_src": "Städer: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Dölj looks helt (en knapp tar tillbaka dem)"
  },
  "no": {
   "yes": "Ja",
@@ -4183,7 +4189,8 @@
   "city_min": "Byer",
   "city_min_t": "Hvilke byer som vises: de største, eller alle over et innbyggertall (under 50 000 bare i Danmark)",
   "city_major": "Største",
-  "cities_src": "Byer: GeoNames (CC BY 4.0)"
+  "cities_src": "Byer: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Skjul looks helt (én knapp henter dem tilbake)"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4781,7 +4788,8 @@
   "city_min": "Kaupungit",
   "city_min_t": "Mitkä kaupungit näytetään: suurimmat tai kaikki tietyn asukasluvun ylittävät (alle 50 000 vain Tanskassa)",
   "city_major": "Suurimmat",
-  "cities_src": "Kaupungit: GeoNames (CC BY 4.0)"
+  "cities_src": "Kaupungit: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Piilota tyylit kokonaan (yksi painike palauttaa ne)"
  },
  "nl": {
   "yes": "Ja",
@@ -5379,7 +5387,8 @@
   "city_min": "Steden",
   "city_min_t": "Welke steden: de grootste, of alle steden boven een inwonertal (onder 50.000 alleen in Denemarken)",
   "city_major": "Grootste",
-  "cities_src": "Steden: GeoNames (CC BY 4.0)"
+  "cities_src": "Steden: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Looks helemaal verbergen (één knop haalt ze terug)"
  },
  "it": {
   "yes": "Sì",
@@ -5977,7 +5986,8 @@
   "city_min": "Città",
   "city_min_t": "Quali città mostrare: le principali o tutte sopra una popolazione (sotto 50.000 solo in Danimarca)",
   "city_major": "Principali",
-  "cities_src": "Città: GeoNames (CC BY 4.0)"
+  "cities_src": "Città: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Nascondi del tutto gli stili (un pulsante li riporta)"
  },
  "tr": {
   "yes": "Evet",
@@ -6575,6 +6585,7 @@
   "city_min": "Şehirler",
   "city_min_t": "Hangi şehirler gösterilir: büyükler veya belirli nüfusun üzerindekiler (50.000 altı yalnızca Danimarka)",
   "city_major": "Büyükler",
-  "cities_src": "Şehirler: GeoNames (CC BY 4.0)"
+  "cities_src": "Şehirler: GeoNames (CC BY 4.0)",
+  "strip_min_t": "Görünümleri tamamen gizle (bir düğme geri getirir)"
  }
 }

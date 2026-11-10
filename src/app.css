@@ -846,6 +846,9 @@ body {
 body.no-strip {
   --chrome: 160px;
 }
+body.strip-min {
+  --chrome: 120px;
+}
 body.no-panel aside,
 body.fs header,
 body.fs aside,
@@ -1001,7 +1004,9 @@ header .btns {
   flex: 1;
   min-width: 0;
 }
-.striphide {
+.striphide,
+.stripmin,
+.stripshow {
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--ink);
@@ -1012,11 +1017,32 @@ header .btns {
   opacity: 0.75;
 }
 .striphide:hover,
+.stripmin:hover,
+.stripshow:hover,
 .rail .railhide:hover {
   opacity: 1;
 }
-body.fs .looksbar {
+body.fs .looksbar,
+body.strip-min .looksbar {
   display: none;
+}
+/* the strip's second fold (names → nothing but a button) and that button */
+.stripmin,
+.stripshow {
+  display: none;
+}
+body.no-strip:not(.strip-min) .stripmin {
+  display: block;
+}
+.stripshow {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+body.strip-min:not(.fs) .stripshow {
+  display: block;
 }
 /* folded: the panel leaves its icon rail (« turns »), the looks strip a slim row of names (︾ turns ︽) */
 body.no-panel .rail .railhide,
@@ -1302,7 +1328,8 @@ header h1 a.home {
   body.sheet-open .stage {
     justify-content: flex-start;
   }
-  .looksbar {
+  .looksbar,
+  .stripshow {
     display: none !important;
   }
   #tip {

@@ -110,7 +110,7 @@ const stripOpen = () => !document.body.classList.contains('no-strip');
 // open or folded (names only), and only when its buttons changed (not on every redraw of the map)
 function renderLooks() {
   const el = document.getElementById('looks');
-  if (!el || document.body.classList.contains('fs')) return;
+  if (!el || document.body.classList.contains('fs') || document.body.classList.contains('strip-min')) return;
   const dice = `<button class="look rnd ${S.fx.preset === 'random' ? 'on' : ''}" onclick="randomLook()" title="${esc(t('look_random_t'))}"><span class="lthumb">🎲</span><span class="lname">${esc(t('look_random'))}</span></button>`;
   const html =
     allLooks()
@@ -323,13 +323,13 @@ function chromeState() {
     return {};
   }
 }
-// ?hp=1 hides the side panel, ?hs=1 the looks strip, ?full=1 shows only the map
+// ?hp=1 hides the side panel, ?hs=1 folds the looks strip to its names (hs=2: to one button), ?full=1 shows only the map
 function chromeFromUrl(search) {
   const q = new URLSearchParams(search || '');
   if (q.has('hp') || q.has('hs'))
     CHROME_LINK = {
       panel: q.has('hp') ? q.get('hp') === '1' : DEFAULT_CHROME.panel,
-      strip: q.has('hs') ? q.get('hs') === '1' : DEFAULT_CHROME.strip,
+      strip: q.has('hs') ? { 1: true, 2: 'min' }[q.get('hs')] || false : DEFAULT_CHROME.strip,
     };
   if (q.get('full') === '1') document.body.classList.add('fs');
 }
@@ -337,16 +337,21 @@ function applyChrome() {
   const c = chromeState(),
     b = document.body;
   b.classList.toggle('no-panel', !!c.panel);
+  // the looks strip: false = open, true = a row of names, 'min' = only a button to bring it back
   b.classList.toggle('no-strip', !!c.strip);
+  b.classList.toggle('strip-min', c.strip === 'min');
   document.getElementById('panelBtn').classList.toggle('on', !c.panel);
   document.getElementById('stripBtn').classList.toggle('on', !c.strip);
   // (not during start-up: the address bar is written once the project is loaded)
   if (typeof syncUrl === 'function' && HIST.list.length) syncUrl();
 }
-// what: 'panel' | 'strip' – the stored value is "hidden"
+// what: 'panel' | 'strip' – the stored value is "hidden" (folded strip: its names)
 function toggleChrome(what) {
+  setChrome(what, !chromeState()[what]);
+}
+function setChrome(what, v) {
   const c = chromeState();
-  c[what] = !c[what];
+  c[what] = v;
   CHROME_LINK = null;
   localStorage.setItem(CHROME_KEY, JSON.stringify(c));
   applyChrome();
