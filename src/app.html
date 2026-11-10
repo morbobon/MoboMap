@@ -29,12 +29,28 @@
       </div>
       <div class="btns">
         <select id="ds" class="hdr" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
-        <button id="undoBtn" class="hdr" onclick="undo()" data-i18n-title="undo">↶</button>
-        <button id="redoBtn" class="hdr" onclick="redo()" data-i18n-title="redo">↷</button>
-        <button id="shareBtn" class="hdr" onclick="shareLink()" data-i18n-title="share_link">🔗</button>
+        <button id="undoBtn" class="hdr" data-i18n-label="lbl_undo" onclick="undo()" data-i18n-title="undo">↶</button>
+        <button id="redoBtn" class="hdr" data-i18n-label="lbl_redo" onclick="redo()" data-i18n-title="redo">↷</button>
+        <button
+          id="shareBtn"
+          class="hdr"
+          data-i18n-label="lbl_share"
+          onclick="shareLink()"
+          data-i18n-title="share_link"
+        >
+          🔗
+        </button>
         <button id="panelBtn" class="hdr" onclick="toggleChrome('panel')" data-i18n-title="toggle_panel">◧</button>
         <button id="stripBtn" class="hdr" onclick="toggleChrome('strip')" data-i18n-title="toggle_strip">⬓</button>
-        <button id="fsBtn" class="hdr" onclick="toggleFullscreen()" data-i18n-title="fullscreen">⛶</button>
+        <button
+          id="fsBtn"
+          class="hdr"
+          data-i18n-label="lbl_fullscreen"
+          onclick="toggleFullscreen()"
+          data-i18n-title="fullscreen"
+        >
+          ⛶
+        </button>
         <select id="uiStyle" class="hdr" onchange="setUiStyle(this.value)" data-i18n-title="ui_style"></select>
         <button id="uiMode" class="hdr" onclick="cycleUiMode()"></button>
         <select

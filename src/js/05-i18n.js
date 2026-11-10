@@ -37,6 +37,10 @@ function setLang(l, silent) {
   document.querySelectorAll('[data-i18n-title]').forEach((e) => {
     e.title = t(e.dataset.i18nTitle);
   });
+  // short visible names for icon buttons where there is no hover (the phone menu)
+  document.querySelectorAll('[data-i18n-label]').forEach((e) => {
+    e.dataset.label = t(e.dataset.i18nLabel);
+  });
   // profile texts that the user has not edited follow the language
   const fl = document.getElementById('footerLabel');
   if (fl && fl.dataset.auto !== '0' && S.ds && DS[S.ds]) fl.value = loc(DS[S.ds].footer.label);

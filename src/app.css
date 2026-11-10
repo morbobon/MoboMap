@@ -1243,3 +1243,75 @@ header h1 a.home {
     max-width: 80vw;
   }
 }
+
+/* ---- touch screens: controls a finger can hit (about 40 px); a mouse keeps the compact sizes ---- */
+@media (pointer: coarse) {
+  button {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .chip,
+  .chip.sm {
+    min-height: 36px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+  }
+  .sw,
+  .sw.sm {
+    width: 34px;
+    height: 34px;
+  }
+  .grp input[type='color'] {
+    width: 40px !important;
+    height: 34px !important;
+  }
+  /* 16 px: phones zoom the page into smaller text fields on focus */
+  textarea,
+  input[type='text'],
+  input[type='url'],
+  select {
+    font-size: 16px;
+    min-height: 42px;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 22px;
+    height: 22px;
+  }
+  input[type='range'] {
+    height: 32px;
+  }
+  label.ck {
+    min-height: 40px;
+    font-size: 13.5px;
+  }
+  .grp .hd .x,
+  .grp .hd .fold,
+  .grp.compact .x {
+    min-width: 36px;
+  }
+}
+@media (max-width: 760px) {
+  /* the ⋯ menu: one button per row, its name next to the icon */
+  body.more-open header .btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  body.more-open header .btns > * {
+    width: 100%;
+    max-width: none !important;
+    justify-content: flex-start;
+    box-sizing: border-box;
+  }
+  body.more-open header #panelBtn,
+  body.more-open header #stripBtn,
+  body.more-open header #moreBtn {
+    display: none;
+  }
+  body.more-open header .btns > button[data-label]::after {
+    content: attr(data-label);
+    margin-left: 8px;
+    font-size: 13px;
+  }
+}

@@ -520,7 +520,16 @@
   "grp_opacity": "Opacity",
   "grp_opacity_t": "How solid the highlight colour is; borders stay solid",
   "grp_on_t": "Show this group on the map",
-  "more_t": "More"
+  "more_t": "More",
+  "lbl_undo": "Undo",
+  "lbl_redo": "Redo",
+  "lbl_share": "Share link",
+  "lbl_fullscreen": "Fullscreen",
+  "lay_phone": "Phone",
+  "tip_tap": "tap →",
+  "tip_dbl_open": "Double-tap: open regions",
+  "tip_dbl_out": "Double-tap: zoom out",
+  "tip_dbl_zoom": "Double-tap: zoom in"
  },
  "da": {
   "yes": "Ja",
@@ -1043,7 +1052,16 @@
   "grp_opacity": "Gennemsigtighed",
   "grp_opacity_t": "Hvor dækkende fremhævningsfarven er; grænser forbliver tydelige",
   "grp_on_t": "Vis gruppen på kortet",
-  "more_t": "Mere"
+  "more_t": "Mere",
+  "lbl_undo": "Fortryd",
+  "lbl_redo": "Gentag",
+  "lbl_share": "Del link",
+  "lbl_fullscreen": "Fuld skærm",
+  "lay_phone": "Telefon",
+  "tip_tap": "tryk →",
+  "tip_dbl_open": "Dobbelttryk: åbn regioner",
+  "tip_dbl_out": "Dobbelttryk: zoom ud",
+  "tip_dbl_zoom": "Dobbelttryk: zoom ind"
  },
  "de": {
   "yes": "Ja",
@@ -1566,7 +1584,16 @@
   "grp_opacity": "Deckkraft",
   "grp_opacity_t": "Wie deckend die Hervorhebungsfarbe ist; Grenzen bleiben kräftig",
   "grp_on_t": "Diese Gruppe auf der Karte zeigen",
-  "more_t": "Mehr"
+  "more_t": "Mehr",
+  "lbl_undo": "Rückgängig",
+  "lbl_redo": "Wiederholen",
+  "lbl_share": "Link teilen",
+  "lbl_fullscreen": "Vollbild",
+  "lay_phone": "Handy",
+  "tip_tap": "Tippen →",
+  "tip_dbl_open": "Doppeltippen: Regionen öffnen",
+  "tip_dbl_out": "Doppeltippen: herauszoomen",
+  "tip_dbl_zoom": "Doppeltippen: hineinzoomen"
  },
  "fr": {
   "yes": "Oui",
@@ -2089,7 +2116,16 @@
   "grp_opacity": "Opacité",
   "grp_opacity_t": "Opacité de la couleur de mise en évidence ; les frontières restent nettes",
   "grp_on_t": "Afficher ce groupe sur la carte",
-  "more_t": "Plus"
+  "more_t": "Plus",
+  "lbl_undo": "Annuler",
+  "lbl_redo": "Rétablir",
+  "lbl_share": "Partager le lien",
+  "lbl_fullscreen": "Plein écran",
+  "lay_phone": "Téléphone",
+  "tip_tap": "toucher →",
+  "tip_dbl_open": "Double toucher : ouvrir les régions",
+  "tip_dbl_out": "Double toucher : dézoomer",
+  "tip_dbl_zoom": "Double toucher : zoomer"
  },
  "es": {
   "yes": "Sí",
@@ -2612,7 +2648,16 @@
   "grp_opacity": "Opacidad",
   "grp_opacity_t": "Opacidad del color de resaltado; los bordes se mantienen sólidos",
   "grp_on_t": "Mostrar este grupo en el mapa",
-  "more_t": "Más"
+  "more_t": "Más",
+  "lbl_undo": "Deshacer",
+  "lbl_redo": "Rehacer",
+  "lbl_share": "Compartir enlace",
+  "lbl_fullscreen": "Pantalla completa",
+  "lay_phone": "Móvil",
+  "tip_tap": "tocar →",
+  "tip_dbl_open": "Doble toque: abrir regiones",
+  "tip_dbl_out": "Doble toque: alejar",
+  "tip_dbl_zoom": "Doble toque: acercar"
  },
  "sv": {
   "yes": "Ja",
@@ -3135,7 +3180,16 @@
   "grp_opacity": "Opacitet",
   "grp_opacity_t": "Hur täckande markeringsfärgen är; gränser förblir tydliga",
   "grp_on_t": "Visa gruppen på kartan",
-  "more_t": "Mer"
+  "more_t": "Mer",
+  "lbl_undo": "Ångra",
+  "lbl_redo": "Gör om",
+  "lbl_share": "Dela länk",
+  "lbl_fullscreen": "Helskärm",
+  "lay_phone": "Telefon",
+  "tip_tap": "tryck →",
+  "tip_dbl_open": "Dubbeltryck: öppna regioner",
+  "tip_dbl_out": "Dubbeltryck: zooma ut",
+  "tip_dbl_zoom": "Dubbeltryck: zooma in"
  },
  "no": {
   "yes": "Ja",
@@ -3658,7 +3712,16 @@
   "grp_opacity": "Dekkevne",
   "grp_opacity_t": "Hvor dekkende uthevingsfargen er; grenser forblir tydelige",
   "grp_on_t": "Vis gruppen på kartet",
-  "more_t": "Mer"
+  "more_t": "Mer",
+  "lbl_undo": "Angre",
+  "lbl_redo": "Gjør om",
+  "lbl_share": "Del lenke",
+  "lbl_fullscreen": "Fullskjerm",
+  "lay_phone": "Telefon",
+  "tip_tap": "trykk →",
+  "tip_dbl_open": "Dobbelttrykk: åpne regioner",
+  "tip_dbl_out": "Dobbelttrykk: zoom ut",
+  "tip_dbl_zoom": "Dobbelttrykk: zoom inn"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4181,7 +4244,16 @@
   "grp_opacity": "Peittävyys",
   "grp_opacity_t": "Korostusvärin peittävyys; rajat pysyvät selkeinä",
   "grp_on_t": "Näytä ryhmä kartalla",
-  "more_t": "Lisää"
+  "more_t": "Lisää",
+  "lbl_undo": "Kumoa",
+  "lbl_redo": "Tee uudelleen",
+  "lbl_share": "Jaa linkki",
+  "lbl_fullscreen": "Koko näyttö",
+  "lay_phone": "Puhelin",
+  "tip_tap": "napauta →",
+  "tip_dbl_open": "Kaksoisnapautus: avaa alueet",
+  "tip_dbl_out": "Kaksoisnapautus: loitonna",
+  "tip_dbl_zoom": "Kaksoisnapautus: lähennä"
  },
  "nl": {
   "yes": "Ja",
@@ -4704,7 +4776,16 @@
   "grp_opacity": "Dekking",
   "grp_opacity_t": "Hoe dekkend de markeerkleur is; grenzen blijven scherp",
   "grp_on_t": "Deze groep op de kaart tonen",
-  "more_t": "Meer"
+  "more_t": "Meer",
+  "lbl_undo": "Ongedaan maken",
+  "lbl_redo": "Opnieuw",
+  "lbl_share": "Link delen",
+  "lbl_fullscreen": "Volledig scherm",
+  "lay_phone": "Telefoon",
+  "tip_tap": "tik →",
+  "tip_dbl_open": "Dubbeltik: regio's openen",
+  "tip_dbl_out": "Dubbeltik: uitzoomen",
+  "tip_dbl_zoom": "Dubbeltik: inzoomen"
  },
  "it": {
   "yes": "Sì",
@@ -5227,7 +5308,16 @@
   "grp_opacity": "Opacità",
   "grp_opacity_t": "Quanto è coprente il colore di evidenziazione; i confini restano netti",
   "grp_on_t": "Mostra questo gruppo sulla mappa",
-  "more_t": "Altro"
+  "more_t": "Altro",
+  "lbl_undo": "Annulla",
+  "lbl_redo": "Ripeti",
+  "lbl_share": "Condividi link",
+  "lbl_fullscreen": "Schermo intero",
+  "lay_phone": "Telefono",
+  "tip_tap": "tocca →",
+  "tip_dbl_open": "Doppio tocco: apri le regioni",
+  "tip_dbl_out": "Doppio tocco: riduci zoom",
+  "tip_dbl_zoom": "Doppio tocco: aumenta zoom"
  },
  "tr": {
   "yes": "Evet",
@@ -5750,6 +5840,15 @@
   "grp_opacity": "Opaklık",
   "grp_opacity_t": "Vurgu renginin ne kadar opak olduğu; sınırlar net kalır",
   "grp_on_t": "Bu grubu haritada göster",
-  "more_t": "Daha fazla"
+  "more_t": "Daha fazla",
+  "lbl_undo": "Geri al",
+  "lbl_redo": "Yinele",
+  "lbl_share": "Bağlantıyı paylaş",
+  "lbl_fullscreen": "Tam ekran",
+  "lay_phone": "Telefon",
+  "tip_tap": "dokun →",
+  "tip_dbl_open": "Çift dokun: bölgeleri aç",
+  "tip_dbl_out": "Çift dokun: uzaklaştır",
+  "tip_dbl_zoom": "Çift dokun: yakınlaştır"
  }
 }

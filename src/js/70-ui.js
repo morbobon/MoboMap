@@ -369,15 +369,37 @@ function focusClick(c) {
   if (S.map === 'world') return setFocus(hasDetail(c) ? 'c:' + c : c);
   setFocus(S.focus === c ? '' : c);
 }
+// touch: a second tap on the same unit (or sea) within 350 ms is a mouse's Ctrl+click; the first tap's selection
+// is undone, so a double-tap only navigates
+let lastTap = null;
 svg.addEventListener('click', (e) => {
   const p = e.target.closest('.k');
+  const touch = lastPointer === 'touch';
+  if (touch && lastTap && lastTap.c === (p ? p.dataset.c : null) && Date.now() - lastTap.t < 350) {
+    const u = lastTap;
+    lastTap = null;
+    if (u.c) {
+      S.groups.forEach((o) => o.sel.delete(u.c));
+      if (S.groups.length > u.groups) S.groups.length = u.groups;
+      if (u.gi >= 0) S.groups[u.gi].sel.add(u.c);
+      S.active = Math.min(S.active, Math.max(0, S.groups.length - 1));
+      syncText();
+      ui();
+    }
+    tip.style.display = 'none';
+    return focusClick(u.c);
+  }
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
     tip.style.display = 'none';
     return focusClick(p && p.dataset.c);
   }
-  if (!p) return;
+  if (!p) {
+    lastTap = touch ? { c: null, t: Date.now() } : null;
+    return;
+  }
   const c = p.dataset.c;
+  if (touch) lastTap = { c, t: Date.now(), gi: S.groups.findIndex((o) => o.sel.has(c)), groups: S.groups.length };
   const g = activeGroup();
   if (g.sel.has(c)) g.sel.delete(c);
   else {
@@ -453,12 +475,14 @@ svg.addEventListener(
   { passive: false },
 );
 let drag = null,
-  dragged = false;
+  dragged = false,
+  lastPointer = 'mouse'; // the kind of the last press on the map: 'mouse', 'pen' or 'touch'
 // touch: every finger on the map by pointerId; two of them pinch (zoom around their midpoint, and pan)
 const fingers = new Map();
 let pinch = null,
   pressT = 0;
 svg.addEventListener('pointerdown', (e) => {
+  lastPointer = e.pointerType;
   if (e.button !== 0) return;
   if (e.pointerType === 'touch') {
     fingers.set(e.pointerId, e);
@@ -559,9 +583,12 @@ function showTip(target, cx, cy) {
   }
   const k = GEO.units.find((k) => k.c === p.dataset.c);
   const gi = groupOf(k.c);
+  // on a touch screen the hints name taps instead of clicks and Ctrl
+  const touch = lastPointer === 'touch';
   const nav =
-    S.map === 'world' && hasDetail(k.c) ? 'tip_ctrl_open' : S.focus === k.c ? 'tip_ctrl_out' : 'tip_ctrl_zoom';
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t('tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
+    (touch ? 'tip_dbl_' : 'tip_ctrl_') +
+    (S.map === 'world' && hasDetail(k.c) ? 'open' : S.focus === k.c ? 'out' : 'zoom');
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
   tip.style.display = 'block';
   // kept on screen (a finger sits near the edge as often as not)
   tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';
