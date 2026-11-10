@@ -1385,3 +1385,57 @@ header h1 a.home {
     font-size: 13px;
   }
 }
+
+/* context menu on the map (75-context.js) */
+#ctx {
+  position: fixed;
+  z-index: 50;
+  display: none;
+  min-width: 210px;
+  max-width: min(320px, calc(100vw - 8px));
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 14px 36px #0005;
+}
+#ctx .ctxhd {
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 8px 4px;
+}
+#ctx button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+}
+#ctx button:hover {
+  background: var(--btn);
+}
+#ctx button.first {
+  font-weight: 600;
+}
+#ctx .ctxhint {
+  font-size: 10.5px;
+  color: var(--mute);
+  padding: 4px 8px 2px;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+}
+/* a control the menu jumped to */
+.flash {
+  animation: flash 1.2s ease-out;
+}
+@keyframes flash {
+  0%,
+  30% {
+    outline: 2px solid var(--accent2);
+    outline-offset: 2px;
+  }
+  100% {
+    outline: 2px solid transparent;
+    outline-offset: 6px;
+  }
+}

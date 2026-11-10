@@ -490,13 +490,13 @@ svg.addEventListener('pointerdown', (e) => {
     fingers.set(e.pointerId, e);
     clearTimeout(pressT);
     if (fingers.size === 2) return startPinch();
-    // long press: the tooltip, and no selection when the finger lifts
+    // long press: the context menu, and no selection when the finger lifts
     const target = e.target,
       cx = e.clientX,
       cy = e.clientY;
     pressT = setTimeout(() => {
       if (!drag || dragged || fingers.size !== 1) return;
-      showTip(target, cx, cy);
+      showCtx(target, cx, cy);
       dragged = true;
     }, 500);
   }
@@ -590,7 +590,7 @@ function showTip(target, cx, cy) {
   const nav =
     (touch ? 'tip_dbl_' : 'tip_ctrl_') +
     (S.map === 'world' && hasDetail(k.c) ? 'open' : S.focus === k.c ? 'out' : 'zoom');
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}</span>`;
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc(S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}${touch ? '' : '<br>' + esc(t('tip_shift'))}</span>`;
   tip.style.display = 'block';
   // kept on screen (a finger sits near the edge as often as not)
   tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';

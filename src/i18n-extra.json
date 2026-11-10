@@ -559,7 +559,16 @@
   "print_too_big": "Too large for one image on this device – choose PDF or a lower resolution.",
   "print_slow": "A large file: this can take a while and needs a lot of memory.",
   "print_tile": "Drawing part {i} of {n} …",
-  "print_go": "Create file"
+  "print_go": "Create file",
+  "ctx_group": "Group \"{g}\" – colour and style",
+  "ctx_remove": "Remove from \"{g}\"",
+  "ctx_add": "Add to \"{g}\"",
+  "ctx_open": "Open regions",
+  "ctx_zoom": "Zoom in on it",
+  "ctx_out": "Zoom out",
+  "ctx_reset_one": "Move back to its place",
+  "ctx_shift": "Shift+click opens the first entry directly",
+  "tip_shift": "Shift+click: settings · right-click: menu"
  },
  "da": {
   "yes": "Ja",
@@ -1121,7 +1130,16 @@
   "print_too_big": "For stort til ét billede på denne enhed – vælg PDF eller en lavere opløsning.",
   "print_slow": "En stor fil: det kan tage et stykke tid og kræver meget hukommelse.",
   "print_tile": "Tegner del {i} af {n} …",
-  "print_go": "Lav fil"
+  "print_go": "Lav fil",
+  "ctx_group": "Gruppe \"{g}\" – farve og stil",
+  "ctx_remove": "Fjern fra \"{g}\"",
+  "ctx_add": "Føj til \"{g}\"",
+  "ctx_open": "Åbn regioner",
+  "ctx_zoom": "Zoom ind på den",
+  "ctx_out": "Zoom ud",
+  "ctx_reset_one": "Flyt tilbage på plads",
+  "ctx_shift": "Shift+klik åbner det første punkt direkte",
+  "tip_shift": "Shift+klik: indstillinger · højreklik: menu"
  },
  "de": {
   "yes": "Ja",
@@ -1683,7 +1701,16 @@
   "print_too_big": "Zu groß für ein Bild auf diesem Gerät – PDF oder eine niedrigere Auflösung wählen.",
   "print_slow": "Eine große Datei: Das kann dauern und braucht viel Speicher.",
   "print_tile": "Zeichne Teil {i} von {n} …",
-  "print_go": "Datei erstellen"
+  "print_go": "Datei erstellen",
+  "ctx_group": "Gruppe \"{g}\" – Farbe und Stil",
+  "ctx_remove": "Aus \"{g}\" entfernen",
+  "ctx_add": "Zu \"{g}\" hinzufügen",
+  "ctx_open": "Regionen öffnen",
+  "ctx_zoom": "Hineinzoomen",
+  "ctx_out": "Herauszoomen",
+  "ctx_reset_one": "An seinen Platz zurück",
+  "ctx_shift": "Umschalt+Klick öffnet den ersten Eintrag direkt",
+  "tip_shift": "Umschalt+Klick: Einstellungen · Rechtsklick: Menü"
  },
  "fr": {
   "yes": "Oui",
@@ -2245,7 +2272,16 @@
   "print_too_big": "Trop grand pour une seule image sur cet appareil – choisissez PDF ou une résolution plus basse.",
   "print_slow": "Un gros fichier : cela peut prendre du temps et beaucoup de mémoire.",
   "print_tile": "Dessin de la partie {i} sur {n} …",
-  "print_go": "Créer le fichier"
+  "print_go": "Créer le fichier",
+  "ctx_group": "Groupe « {g} » – couleur et style",
+  "ctx_remove": "Retirer de « {g} »",
+  "ctx_add": "Ajouter à « {g} »",
+  "ctx_open": "Ouvrir les régions",
+  "ctx_zoom": "Zoomer dessus",
+  "ctx_out": "Dézoomer",
+  "ctx_reset_one": "Remettre à sa place",
+  "ctx_shift": "Maj+clic ouvre directement la première entrée",
+  "tip_shift": "Maj+clic : réglages · clic droit : menu"
  },
  "es": {
   "yes": "Sí",
@@ -2807,7 +2843,16 @@
   "print_too_big": "Demasiado grande para una imagen en este dispositivo: elija PDF o una resolución menor.",
   "print_slow": "Un archivo grande: puede tardar y necesita mucha memoria.",
   "print_tile": "Dibujando parte {i} de {n} …",
-  "print_go": "Crear archivo"
+  "print_go": "Crear archivo",
+  "ctx_group": "Grupo \"{g}\" – color y estilo",
+  "ctx_remove": "Quitar de \"{g}\"",
+  "ctx_add": "Añadir a \"{g}\"",
+  "ctx_open": "Abrir regiones",
+  "ctx_zoom": "Acercar",
+  "ctx_out": "Alejar",
+  "ctx_reset_one": "Volver a su sitio",
+  "ctx_shift": "Mayús+clic abre directamente la primera opción",
+  "tip_shift": "Mayús+clic: ajustes · clic derecho: menú"
  },
  "sv": {
   "yes": "Ja",
@@ -3369,7 +3414,16 @@
   "print_too_big": "För stort för en bild på den här enheten – välj PDF eller lägre upplösning.",
   "print_slow": "En stor fil: det kan ta en stund och kräver mycket minne.",
   "print_tile": "Ritar del {i} av {n} …",
-  "print_go": "Skapa fil"
+  "print_go": "Skapa fil",
+  "ctx_group": "Grupp \"{g}\" – färg och stil",
+  "ctx_remove": "Ta bort från \"{g}\"",
+  "ctx_add": "Lägg till i \"{g}\"",
+  "ctx_open": "Öppna regioner",
+  "ctx_zoom": "Zooma in på den",
+  "ctx_out": "Zooma ut",
+  "ctx_reset_one": "Flytta tillbaka",
+  "ctx_shift": "Skift+klick öppnar första raden direkt",
+  "tip_shift": "Skift+klick: inställningar · högerklick: meny"
  },
  "no": {
   "yes": "Ja",
@@ -3931,7 +3985,16 @@
   "print_too_big": "For stort til ett bilde på denne enheten – velg PDF eller lavere oppløsning.",
   "print_slow": "En stor fil: det kan ta litt tid og krever mye minne.",
   "print_tile": "Tegner del {i} av {n} …",
-  "print_go": "Lag fil"
+  "print_go": "Lag fil",
+  "ctx_group": "Gruppe \"{g}\" – farge og stil",
+  "ctx_remove": "Fjern fra \"{g}\"",
+  "ctx_add": "Legg til i \"{g}\"",
+  "ctx_open": "Åpne regioner",
+  "ctx_zoom": "Zoom inn på den",
+  "ctx_out": "Zoom ut",
+  "ctx_reset_one": "Flytt tilbake på plass",
+  "ctx_shift": "Shift+klikk åpner det første punktet direkte",
+  "tip_shift": "Shift+klikk: innstillinger · høyreklikk: meny"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4493,7 +4556,16 @@
   "print_too_big": "Liian suuri yhdeksi kuvaksi tällä laitteella – valitse PDF tai pienempi tarkkuus.",
   "print_slow": "Suuri tiedosto: tämä voi kestää ja vaatii paljon muistia.",
   "print_tile": "Piirretään osa {i}/{n} …",
-  "print_go": "Luo tiedosto"
+  "print_go": "Luo tiedosto",
+  "ctx_group": "Ryhmä \"{g}\" – väri ja tyyli",
+  "ctx_remove": "Poista ryhmästä \"{g}\"",
+  "ctx_add": "Lisää ryhmään \"{g}\"",
+  "ctx_open": "Avaa alueet",
+  "ctx_zoom": "Lähennä siihen",
+  "ctx_out": "Loitonna",
+  "ctx_reset_one": "Palauta paikalleen",
+  "ctx_shift": "Vaihto+napsautus avaa ensimmäisen kohdan suoraan",
+  "tip_shift": "Vaihto+napsautus: asetukset · oikea napsautus: valikko"
  },
  "nl": {
   "yes": "Ja",
@@ -5055,7 +5127,16 @@
   "print_too_big": "Te groot voor één afbeelding op dit apparaat – kies PDF of een lagere resolutie.",
   "print_slow": "Een groot bestand: dit kan even duren en vraagt veel geheugen.",
   "print_tile": "Deel {i} van {n} tekenen …",
-  "print_go": "Bestand maken"
+  "print_go": "Bestand maken",
+  "ctx_group": "Groep \"{g}\" – kleur en stijl",
+  "ctx_remove": "Verwijderen uit \"{g}\"",
+  "ctx_add": "Toevoegen aan \"{g}\"",
+  "ctx_open": "Regio's openen",
+  "ctx_zoom": "Erop inzoomen",
+  "ctx_out": "Uitzoomen",
+  "ctx_reset_one": "Terug op zijn plaats",
+  "ctx_shift": "Shift+klik opent direct het eerste item",
+  "tip_shift": "Shift+klik: instellingen · rechtsklik: menu"
  },
  "it": {
   "yes": "Sì",
@@ -5617,7 +5698,16 @@
   "print_too_big": "Troppo grande per un'immagine su questo dispositivo: scegli PDF o una risoluzione inferiore.",
   "print_slow": "Un file grande: può richiedere tempo e molta memoria.",
   "print_tile": "Disegno parte {i} di {n} …",
-  "print_go": "Crea file"
+  "print_go": "Crea file",
+  "ctx_group": "Gruppo \"{g}\" – colore e stile",
+  "ctx_remove": "Rimuovi da \"{g}\"",
+  "ctx_add": "Aggiungi a \"{g}\"",
+  "ctx_open": "Apri le regioni",
+  "ctx_zoom": "Ingrandisci",
+  "ctx_out": "Riduci",
+  "ctx_reset_one": "Rimetti al suo posto",
+  "ctx_shift": "Maiusc+clic apre direttamente la prima voce",
+  "tip_shift": "Maiusc+clic: impostazioni · clic destro: menu"
  },
  "tr": {
   "yes": "Evet",
@@ -6179,6 +6269,15 @@
   "print_too_big": "Bu cihazda tek görüntü için çok büyük – PDF veya daha düşük çözünürlük seçin.",
   "print_slow": "Büyük bir dosya: biraz sürebilir ve çok bellek gerektirir.",
   "print_tile": "Parça {i}/{n} çiziliyor …",
-  "print_go": "Dosya oluştur"
+  "print_go": "Dosya oluştur",
+  "ctx_group": "\"{g}\" grubu – renk ve stil",
+  "ctx_remove": "\"{g}\" grubundan çıkar",
+  "ctx_add": "\"{g}\" grubuna ekle",
+  "ctx_open": "Bölgeleri aç",
+  "ctx_zoom": "Yakınlaştır",
+  "ctx_out": "Uzaklaştır",
+  "ctx_reset_one": "Yerine geri koy",
+  "ctx_shift": "Shift+tık ilk öğeyi doğrudan açar",
+  "tip_shift": "Shift+tık: ayarlar · sağ tık: menü"
  }
 }
