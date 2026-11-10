@@ -132,8 +132,10 @@ function ui() {
         : 'transparent';
   const removeBtn = (i) =>
     `<button class="x" title="${esc(t('remove_group'))}" onclick="event.stopPropagation();removeGroup(${i})">×</button>`;
-  const fullCard = (g, i) => `<div class="grp ${i === S.active ? 'active' : 'open'}">
-  <div class="hd"${i === S.active ? '' : ` onclick="if(event.target===this||event.target.type==='radio')activateGroup(${i})"`}><input type="radio" name="act" ${i === S.active ? 'checked' : ''} title="${esc(t('active_group'))}"><input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${i === S.active ? '' : `<button class="fold" title="${esc(t('grp_fold'))}" onclick="event.stopPropagation();foldGroup(${i})">▴</button>`}${removeBtn(i)}</div>
+  const onBox = (g, i) =>
+    `<input type="checkbox" class="on" ${g.off ? '' : 'checked'} title="${esc(t('grp_on_t'))}" onclick="event.stopPropagation()" onchange="setGroupOn(${i},this.checked)">`;
+  const fullCard = (g, i) => `<div class="grp ${i === S.active ? 'active' : 'open'}${g.off ? ' off' : ''}">
+  <div class="hd"${i === S.active ? '' : ` onclick="if(event.target===this||event.target.type==='radio')activateGroup(${i})"`}><input type="radio" name="act" ${i === S.active ? 'checked' : ''} title="${esc(t('active_group'))}">${onBox(g, i)}<input type="text" value="${esc(g.name)}" oninput="S.groups[${i}].name=this.value;render()" placeholder="${esc(t('group_name'))}"><span class="cnt">${g.sel.size}</span>${i === S.active ? '' : `<button class="fold" title="${esc(t('grp_fold'))}" onclick="event.stopPropagation();foldGroup(${i})">▴</button>`}${removeBtn(i)}</div>
   <textarea rows="2" id="list${i}" oninput="fromText(${i})" placeholder="${esc(t('ph_units').replace('{ex}', MAPS[S.map].ex))}">${esc(g.text != null ? g.text : [...g.sel].map((c) => nm(GEO.units.find((k) => k.c === c))).join(', '))}</textarea>
   <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
@@ -141,7 +143,7 @@ function ui() {
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
  </div>`;
   const compact = (g, i) =>
-    `<div class="grp compact" title="${esc(t('active_group'))}" onclick="activateGroup(${i})"><span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
+    `<div class="grp compact${g.off ? ' off' : ''}" title="${esc(t('active_group'))}" onclick="activateGroup(${i})">${onBox(g, i)}<span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${g.sel.size}</span>${removeBtn(i)}</div>`;
   // as many groups open as there is room for: the active one always, then the most recently opened;
   // the rest fold to one line only when the panel would otherwise scroll
   const gEl = document.getElementById('groups');
@@ -223,6 +225,11 @@ window.addEventListener('resize', () => {
   clearTimeout(groupFitT);
   groupFitT = setTimeout(() => typeof ui === 'function' && ui(), 150);
 });
+function setGroupOn(i, on) {
+  S.groups[i].off = !on;
+  ui();
+  render();
+}
 function addGroup() {
   const D = DS[S.ds];
   const i = S.groups.length;
@@ -299,7 +306,7 @@ function setMap(id) {
         ? 'local'
         : S.proj;
   // keep the user's groups (names, colours, modes – possibly none) but clear selections: unit codes differ per map
-  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color, g.op));
+  S.groups = S.groups.map((g) => newGroup(g.name, [...g.hl], g.color, g.op, g.off));
   // example selection only the first time a map is opened in this session
   const key = S.country || 'world';
   if (!S.visited.has(key) && S.groups.length) MAPS[S.map].defaults.forEach((c) => S.groups[0].sel.add(c));

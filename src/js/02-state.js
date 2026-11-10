@@ -33,4 +33,13 @@ const S = {
   partners: [],
   visited: new Set(), // maps opened this session (example selection only on first visit)
 };
-const newGroup = (name, hl, color, op = 1) => ({ name, sel: new Set(), hl: new Set(hl), color, op, bad: [] });
+// off: hidden from the map (kept in the panel, projects and links)
+const newGroup = (name, hl, color, op = 1, off = false) => ({
+  name,
+  sel: new Set(),
+  hl: new Set(hl),
+  color,
+  op,
+  off,
+  bad: [],
+});

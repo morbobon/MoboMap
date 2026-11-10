@@ -41,6 +41,7 @@ function projectState() {
       color: g.color,
       hl: [...g.hl],
       ...(g.op < 1 ? { opacity: g.op } : {}),
+      ...(g.off ? { off: true } : {}),
       kommuner: [...g.sel],
     })),
     title: document.getElementById('title').value,
@@ -142,6 +143,7 @@ function loadProject(p, quiet) {
       g.hl || ['fill'],
       g.color || D.highlight[0],
       op > 0 && op < 1 ? op : 1,
+      !!g.off,
     );
     (g.kommuner || []).forEach((c) => {
       const code = byName[String(c).toLowerCase()] || byName[c];

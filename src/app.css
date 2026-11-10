@@ -566,6 +566,17 @@ aside {
   font-size: 12px;
   line-height: 1;
 }
+.grp input.on {
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.grp.off .dot,
+.grp.off .nm,
+.grp.off .hd input[type='text'],
+.grp.off .cnt {
+  opacity: 0.45;
+}
 .groups-empty {
   font-size: 12px;
   color: var(--mute);

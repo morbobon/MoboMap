@@ -124,7 +124,8 @@ function render(target) {
   // opacity for faint secondary text (sources, footer label, sea names): kept unless it costs readability
   const tOp = (o) =>
     guard && Math.min(...textBgs.filter(isHex).map((b) => contrast(mix(ink, b, 1 - o), b))) < 4.5 ? 1 : o;
-  const groups = S.groups;
+  const groups = S.groups.filter((g) => !g.off);
+  const shownOf = (c) => groups.find((g) => g.sel.has(c));
   const selAll = new Set(groups.flatMap((g) => [...g.sel]));
   const AT = attrDef();
   const ATC = AT ? attrCats(AT) : [];
@@ -293,6 +294,15 @@ function render(target) {
               : 0.9;
   const strokeBase = st === 'silhouette' ? 'none' : stroke;
   out += `<g id="unsel"${st === 'paper' ? ' filter="url(#paper)"' : sp.filter ? ' filter="url(#' + sp.filter + ')"' : ''}>`;
+  // a faded group shows the map through it: its units get their normal land fill here, under relief and land fx
+  const clearHL = (hl) =>
+    sp.pixel || (st === 'outline' && !hl.has('fill') && !hl.has('hatch') && !hl.has('dots') && !hl.has('tint'));
+  const faded = (g) => (g.op ?? 1) < 1 && !clearHL(g.hl);
+  for (const g of groups.filter(faded))
+    for (const c of g.sel) {
+      const k = GEO.units.find((k) => k.c === c);
+      if (k) out += `<path d="${kp(k, det)}" fill="${baseFill(k)}" stroke="none" pointer-events="none"/>`;
+    }
   for (const k of unsel) {
     const fo = !inFocus(k);
     if (fo && S.focusHide) continue;
@@ -337,8 +347,8 @@ function render(target) {
       `<path d="${ls}" stroke="${net.link}" stroke-width=".7" opacity=".5" fill="none" pointer-events="none"/><g filter="url(#neonf)" pointer-events="none">` +
       nodes
         .map((n) => {
-          const gi = groupOf(n.k.c);
-          return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${gi >= 0 ? 4.5 : 2.2}" fill="${gi >= 0 ? S.groups[gi].color : net.node}"/>`;
+          const g = shownOf(n.k.c);
+          return `<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${g ? 4.5 : 2.2}" fill="${g ? g.color : net.node}"/>`;
         })
         .join('') +
       '</g>';
@@ -347,8 +357,8 @@ function render(target) {
     out +=
       `<g filter="url(#pxshadow)" pointer-events="none">` +
       pixelCells(det, (k) => {
-        const gi = groupOf(k.c);
-        if (gi >= 0) return S.groups[gi].color;
+        const g = shownOf(k.c);
+        if (g) return g.color;
         const f = baseFill(k);
         return f.startsWith('url') ? land : f;
       }) +
@@ -491,14 +501,14 @@ function render(target) {
       }
       const tr = hl.has('emboss') ? 'transform="translate(0,-6)"' : '';
       const f = hl.has('emboss') ? 'filter="url(#emboss)"' : '';
-      const clear =
-        sp.pixel || (st === 'outline' && !hl.has('fill') && !hl.has('hatch') && !hl.has('dots') && !hl.has('tint'));
-      // group opacity fades the highlight fill over the unit's normal fill; borders stay solid
-      const op = g.op ?? 1,
-        fade = !clear && op < 1 && fill !== baseFill(k);
-      const fillAttr = clear ? 'fill-opacity="0"' : fade ? `fill-opacity="${op}"` : '';
-      const under = fade ? `<path d="${kp(k, det)}" fill="${baseFill(k)}" stroke="none" pointer-events="none"/>` : '';
-      out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}${under}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
+      // a faded group's highlight fill lies over the map drawn in the base pass; borders stay solid
+      const op = g.op ?? 1;
+      const fillAttr = clearHL(hl)
+        ? 'fill-opacity="0"'
+        : faded(g)
+          ? `fill-opacity="${fill === baseFill(k) ? 0 : op}"`
+          : '';
+      out += `<g ${tr}>${hl.has('glow') ? `<path d="${kp(k, det)}" fill="${col}" stroke="${col}" stroke-width="6" filter="url(#glow)" opacity="${(0.85 * op).toFixed(2)}" pointer-events="none"/>` : ''}<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${fill}" ${fillAttr} stroke="${strk}" stroke-width="${sw}" stroke-linejoin="round" ${f}/></g>`;
     }
     out += '</g>';
   });

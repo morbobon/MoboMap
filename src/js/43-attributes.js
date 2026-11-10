@@ -342,7 +342,7 @@ function attrInScope(k) {
   const s = S.attrScope || 'all';
   if (s === 'all') return true;
   if (s === 'focus') return !S.focus || inFocus(k);
-  if (s === 'sel') return S.groups.some((g) => g.sel.has(k.c));
+  if (s === 'sel') return S.groups.some((g) => !g.off && g.sel.has(k.c));
   if (s.startsWith('r:')) return k.r === s.slice(2);
   return true;
 }

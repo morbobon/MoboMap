@@ -111,7 +111,7 @@ function thumbKey() {
     S.proj,
     S.far,
     S.lang,
-    S.groups.map((g) => [g.color, g.op, g.sel.size, [...g.hl]]),
+    S.groups.map((g) => [g.color, g.op, g.off, g.sel.size, [...g.hl]]),
     S.partners.length,
     S.zoom,
     S.focusHide,
