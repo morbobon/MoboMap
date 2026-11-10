@@ -538,7 +538,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Simple",
   "detail_detailed": "Detailed",
-  "detail_fine": "Fine"
+  "detail_fine": "Fine",
+  "lay_og": "Link preview",
+  "lay_g_paper": "Paper",
+  "lay_g_screen": "Screen",
+  "lay_g_social": "Social & photo"
  },
  "da": {
   "yes": "Ja",
@@ -1079,7 +1083,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Enkel",
   "detail_detailed": "Detaljeret",
-  "detail_fine": "Fin"
+  "detail_fine": "Fin",
+  "lay_og": "Linkvisning",
+  "lay_g_paper": "Papir",
+  "lay_g_screen": "Skærm",
+  "lay_g_social": "Sociale medier & foto"
  },
  "de": {
   "yes": "Ja",
@@ -1620,7 +1628,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Einfach",
   "detail_detailed": "Detailliert",
-  "detail_fine": "Fein"
+  "detail_fine": "Fein",
+  "lay_og": "Link-Vorschau",
+  "lay_g_paper": "Papier",
+  "lay_g_screen": "Bildschirm",
+  "lay_g_social": "Social Media & Foto"
  },
  "fr": {
   "yes": "Oui",
@@ -2161,7 +2173,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Simple",
   "detail_detailed": "Détaillé",
-  "detail_fine": "Fin"
+  "detail_fine": "Fin",
+  "lay_og": "Aperçu de lien",
+  "lay_g_paper": "Papier",
+  "lay_g_screen": "Écran",
+  "lay_g_social": "Réseaux sociaux & photo"
  },
  "es": {
   "yes": "Sí",
@@ -2702,7 +2718,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Simple",
   "detail_detailed": "Detallado",
-  "detail_fine": "Fino"
+  "detail_fine": "Fino",
+  "lay_og": "Vista previa de enlace",
+  "lay_g_paper": "Papel",
+  "lay_g_screen": "Pantalla",
+  "lay_g_social": "Redes sociales y foto"
  },
  "sv": {
   "yes": "Ja",
@@ -3243,7 +3263,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Enkel",
   "detail_detailed": "Detaljerad",
-  "detail_fine": "Fin"
+  "detail_fine": "Fin",
+  "lay_og": "Länkförhandsvisning",
+  "lay_g_paper": "Papper",
+  "lay_g_screen": "Skärm",
+  "lay_g_social": "Sociala medier & foto"
  },
  "no": {
   "yes": "Ja",
@@ -3784,7 +3808,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Enkel",
   "detail_detailed": "Detaljert",
-  "detail_fine": "Fin"
+  "detail_fine": "Fin",
+  "lay_og": "Lenkeforhåndsvisning",
+  "lay_g_paper": "Papir",
+  "lay_g_screen": "Skjerm",
+  "lay_g_social": "Sosiale medier & foto"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4325,7 +4353,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Yksinkert.",
   "detail_detailed": "Tarkka",
-  "detail_fine": "Hieno"
+  "detail_fine": "Hieno",
+  "lay_og": "Linkin esikatselu",
+  "lay_g_paper": "Paperi",
+  "lay_g_screen": "Näyttö",
+  "lay_g_social": "Some ja valokuva"
  },
  "nl": {
   "yes": "Ja",
@@ -4866,7 +4898,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Eenvoudig",
   "detail_detailed": "Gedetailleerd",
-  "detail_fine": "Fijn"
+  "detail_fine": "Fijn",
+  "lay_og": "Linkvoorbeeld",
+  "lay_g_paper": "Papier",
+  "lay_g_screen": "Scherm",
+  "lay_g_social": "Social & foto"
  },
  "it": {
   "yes": "Sì",
@@ -5407,7 +5443,11 @@
   "detail_auto": "Auto",
   "detail_simple": "Semplice",
   "detail_detailed": "Dettagliato",
-  "detail_fine": "Fine"
+  "detail_fine": "Fine",
+  "lay_og": "Anteprima link",
+  "lay_g_paper": "Carta",
+  "lay_g_screen": "Schermo",
+  "lay_g_social": "Social e foto"
  },
  "tr": {
   "yes": "Evet",
@@ -5948,6 +5988,10 @@
   "detail_auto": "Otomatik",
   "detail_simple": "Basit",
   "detail_detailed": "Ayrıntılı",
-  "detail_fine": "İnce"
+  "detail_fine": "İnce",
+  "lay_og": "Bağlantı önizlemesi",
+  "lay_g_paper": "Kâğıt",
+  "lay_g_screen": "Ekran",
+  "lay_g_social": "Sosyal medya ve fotoğraf"
  }
 }

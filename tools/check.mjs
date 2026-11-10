@@ -49,7 +49,7 @@ const en = new Set(Object.keys(T.en));
 const required = new Set();
 for (const m of code.matchAll(/\bt\('([a-z0-9_]+)'\)/g)) required.add(m[1]);
 for (const m of markup.matchAll(/data-i18n(?:-ph)?="([a-z0-9_]+)"/g)) required.add(m[1]);
-// (b) keys built from id lists: st_<style>[_d], hl_<mode>[_t], lay_<layout>, rel_<religion>
+// (b) keys built from id lists: st_<style>[_d], hl_<mode>[_t], lay_<o>/lay_g_<g>, rel_<religion>
 const idList = (name) => {
   const m = code.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\]`));
   if (!m) {
@@ -60,7 +60,13 @@ const idList = (name) => {
 };
 for (const id of idList('STYLES')) required.add('st_' + id).add('st_' + id + '_d');
 for (const id of idList('HLS')) required.add('hl_' + id).add('hl_' + id + '_t');
-for (const id of idList('LAYOUTS')) required.add('lay_' + id);
+// page layouts are named by orientation or use (o: → lay_<o>) under a group (g: → lay_g_<g>)
+{
+  const m = code.match(/const LAYOUTS = \[([\s\S]*?)\]/);
+  if (!m) err('id list LAYOUTS not found');
+  for (const x of (m ? m[1] : '').matchAll(/o: '([a-z0-9]+)'/g)) required.add('lay_' + x[1]);
+  for (const x of (m ? m[1] : '').matchAll(/g: '([a-z0-9]+)'/g)) required.add('lay_g_' + x[1]);
+}
 for (const id of idList('REL')) required.add('rel_' + id);
 for (const id of idList('ATTR_CATS')) required.add('cat_' + id);
 for (const id of idList('UI_MODES')) required.add('ui_' + id);

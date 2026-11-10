@@ -27,4 +27,10 @@ try {
 } catch (e) {
   toast(t('ts_link_bad') + ': ' + e.message);
 }
+// a phone held upright starts on a portrait page (a link keeps the page it was made with)
+if (!fromUrl && isPhone() && innerHeight > innerWidth && layoutOf(S.layout).w > layoutOf(S.layout).h) {
+  S.layout = 'port';
+  ui();
+  render();
+}
 window.MOBOMAP_READY = true; // start-up done (setTab may redraw from now on)

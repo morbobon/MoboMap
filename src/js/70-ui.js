@@ -113,11 +113,12 @@ function ui() {
     .join('');
   document.getElementById('langSel').value = S.lang;
   document.getElementById('layouts').innerHTML = LAYOUTS.map(
-    (l) =>
-      `<button class="tile ${S.layout === l.id ? 'on' : ''}" onclick="S.layout='${l.id}';ui();render()"><b>${t('lay_' + l.id)}</b><i>${l.d}</i></button>`,
+    (l, i) =>
+      (i && LAYOUTS[i - 1].g === l.g ? '' : `<div class="laygrp">${esc(t('lay_g_' + l.g))}</div>`) +
+      `<button class="tile ${S.layout === l.id ? 'on' : ''}" onclick="S.layout='${l.id}';ui();render()"><b>${l.n}</b><i>${esc(t('lay_' + l.o))}</i></button>`,
   ).join('');
   // section summaries (visible when a section is collapsed)
-  document.getElementById('layoutInfo').textContent = t('lay_' + S.layout) + ' · ' + W + '×' + H;
+  document.getElementById('layoutInfo').textContent = layoutName(layoutOf(S.layout));
   document.getElementById('styleNo').textContent = t('st_' + S.style);
   document.getElementById('styles').innerHTML = STYLES.map(
     (s) =>

@@ -160,6 +160,18 @@ section h2 span {
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
 }
+/* Page → Layout: Paper / Screen / Social & photo */
+.laygrp {
+  grid-column: 1 / -1;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+  margin-top: 6px;
+}
+.laygrp:first-child {
+  margin-top: 0;
+}
 .tile {
   text-align: left;
   padding: 7px 9px;

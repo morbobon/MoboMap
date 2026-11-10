@@ -66,7 +66,7 @@ function computeMain() {
 
 // ---- layout, projection to screen ----
 function setLayout(id) {
-  const L = LAYOUTS.find((l) => l.id === id) || LAYOUTS[0];
+  const L = layoutOf(id);
   S.layout = L.id;
   W = L.w;
   H = L.h;
