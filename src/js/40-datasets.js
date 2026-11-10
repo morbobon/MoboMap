@@ -131,7 +131,7 @@ function countryData(iso) {
 }
 const countryName = (iso) => {
   const w = DATA.world.units.find((u) => u.c === iso);
-  return w ? nm(w) : (DATA.adm1[iso] || {}).n || iso;
+  return w ? nm(w) : DATA.adm1i[iso] || iso;
 };
 
 // ---- current dataset, names and lookup ----

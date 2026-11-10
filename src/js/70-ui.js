@@ -64,7 +64,7 @@ function ui() {
   if (GEO.geo) ps.value = S.proj;
   const fsel = document.getElementById('focusSel2');
   const cmp = (a, b) => a[1].localeCompare(b[1], S.lang);
-  const ctry = [...new Set([...Object.keys(DATA.adm1), 'DNK'])].map((c) => [c, countryName(c)]).sort(cmp);
+  const ctry = [...new Set([...Object.keys(DATA.adm1i), 'DNK'])].map((c) => [c, countryName(c)]).sort(cmp);
   const og = (label, arr) =>
     arr.length
       ? `<optgroup label="${esc(label)}">` +
@@ -363,7 +363,7 @@ const svg = document.getElementById('svg'),
 // Ctrl/Cmd+click = navigate instead of select:
 //   world view: open the country's regions (or zoom to it if no detail exists)
 //   country view: zoom to the clicked unit; on empty sea step out (unit -> whole country -> world)
-const hasDetail = (iso) => iso === 'DNK' || !!DATA.adm1[iso];
+const hasDetail = (iso) => iso === 'DNK' || !!DATA.adm1i[iso];
 function focusClick(c) {
   if (!c) return setFocus(S.focus ? '' : S.country ? 'world' : '');
   if (S.map === 'world') return setFocus(hasDetail(c) ? 'c:' + c : c);

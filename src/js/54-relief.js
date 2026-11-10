@@ -63,7 +63,7 @@ const HYPSO = {
 function reliefOn(sp) {
   // a statistic ("Colour by") takes over the land colours of the topographic style; the relief checkbox still adds it
   const byStat = typeof attrDef === 'function' && attrDef();
-  return !!DATA.elev && ((sp.relief && !byStat) || sp.reliefShade || document.getElementById('relief').checked);
+  return !!DATA_Z.elev && ((sp.relief && !byStat) || sp.reliefShade || document.getElementById('relief').checked);
 }
 // Sea depths: drawn under the land.
 function reliefSea(sp, bg, dark) {

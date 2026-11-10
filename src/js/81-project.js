@@ -68,7 +68,8 @@ function saveProject() {
 }
 // Start-up state: src/default-project.json (a saved project), inlined by the build
 const DEFAULT_PROJECT = /*__DEFAULT_PROJECT__*/ null;
-function loadProject(p, quiet) {
+// noDraw: another project follows at once (start-up with a link), so skip drawing this one
+function loadProject(p, quiet, noDraw) {
   if (!p || p.format !== 'mobomap-project') throw new Error(t('ts_not_project'));
   if (p.designSystemData) {
     const r = addDS(p.designSystemData, 'user');
@@ -167,6 +168,7 @@ function loadProject(p, quiet) {
   document.getElementById('sub').value = p.sub ?? '';
   document.getElementById('footerLabel').value = p.footerLabel ?? loc(D.footer.label);
   for (const k of CK) if (p.checks && k in p.checks) document.getElementById(k).checked = !!p.checks[k];
+  if (noDraw) return;
   ui();
   render();
   if (!quiet) toast(t('ts_proj_opened'));

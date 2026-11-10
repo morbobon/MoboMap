@@ -406,7 +406,10 @@ if (fs.existsSync(A('geo/regional-stats.json'))) {
   dk.statsMeta = rs.meta;
   for (const [iso, v] of Object.entries(rs.adm1)) if (adm1[iso]) adm1[iso].s = v;
 }
-const data = { dk, world, adm1, elev, regionMeta };
+// Provinces and terrain are packed apart and unpacked in the page on first use (src/js/00-boot.js);
+// adm1i (iso -> name) lists the countries with provinces without unpacking them
+const adm1i = Object.fromEntries(Object.entries(adm1).map(([iso, c]) => [iso, c.n]));
+const data = { dk, world, adm1i, regionMeta };
 
 // ---------- Fonte ----------
 const b64 = (p) => fs.readFileSync(A(p)).toString('base64');
@@ -504,7 +507,17 @@ let html = fs
   .replace('/*__JS__*/', () => appJs);
 html = html
   // map data and jsPDF are stored deflated (base64) and unpacked in the page (src/js/00-inflate.js)
-  .replace('/*__DATA__*/', () => 'const DATA = unpackJSON("' + pack(JSON.stringify(data)) + '");')
+  .replace(
+    '/*__DATA__*/',
+    () =>
+      'const DATA = unpackJSON("' +
+      pack(JSON.stringify(data)) +
+      '");\nconst DATA_Z = { adm1: "' +
+      pack(JSON.stringify(adm1)) +
+      '", elev: ' +
+      (elev ? '"' + pack(JSON.stringify(elev)) + '"' : 'null') +
+      ' };',
+  )
   .replace('/*__FONTS__*/', () => 'const FONTS = ' + JSON.stringify(fonts) + ';')
   .replace("/*__JSPDF_Z__*/ ''", () => '"' + pack(fs.readFileSync(A('jspdf.umd.min.js'), 'utf8')) + '"')
   .replace(/\/\*__DESIGNSYSTEMS__\*\/\s*\[\]/, () => JSON.stringify(designSystems))

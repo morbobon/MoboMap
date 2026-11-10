@@ -186,7 +186,7 @@ function projectFromUrl(search) {
   const p = linkBase();
   p.format = 'mobomap-project';
   const g = (k) => q.get(k);
-  const okCountry = (c) => c === 'world' || c.toUpperCase() === 'DNK' || Object.hasOwn(DATA.adm1, c.toUpperCase());
+  const okCountry = (c) => c === 'world' || c.toUpperCase() === 'DNK' || Object.hasOwn(DATA.adm1i, c.toUpperCase());
   if (q.has('c') && !okCountry(g('c'))) {
     const bad = g('c');
     setTimeout(() => toast(t('ts_link_bad') + ': c=' + bad), 600);

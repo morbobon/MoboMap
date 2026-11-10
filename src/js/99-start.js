@@ -13,10 +13,15 @@ setData('world');
 S.visited.add('world');
 setDS(S.ds);
 CK.forEach((k) => (DEFAULT_CHECKS[k] = document.getElementById(k).checked));
-if (DEFAULT_PROJECT) loadProject(DEFAULT_PROJECT, true);
-// a shared link (?c=DNK&st=topo&…) on top of the start project
+// a shared link (?c=DNK&st=topo&…) on top of the start project, which is then not drawn first
+let fromUrl = null;
 try {
-  const fromUrl = projectFromUrl(location.search);
+  fromUrl = projectFromUrl(location.search);
+} catch (e) {
+  toast(t('ts_link_bad') + ': ' + e.message);
+}
+if (DEFAULT_PROJECT) loadProject(DEFAULT_PROJECT, true, !!fromUrl);
+try {
   if (fromUrl) loadProject(fromUrl, true);
 } catch (e) {
   toast(t('ts_link_bad') + ': ' + e.message);
