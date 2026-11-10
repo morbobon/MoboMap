@@ -5,6 +5,7 @@ chromeFromUrl(location.search);
 applyChrome();
 document.getElementById('snapCk').checked = snapOn();
 document.getElementById('autoDetail').checked = autoDetailOn();
+document.getElementById('homeAsk').checked = homeAsk();
 loadDS();
 S.ds = DSORDER.find((i) => !DS[i].private) || DSORDER[0];
 applyUiMode();

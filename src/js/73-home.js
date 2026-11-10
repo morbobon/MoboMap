@@ -9,19 +9,27 @@ function mapIsDefault() {
     return false;
   }
 }
+// "Don't ask again" in the dialog (or the checkbox in the Map tab): reset straight away, in this browser
+const homeAsk = () => localStorage.getItem('mobomap.homeAsk') !== '0';
+function setHomeAsk(on) {
+  localStorage.setItem('mobomap.homeAsk', on ? '1' : '0');
+  document.getElementById('homeAsk').checked = on;
+}
 function leaveHome() {
   location.href = location.pathname;
 }
 function goHome(e) {
   if (e) e.preventDefault();
-  if (mapIsDefault()) return leaveHome();
+  if (mapIsDefault() || !homeAsk()) return leaveHome();
   const d = document.getElementById('homeDlg');
+  document.getElementById('homeNoAsk').checked = false;
   if (typeof d.showModal === 'function') d.showModal();
   else if (confirm(t('home_q'))) leaveHome();
   return false;
 }
 function homeSave(kind) {
   const d = document.getElementById('homeDlg');
+  if (kind !== 'cancel' && document.getElementById('homeNoAsk').checked) setHomeAsk(false);
   if (kind === 'look') {
     const n = userLooks().length;
     saveLook();

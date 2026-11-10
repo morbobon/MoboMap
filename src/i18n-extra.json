@@ -530,7 +530,9 @@
   "tip_dbl_open": "Double-tap: open regions",
   "tip_dbl_out": "Double-tap: zoom out",
   "tip_dbl_zoom": "Double-tap: zoom in",
-  "lbl_reset": "Reset map"
+  "lbl_reset": "Reset map",
+  "home_noask": "Don't ask again",
+  "home_ask": "Ask before resetting the map"
  },
  "da": {
   "yes": "Ja",
@@ -1063,7 +1065,9 @@
   "tip_dbl_open": "Dobbelttryk: åbn regioner",
   "tip_dbl_out": "Dobbelttryk: zoom ud",
   "tip_dbl_zoom": "Dobbelttryk: zoom ind",
-  "lbl_reset": "Nulstil kort"
+  "lbl_reset": "Nulstil kort",
+  "home_noask": "Spørg ikke igen",
+  "home_ask": "Spørg før kortet nulstilles"
  },
  "de": {
   "yes": "Ja",
@@ -1596,7 +1600,9 @@
   "tip_dbl_open": "Doppeltippen: Regionen öffnen",
   "tip_dbl_out": "Doppeltippen: herauszoomen",
   "tip_dbl_zoom": "Doppeltippen: hineinzoomen",
-  "lbl_reset": "Karte zurücksetzen"
+  "lbl_reset": "Karte zurücksetzen",
+  "home_noask": "Nicht mehr fragen",
+  "home_ask": "Vor dem Zurücksetzen der Karte fragen"
  },
  "fr": {
   "yes": "Oui",
@@ -2129,7 +2135,9 @@
   "tip_dbl_open": "Double toucher : ouvrir les régions",
   "tip_dbl_out": "Double toucher : dézoomer",
   "tip_dbl_zoom": "Double toucher : zoomer",
-  "lbl_reset": "Réinitialiser la carte"
+  "lbl_reset": "Réinitialiser la carte",
+  "home_noask": "Ne plus demander",
+  "home_ask": "Demander avant de réinitialiser la carte"
  },
  "es": {
   "yes": "Sí",
@@ -2662,7 +2670,9 @@
   "tip_dbl_open": "Doble toque: abrir regiones",
   "tip_dbl_out": "Doble toque: alejar",
   "tip_dbl_zoom": "Doble toque: acercar",
-  "lbl_reset": "Restablecer mapa"
+  "lbl_reset": "Restablecer mapa",
+  "home_noask": "No volver a preguntar",
+  "home_ask": "Preguntar antes de restablecer el mapa"
  },
  "sv": {
   "yes": "Ja",
@@ -3195,7 +3205,9 @@
   "tip_dbl_open": "Dubbeltryck: öppna regioner",
   "tip_dbl_out": "Dubbeltryck: zooma ut",
   "tip_dbl_zoom": "Dubbeltryck: zooma in",
-  "lbl_reset": "Återställ karta"
+  "lbl_reset": "Återställ karta",
+  "home_noask": "Fråga inte igen",
+  "home_ask": "Fråga innan kartan återställs"
  },
  "no": {
   "yes": "Ja",
@@ -3728,7 +3740,9 @@
   "tip_dbl_open": "Dobbelttrykk: åpne regioner",
   "tip_dbl_out": "Dobbelttrykk: zoom ut",
   "tip_dbl_zoom": "Dobbelttrykk: zoom inn",
-  "lbl_reset": "Tilbakestill kart"
+  "lbl_reset": "Tilbakestill kart",
+  "home_noask": "Ikke spør igjen",
+  "home_ask": "Spør før kartet tilbakestilles"
  },
  "fi": {
   "yes": "Kyllä",
@@ -4261,7 +4275,9 @@
   "tip_dbl_open": "Kaksoisnapautus: avaa alueet",
   "tip_dbl_out": "Kaksoisnapautus: loitonna",
   "tip_dbl_zoom": "Kaksoisnapautus: lähennä",
-  "lbl_reset": "Palauta kartta"
+  "lbl_reset": "Palauta kartta",
+  "home_noask": "Älä kysy uudelleen",
+  "home_ask": "Kysy ennen kartan palauttamista"
  },
  "nl": {
   "yes": "Ja",
@@ -4794,7 +4810,9 @@
   "tip_dbl_open": "Dubbeltik: regio's openen",
   "tip_dbl_out": "Dubbeltik: uitzoomen",
   "tip_dbl_zoom": "Dubbeltik: inzoomen",
-  "lbl_reset": "Kaart resetten"
+  "lbl_reset": "Kaart resetten",
+  "home_noask": "Niet meer vragen",
+  "home_ask": "Vragen voordat de kaart wordt gereset"
  },
  "it": {
   "yes": "Sì",
@@ -5327,7 +5345,9 @@
   "tip_dbl_open": "Doppio tocco: apri le regioni",
   "tip_dbl_out": "Doppio tocco: riduci zoom",
   "tip_dbl_zoom": "Doppio tocco: aumenta zoom",
-  "lbl_reset": "Reimposta mappa"
+  "lbl_reset": "Reimposta mappa",
+  "home_noask": "Non chiedere più",
+  "home_ask": "Chiedi prima di reimpostare la mappa"
  },
  "tr": {
   "yes": "Evet",
@@ -5860,6 +5880,8 @@
   "tip_dbl_open": "Çift dokun: bölgeleri aç",
   "tip_dbl_out": "Çift dokun: uzaklaştır",
   "tip_dbl_zoom": "Çift dokun: yakınlaştır",
-  "lbl_reset": "Haritayı sıfırla"
+  "lbl_reset": "Haritayı sıfırla",
+  "home_noask": "Bir daha sorma",
+  "home_ask": "Haritayı sıfırlamadan önce sor"
  }
 }
