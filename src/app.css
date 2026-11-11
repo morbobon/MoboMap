@@ -1827,3 +1827,102 @@ body.viewer .stage {
   flex: 1;
   min-width: 60px;
 }
+/* Page areas: the spacing diagram (79-page.js) – rings as nested boxes, the sheet with header, map and footer */
+.pgl,
+.pgrow label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--mute);
+}
+.pgrow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.pgrow label {
+  flex: 1;
+}
+.pgd {
+  user-select: none;
+}
+.pgr {
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  padding: 0 9px 9px;
+  background: var(--card);
+  cursor: pointer;
+}
+.pgr > i {
+  display: flex;
+  justify-content: space-between;
+  font-style: normal;
+  font-size: 10.5px;
+  line-height: 17px;
+  color: var(--mute);
+}
+.pgr > i b {
+  font-weight: 600;
+}
+.pgr:hover {
+  border-color: var(--mute);
+}
+.pgr.sel {
+  border-color: var(--accent2);
+  box-shadow: inset 0 0 0 1px var(--accent2);
+}
+.pgr.sel > i {
+  color: var(--ink);
+  font-weight: 600;
+}
+.pgr.na {
+  border-style: dashed;
+  background: none;
+}
+.pgr.na > i {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.pgr-margin {
+  padding: 0;
+  background: var(--panel);
+}
+.pgr-margin > i {
+  padding: 0 9px;
+}
+.pgin {
+  margin: 0 9px 9px;
+}
+.pga {
+  font-size: 10.5px;
+  text-align: center;
+  color: var(--mute);
+  border: 1px dashed var(--line);
+  padding: 3px 0;
+}
+.pga.pgm {
+  padding: 22px 0;
+  border-top: 0;
+}
+.pga.pgf {
+  border-width: 1px 0 0;
+  border-radius: 0 0 4px 4px;
+}
+.pga.off {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+/* what the map fills is tinted */
+.pgd.fill-area .pgm,
+.pgd.fill-sheet .pgr-margin,
+.pgd.fill-page .pgr {
+  background: color-mix(in srgb, var(--accent2) 16%, var(--panel));
+}
+.pgd.fill-sheet .pgr-margin .pga,
+.pgd.fill-page .pga {
+  background: none;
+}
+#pgRingNa[hidden] {
+  display: none;
+}

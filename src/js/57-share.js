@@ -121,6 +121,9 @@ function shareParams() {
     lgd = logoClean(d.logo);
   if (lgo.scale !== lgd.scale) q.set('lg', Math.round(lgo.scale * 100));
   if (lgo.link !== lgd.link) q.set('ll', lgo.link);
+  // page areas (79-page.js): only when they differ from the start map's
+  const pgc = pageCode(p.page);
+  if (pgc !== pageCode(d.page)) q.set('pg', pgc);
   const gs = p.groups.map((g, i) => {
     const f = [
       String(g.color).replace('#', ''),
@@ -167,6 +170,7 @@ function projectFromUrl(search) {
     'lk',
     'lg',
     'll',
+    'pg',
     'c',
     'f',
     'st',
@@ -321,6 +325,7 @@ function projectFromUrl(search) {
   }
   if (q.has('tx')) txFromParam(g('tx'), p);
   if (q.has('lk')) p.lock = lockFromParam(g('lk'));
+  if (q.has('pg')) p.page = pageFromCode(g('pg'));
   if (q.has('lg') || q.has('ll'))
     p.logo = logoClean({
       scale: q.has('lg') ? +g('lg') / 100 : (p.logo || {}).scale,

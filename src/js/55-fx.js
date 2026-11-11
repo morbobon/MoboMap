@@ -406,19 +406,18 @@ let FXL = { s: 1, tx: 0, ty: 0, P: null, active: false };
 function fxLayout() {
   const f = FRAME_SPEC[S.fx.frame] || {},
     S0 = Math.min(W, H);
-  const m = (f.m || 0) * S0,
-    b = (f.b || 0) * S0,
-    t = (f.t || 0) * S0;
+  const edge = fxOn('torn') || fxOn('burnt') ? 0.035 * S0 : 0;
+  const roll = fxOn('roll') ? 0.05 * S0 : 0;
+  // the rings around the sheet: wall, frame band, mat. Each is the frame's own width unless the page sets one
+  // (79-page.js); with no frame a torn/burnt/rolled sheet still gets room for the surface around it
+  const pg = pageOpts(),
+    own = (v, d) => (v == null ? d : (v / 100) * S0);
+  const m = own(pg.wall, (f.m || 0) * S0 || (edge || roll ? 0.04 * S0 : 0)),
+    b = ringOn('band') ? own(pg.band, (f.b || 0) * S0) : 0,
+    t = ringOn('mat') ? own(pg.mat, (f.t || 0) * S0) : 0;
   const Ro = [m, m, W - m, H - m]; // outer edge of the frame (or of the card/print)
   const O = [Ro[0] + b, Ro[1] + b, Ro[2] - b, Ro[3] - b]; // opening (mat area)
   let P = [O[0] + t, O[1] + t, O[2] - t, O[3] - t - (f.bottom || 0) * S0]; // the sheet
-  const edge = fxOn('torn') || fxOn('burnt') ? 0.035 * S0 : 0;
-  const roll = fxOn('roll') ? 0.05 * S0 : 0;
-  if (!m && (edge || roll)) {
-    // no frame: leave room for the surface around a torn/burnt/rolled sheet
-    const e = 0.04 * S0;
-    P = [e, e, W - e, H - e];
-  }
   P = [P[0] + edge, P[1] + edge + roll, P[2] - edge, P[3] - edge - roll];
   // the decorative map border: content (title, footer, logos) fits inside it, the sheet keeps its size
   const bd = fxOn('border') ? 0.055 * S0 : 0;
@@ -426,10 +425,11 @@ function fxLayout() {
   const pw = Pc[2] - Pc[0],
     ph = Pc[3] - Pc[1];
   const s = Math.min(pw / W, ph / H);
-  const active = !!(m || edge || roll || bd);
+  const active = !!(m || b || t || edge || roll || bd);
   return (FXL = {
     f,
     S0,
+    mat: t,
     Ro,
     O,
     P,
@@ -596,6 +596,9 @@ function fxWrap(content, bg, ink, accent) {
   let o = '';
   // wall / table
   if (L.active) o += `<rect width="${W}" height="${H}" fill="${surface}"/>`;
+  // "Map fills: whole page": the map also covers the wall, behind the frame (a copy of the sheet's map)
+  if (L.active && pageOpts().fill === 'page')
+    o += `<rect width="${W}" height="${H}" fill="${bg}"/><use href="#mapz" transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})" pointer-events="none"/>`;
   const kind = f.kind;
   const Ro = L.Ro,
     O = L.O;
@@ -740,7 +743,7 @@ function fxWrap(content, bg, ink, accent) {
   // frame decorations on top of the sheet
   if (FRAMED.includes(kind)) {
     // the window of the mat: bevel (white core) and the shadow it casts on the paper
-    if (f.t) {
+    if (L.mat) {
       o += rect(
         [px0 - 1.5, py0 - 1.5, px1 + 1.5, py1 + 1.5],
         `fill="none" stroke="${kind === 'gold' && f.thin ? '#000' : '#fffefa'}" stroke-width="3"`,

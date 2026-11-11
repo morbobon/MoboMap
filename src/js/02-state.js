@@ -34,6 +34,7 @@ const S = {
   active: 0,
   partners: [],
   logo: { scale: 1, link: '' }, // the brand logo's size on this map and its own link (71-page-items.js)
+  page: null, // page areas: header, footer, map fill, spacing rings – null = the standard (79-page.js)
   texts: [], // custom text items (76-texts.js)
   lock: { on: false, pos: true, zoom: 1, zr: [1, 4], hl: true, edit: false }, // map locks (77-locks.js)
   tb: { title: {}, sub: {} }, // the title's and subtitle's own font, size, colour … (76-texts.js)

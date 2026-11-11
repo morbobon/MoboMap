@@ -76,9 +76,32 @@ function setLayout(id) {
   const foot = footerHeight(); // partner rows (74-partners.js)
   FOOT = foot;
   PAD = { l: Math.round(W * 0.06), r: Math.round(W * 0.06), t: Math.round(H * 0.15), b: Math.round(H * 0.06) + foot };
-  sc = Math.min((W - PAD.l - PAD.r) / mw, (H - PAD.t - PAD.b) / mh);
-  ox = PAD.l + (W - PAD.l - PAD.r - mw * sc) / 2 - M[0] * sc;
-  oy = PAD.t + (H - PAD.t - PAD.b - mh * sc) / 2 - M[1] * sc;
+  // the page's own margin and header (79-page.js); untouched, the lines above stand as they are
+  const pg = pageOpts();
+  if (pg.margin !== PAGE_DEFAULT.margin || pg.headerH !== PAGE_DEFAULT.headerH || !pg.header) {
+    const mx = Math.round((W * pg.margin) / 100),
+      my = Math.round((H * pg.margin) / 100);
+    PAD = { l: mx, r: mx, t: Math.round((H * (pg.margin + (pg.header ? pg.headerH : 0))) / 100), b: my + foot };
+  }
+  // the box the map is fitted in: between header, footer and margins – or, for "whole page", the whole artboard
+  // seen from the sheet (the sheet may be scaled into a frame)
+  let box = [PAD.l, PAD.t, W - PAD.r, H - PAD.b];
+  if (pg.fill === 'page') {
+    const L = fxLayout();
+    box = [-L.tx / L.s, -L.ty / L.s, (W - L.tx) / L.s, (H - L.ty) / L.s];
+  }
+  if (pg.fill === 'page' || box[2] - box[0] < 20 || box[3] - box[1] < 20) {
+    // (a box squeezed to nothing by large margins is fitted the same way, so the scale never turns negative)
+    const bw = Math.max(20, box[2] - box[0]),
+      bh = Math.max(20, box[3] - box[1]);
+    sc = Math.min(bw / mw, bh / mh);
+    ox = box[0] + (box[2] - box[0] - mw * sc) / 2 - M[0] * sc;
+    oy = box[1] + (box[3] - box[1] - mh * sc) / 2 - M[1] * sc;
+  } else {
+    sc = Math.min((W - PAD.l - PAD.r) / mw, (H - PAD.t - PAD.b) / mh);
+    ox = PAD.l + (W - PAD.l - PAD.r - mw * sc) / 2 - M[0] * sc;
+    oy = PAD.t + (H - PAD.t - PAD.b - mh * sc) / 2 - M[1] * sc;
+  }
   const z = S.zoom;
   if (z.k !== 1 || z.x || z.y) {
     sc *= z.k;

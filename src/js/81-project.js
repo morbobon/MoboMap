@@ -57,6 +57,7 @@ function projectState() {
     ...txOut(),
     ...lockOut(),
     ...logoOut(),
+    ...pageOut(),
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
     footer: footerOpts(),
@@ -177,6 +178,7 @@ function loadProject(p, quiet, noDraw) {
   txLoad(p);
   S.lock = lockClean(p.lock);
   S.logo = logoClean(p.logo);
+  S.page = pageClean(p.page);
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',
     link: q.link || '',

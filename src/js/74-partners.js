@@ -64,11 +64,13 @@ const partnersOn = () => document.getElementById('showFooter').checked;
 // the height the rows need (and, while the footer is empty, the band at the bottom that takes a logo back)
 const footerBand = () => Math.round(H * 0.11) + 20 + (footerOpts().rows - 1) * Math.round(H * 0.075);
 function footerHeight() {
-  if (!partnersOn() || !S.partners.some((p) => partnerShown(p) && !partnerFree(p))) return 0;
+  if (!pageOpts().footer || !partnersInRows()) return 0;
   return footerBand();
 }
-// only free logos are shown: they are drawn without a footer
-const partnersLoose = () => !FOOT && partnersOn() && S.partners.some((p) => partnerShown(p) && partnerFree(p));
+// partners that sit in the bottom rows
+const partnersInRows = () => partnersOn() && S.partners.some((p) => partnerShown(p) && !partnerFree(p));
+// partners are shown but no footer holds them (only free logos, or the footer is switched off): drawn without one
+const partnersLoose = () => !FOOT && partnersOn() && S.partners.some((p) => partnerShown(p));
 // the footer's partner logos and the free ones: returns SVG; records slots for drag-and-drop
 // c: { fy, ink, dark, bg, lf, head, label, tOp, dragOf, links }
 function partnersSvg(c) {

@@ -188,6 +188,7 @@ function ui() {
   });
   document.getElementById('addSubBtn').disabled = !S.groups.length;
   partnersUI();
+  pageUI();
   logoUI();
   textsUI();
   lockUI();
@@ -792,7 +793,7 @@ window.addEventListener('pointermove', (e) => {
   SNAP_GUIDES = null;
   if (SNAP_KEYS.includes(textDrag.key) && snapOn() && !e.ctrlKey && !e.metaKey && textDrag.box) {
     const [bx0, by0, bx1, by1] = textDrag.box;
-    const mx = PAD.l - 12,
+    const mx = Math.max(10, PAD.l - 12),
       my = 22,
       T = 16;
     const xs = [

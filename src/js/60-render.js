@@ -768,12 +768,18 @@ function render(target) {
     const step = Math.min(70, avail / n);
     const y0 = (H - FOOT - step * (n - 1)) / 2 + 40;
     const z = S.zoom;
+    // the page edges the labels keep to – the map area's when the map is cut off there (79-page.js)
+    const inArea = pageOpts().fill === 'area';
+    const cL = inArea ? PAD.l + 6 : 24,
+      cR = inArea ? W - PAD.r - 6 : W - 24,
+      cT = inArea ? PAD.t + 16 : PAD.t * 0.6,
+      cB = inArea ? H - PAD.b - 8 : H - FOOT - 24;
     arr.forEach((o, i) => {
       // position on the unzoomed page, then moved with the map (zoom/pan), then by the user's drag
       const [ddx, ddy] = dragOf('co:' + o.key);
       // follows zoom/pan, but never leaves the page; the user's drag comes on top
-      const tx = Math.min(W - 24, Math.max(24, (side === 'l' ? 24 : W - 24) * z.k + z.x)) + ddx,
-        lab = Math.min(H - FOOT - 24, Math.max(PAD.t * 0.6, (y0 + i * step) * z.k + z.y)) + ddy;
+      const tx = Math.min(cR, Math.max(cL, (side === 'l' ? 24 : W - 24) * z.k + z.x)) + ddx,
+        lab = Math.min(cB, Math.max(cT, (y0 + i * step) * z.k + z.y)) + ddy;
       const name = o.text,
         nw = name.length * 15 * 0.6,
         rw = o.reg.length * (9 * 0.66 + 1.5) + 4,
@@ -788,7 +794,26 @@ function render(target) {
     });
   }
   out += '</g>';
-  out = out.slice(0, mapStart) + '<g id="mapz">' + out.slice(mapStart) + '</g><g pointer-events="none">';
+  // "Map fills: map area" cuts the map off at header, footer and margins (the clip sits outside mapz, which moves)
+  const pg = pageOpts(),
+    mapClip =
+      pg.fill === 'area'
+        ? `<clipPath id="pgmap"><rect x="${PAD.l}" y="${PAD.t}" width="${Math.max(0, W - PAD.l - PAD.r)}" height="${Math.max(0, H - PAD.t - PAD.b)}"/></clipPath><g clip-path="url(#pgmap)">`
+        : '';
+  out =
+    out.slice(0, mapStart) +
+    mapClip +
+    '<g id="mapz">' +
+    out.slice(mapStart) +
+    '</g>' +
+    (mapClip ? '</g>' : '') +
+    '<g pointer-events="none">';
+  // the sheet margin moves what sits at the page edges: pmx = the side the texts and the logo line up on,
+  // pdy = how far the header's content moves down (0 with the standard margin), pfoot = the room kept free at
+  // the bottom for partner logos (the footer, or their row when the footer is switched off)
+  const pmx = Math.max(10, PAD.l - 12),
+    pdy = pageShift(),
+    pfoot = FOOT || (!pg.footer && partnersInRows() ? footerBand() : 0);
   // signaturforklaring
   // Title/subtitle text and positions (computed before the legend, which moves up to make room).
   // Positions: t/b (top/bottom) + l/c/r. Title "auto" follows the map style; subtitle "under" sits below the title.
@@ -811,10 +836,10 @@ function render(target) {
   if (tp === 'auto') tp = 't' + (sp.titleAlign || 'left')[0];
   let sPos = document.getElementById('subPos').value;
   if (sPos === tp || !title) sPos = 'under';
-  const hx = (h) => (h === 'c' ? W / 2 : h === 'r' ? W - PAD.l + 12 : PAD.l - 12);
+  const hx = (h) => (h === 'c' ? W / 2 : h === 'r' ? W - pmx : pmx);
   const anc = (h) => (h === 'c' ? 'middle' : h === 'r' ? 'end' : 'start');
-  const top = Math.round(ts * 2),
-    bot = H - FOOT - Math.round(H * 0.035);
+  const top = Math.round(ts * 2) + pdy,
+    bot = H - pfoot - Math.round(H * 0.035) - Math.max(0, pdy);
   // title / subtitle flair: the room it needs moves the texts (see 59-text-fx.js)
   const tfx = textFxOf('title'),
     sfx = textFxOf('sub');
@@ -873,15 +898,20 @@ function render(target) {
     // with a frame line, picture frame, cut edges or map border the legend moves further into the map
     const framed = frame || FXL.active || fxOn('border');
     const inset = framed ? Math.round(Math.min(W, H) * 0.04) : 0;
-    let bottom = H - FOOT - (frame && !FOOT ? 34 : 14) - inset;
-    if (textTop[side] != null) bottom -= Math.max(0, H - FOOT - 2 - textTop[side]);
+    let bottom = H - pfoot - (frame && !pfoot ? 34 : 14) - inset - Math.max(0, pdy);
+    if (textTop[side] != null) bottom -= Math.max(0, H - pfoot - 2 - textTop[side] - Math.max(0, pdy));
     // one legend box above `bottom`; returns its top, where the next one stacks
     const box = (list, key) => {
       let y = bottom - list.length * 18;
       const top = y - 8;
       const lw =
         Math.max(...list.map((o) => o.label.length * (o.src ? 5.2 : o.bold ? 6.8 : 6.2) + (o.ind ? 12 : 0))) + 50;
-      const x = side === 'c' ? (W - lw) / 2 : side === 'r' ? W - PAD.r + 20 - lw - inset : PAD.l - 20 + inset;
+      const x =
+        side === 'c'
+          ? (W - lw) / 2
+          : side === 'r'
+            ? W - Math.max(4, PAD.r - 20) - lw - inset
+            : Math.max(4, PAD.l - 20) + inset;
       let lg = `<rect x="${x - 8}" y="${y - 8}" width="${lw}" height="${list.length * 18 + 12}" rx="6" fill="${bg}" fill-opacity=".85"/>`;
       list.forEach((o) => {
         const ix = x + (o.ind ? 12 : 0);
@@ -962,9 +992,13 @@ function render(target) {
   out += textItemsSvg({ ds, ink, bg, dark, guard, textBgs, hcol, Lt, dragG });
   // the logo's own size on this map (S.logo.scale): it grows from its top right corner, where it meets the margins
   const logoS = logoScale(),
-    lax = W - PAD.l + 12;
-  const logoSized = (inner) =>
-    logoS === 1 ? inner : `<g transform="translate(${lax} 46) scale(${logoS}) translate(${-lax} -46)">${inner}</g>`;
+    lax = W - pmx;
+  // (with another sheet margin the logo moves with the header's content: pdy)
+  const logoSized = (inner) => {
+    const g =
+      logoS === 1 ? inner : `<g transform="translate(${lax} 46) scale(${logoS}) translate(${-lax} -46)">${inner}</g>`;
+    return pdy ? `<g transform="translate(0 ${pdy})">${g}</g>` : g;
+  };
   let logoBox = null; // [x, y, w, h] as drawn at size 1
   if (document.getElementById('showLogo').checked) {
     const L = D.company.logo;
@@ -987,16 +1021,14 @@ function render(target) {
       if (!box) {
         out += dragG(
           'logo',
-          logoSized(
-            `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`,
-          ),
+          logoSized(`<image href="${L.src}" x="${W - pmx - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`),
         );
         logoBox = [lax - lw, 46, lw, lh];
       } else {
         out += dragG(
           'logo',
           logoSized(
-            `<rect x="${W - PAD.l + 12 - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`,
+            `<rect x="${W - pmx - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - pmx - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`,
           ),
         );
         logoBox = [lax - lw - 22, 38, lw + 44, lh + 30];
@@ -1007,7 +1039,7 @@ function render(target) {
         out += dragG(
           'logo',
           logoSized(
-            `<text x="${W - PAD.l + 12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - PAD.l + 12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`,
+            `<text x="${W - pmx}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - pmx}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`,
           ),
         );
         const tw = textW(txt, ds.head, 700, 20);
@@ -1024,25 +1056,25 @@ function render(target) {
     const [dx, dy] = dragOf('logo');
     window._links.push({
       x: lax + (logoBox[0] - lax) * logoS + dx,
-      y: 46 + (logoBox[1] - 46) * logoS + dy,
+      y: 46 + (logoBox[1] - 46) * logoS + dy + pdy,
       w: logoBox[2] * logoS,
       h: logoBox[3] * logoS,
       url: logoUrl,
     });
   }
+  const label = document.getElementById('footerLabel').value;
   if (FOOT) {
     const fy = H - FOOT;
-    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y)
+    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page')
       out += `<rect x="0" y="${fy}" width="${W}" height="${FOOT}" fill="${bg}"/>`;
-    const label = document.getElementById('footerLabel').value;
     const dv = D.footer.divider;
     let dcol = dv.color || ds.primary;
     // the brand divider keeps its colour unless it would disappear on this background
     const dop = dv.opacity != null ? dv.opacity : 1;
     const dvis = (c) => Math.min(...textBgs.filter(isHex).map((b) => contrast(mix(c, b, 1 - dop), b)));
     if (guard && dvis(dcol) < 2) dcol = readable([dcol, ds.accent, ds.primary, ink0, ink], textBgs, 3, dop);
-    const dw = dv.width <= 1 ? (W - 2 * (PAD.l - 12)) * dv.width : dv.width;
-    const dx = dv.align === 'center' ? (W - dw) / 2 : dv.align === 'right' ? W - PAD.l + 12 - dw : PAD.l - 12;
+    const dw = dv.width <= 1 ? (W - 2 * pmx) * dv.width : dv.width;
+    const dx = dv.align === 'center' ? (W - dw) / 2 : dv.align === 'right' ? W - pmx - dw : pmx;
     out += '<g pointer-events="none">';
     if (dv.style === 'bar')
       out += `<rect x="${dx.toFixed(1)}" y="${(fy - dv.height / 2).toFixed(1)}" width="${dw.toFixed(1)}" height="${dv.height}" rx="${dv.height / 2}" fill="${dcol}" fill-opacity="${dv.opacity}"/>`;
@@ -1063,7 +1095,8 @@ function render(target) {
     });
     out += '</g>';
   } else if (partnersLoose())
-    // every partner shown is a free logo: no footer, the logos where they were put
+    // no footer: every partner shown is a free logo, drawn where it was put – or the footer is switched off
+    // (79-page.js) and the logos sit in their bottom rows on top of the map, with no room kept for them
     out +=
       '<g pointer-events="none">' +
       partnersSvg({
@@ -1073,7 +1106,7 @@ function render(target) {
         bg,
         lf,
         head: ds.head,
-        label: '',
+        label: partnersInRows() ? label : '',
         tOp,
         dragOf,
         links: window._links,

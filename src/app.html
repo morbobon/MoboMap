@@ -306,6 +306,42 @@
               <div class="grid4" id="layouts"></div>
             </div>
           </section>
+          <section class="sec" data-sec="areas">
+            <h2 onclick="toggleSec('areas')"><span class="chev"></span><span data-i18n="sec_areas"></span></h2>
+            <div class="body">
+              <label class="pgl"
+                ><span data-i18n="pg_fill"></span
+                ><select id="pgFill" onchange="pageSet('fill', this.value)" data-i18n-title="pg_fill_t">
+                  <option value="area" data-i18n="pg_fill_area"></option>
+                  <option value="sheet" data-i18n="pg_fill_sheet"></option>
+                  <option value="page" data-i18n="pg_fill_page"></option></select
+              ></label>
+              <label class="ck" data-i18n-title="pg_header_t"
+                ><input type="checkbox" id="pgHeader" checked onchange="pageSet('header', this.checked)" />
+                <span data-i18n="pg_header"></span
+              ></label>
+              <label class="pgl"
+                ><span data-i18n="pg_header_h"></span> <b id="pgHeaderHV"></b
+                ><input
+                  type="range"
+                  id="pgHeaderH"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  oninput="pageSet('headerH', +this.value)"
+              /></label>
+              <div class="note" data-i18n="pg_spacing"></div>
+              <div class="pgd" id="pgRings"></div>
+              <div class="pgrow">
+                <label
+                  ><span id="pgRingN"></span> <b id="pgRingV"></b
+                  ><input type="range" id="pgRingW" min="0" max="20" step="0.5" oninput="ringSet(PG.ring, +this.value)"
+                /></label>
+                <button class="chip" id="pgRingStd" onclick="ringSet(PG.ring, null)" data-i18n="pg_r_std"></button>
+              </div>
+              <div class="note" id="pgRingNa" data-i18n="pg_r_na" hidden></div>
+            </div>
+          </section>
           <section class="sec" data-sec="text">
             <h2 onclick="toggleSec('text')">
               <span class="chev"></span><span data-i18n="sec_text"></span><span class="sum" id="textInfo"></span>
@@ -403,6 +439,90 @@
                 <option value="on" data-i18n="frame_on"></option>
                 <option value="off" data-i18n="frame_off"></option>
               </select>
+            </div>
+          </section>
+          <section class="sec" data-sec="footer">
+            <h2 onclick="toggleSec('footer')">
+              <span class="chev"></span><span data-i18n="sec_footer"></span><span class="sum" id="partnerCount"></span>
+            </h2>
+            <div class="body">
+              <label class="ck" data-i18n-title="pg_footer_t"
+                ><input type="checkbox" id="pgFooter" checked onchange="pageSet('footer', this.checked)" />
+                <span data-i18n="pg_footer"></span
+              ></label>
+              <label class="ck"
+                ><input type="checkbox" id="showFooter" checked onchange="render()" />
+                <span data-i18n="show_footer"></span
+              ></label>
+              <input
+                type="text"
+                id="footerLabel"
+                value=""
+                oninput="
+                  this.dataset.auto = '0';
+                  render();
+                "
+                data-i18n-ph="ph_footer"
+              />
+              <div class="row2">
+                <label
+                  ><span data-i18n="pt_rows"></span
+                  ><select id="ptRows" onchange="setFooterOpt('rows', +this.value)">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select></label
+                >
+                <label
+                  ><span data-i18n="pt_margin"></span> <b id="ptMarginV"></b
+                  ><input
+                    type="range"
+                    id="ptMargin"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    oninput="setFooterOpt('margin', +this.value)"
+                /></label>
+              </div>
+              <div class="row2">
+                <label
+                  ><span data-i18n="pt_align"></span
+                  ><select id="ptAlign" onchange="setFooterOpt('align', this.value)">
+                    <option value="left" data-i18n="al_left"></option>
+                    <option value="center" data-i18n="al_center"></option>
+                    <option value="right" data-i18n="al_right"></option></select
+                ></label>
+              </div>
+              <div class="row2 rowaligns" id="ptRowAlign"></div>
+              <label class="ck" data-i18n-title="pt_auto_t"
+                ><input type="checkbox" id="ptAuto" checked onchange="setFooterOpt('autoScale', this.checked)" />
+                <span data-i18n="pt_auto"></span
+              ></label>
+              <div id="partners"></div>
+              <details>
+                <summary data-i18n="add_partner"></summary>
+                <input type="text" id="pName" data-i18n-ph="ph_name" />
+                <input type="url" id="pLink" data-i18n-ph="ph_link" />
+                <div class="row">
+                  <button class="chip" onclick="document.getElementById('pFile').click()">
+                    <span data-i18n="pick_logo_p"></span>
+                  </button>
+                  <input
+                    type="file"
+                    id="pFile"
+                    accept="image/*"
+                    hidden
+                    onchange="
+                      pickPartnerLogo(this.files[0]);
+                      this.value = '';
+                    "
+                  />
+                  <span id="pFileName" class="note"></span>
+                  <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
+                </div>
+                <p class="note" data-i18n="partner_note"></p>
+              </details>
             </div>
           </section>
         </div>
@@ -507,86 +627,6 @@
               /></label>
               <input type="url" id="logoLink" data-i18n-ph="ph_link" oninput="logoSet('link', this.value)" />
               <p class="note" data-i18n="logo_note"></p>
-            </div>
-          </section>
-          <section class="sec" data-sec="footer">
-            <h2 onclick="toggleSec('footer')">
-              <span class="chev"></span><span data-i18n="sec_footer"></span><span class="sum" id="partnerCount"></span>
-            </h2>
-            <div class="body">
-              <label class="ck"
-                ><input type="checkbox" id="showFooter" checked onchange="render()" />
-                <span data-i18n="show_footer"></span
-              ></label>
-              <input
-                type="text"
-                id="footerLabel"
-                value=""
-                oninput="
-                  this.dataset.auto = '0';
-                  render();
-                "
-                data-i18n-ph="ph_footer"
-              />
-              <div class="row2">
-                <label
-                  ><span data-i18n="pt_rows"></span
-                  ><select id="ptRows" onchange="setFooterOpt('rows', +this.value)">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                  </select></label
-                >
-                <label
-                  ><span data-i18n="pt_margin"></span> <b id="ptMarginV"></b
-                  ><input
-                    type="range"
-                    id="ptMargin"
-                    min="0"
-                    max="20"
-                    step="0.5"
-                    oninput="setFooterOpt('margin', +this.value)"
-                /></label>
-              </div>
-              <div class="row2">
-                <label
-                  ><span data-i18n="pt_align"></span
-                  ><select id="ptAlign" onchange="setFooterOpt('align', this.value)">
-                    <option value="left" data-i18n="al_left"></option>
-                    <option value="center" data-i18n="al_center"></option>
-                    <option value="right" data-i18n="al_right"></option></select
-                ></label>
-              </div>
-              <div class="row2 rowaligns" id="ptRowAlign"></div>
-              <label class="ck" data-i18n-title="pt_auto_t"
-                ><input type="checkbox" id="ptAuto" checked onchange="setFooterOpt('autoScale', this.checked)" />
-                <span data-i18n="pt_auto"></span
-              ></label>
-              <div id="partners"></div>
-              <details>
-                <summary data-i18n="add_partner"></summary>
-                <input type="text" id="pName" data-i18n-ph="ph_name" />
-                <input type="url" id="pLink" data-i18n-ph="ph_link" />
-                <div class="row">
-                  <button class="chip" onclick="document.getElementById('pFile').click()">
-                    <span data-i18n="pick_logo_p"></span>
-                  </button>
-                  <input
-                    type="file"
-                    id="pFile"
-                    accept="image/*"
-                    hidden
-                    onchange="
-                      pickPartnerLogo(this.files[0]);
-                      this.value = '';
-                    "
-                  />
-                  <span id="pFileName" class="note"></span>
-                  <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
-                </div>
-                <p class="note" data-i18n="partner_note"></p>
-              </details>
             </div>
           </section>
         </div>
