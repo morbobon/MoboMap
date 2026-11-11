@@ -1,5 +1,6 @@
 // the page as an SVG to rasterize: no pulsing pins or hover outline, fonts embedded
 function exportSvg() {
+  snapSettle(); // the drawing itself, not a gesture's picture of it
   const el = document.getElementById('svg').cloneNode(true);
   el.querySelectorAll('.pulse').forEach((c) => c.removeAttribute('class'));
   el.querySelector('#hoverwrap')?.remove();
@@ -252,4 +253,4 @@ function dl(u, n) {
   a.click();
   a.remove();
 }
-window.exportSVG = () => new XMLSerializer().serializeToString(document.getElementById('svg'));
+window.exportSVG = () => (snapSettle(), new XMLSerializer()).serializeToString(document.getElementById('svg'));

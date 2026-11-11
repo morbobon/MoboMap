@@ -1157,6 +1157,9 @@ function render(target) {
     window._links = links;
     return;
   }
+  // (a gesture's picture of the last drawing goes with it: 69-snapshot.js)
+  snapDrop();
+  gestureEnd();
   document.getElementById('svg').innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
   DRAWN = { view: S.map + '|' + S.country + '|' + S.focus, zoom: Object.assign({}, S.zoom) };
   const wrap = document.getElementById('wrap');

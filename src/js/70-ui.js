@@ -469,8 +469,10 @@ function unitEl(target) {
   REP_DX = 0;
   if (!target || !target.closest) return null;
   const k = target.closest('.k');
-  if (k || !REP || !target.classList || !target.classList.contains('rp')) return k;
-  const body = document.getElementById('mapzr'),
+  // (the same goes for the picture that stands for the map while it is moved, 69-snapshot.js)
+  const snap = !!target.classList && target.classList.contains('snp');
+  if (k || !target.classList || !(snap || (REP && target.classList.contains('rp')))) return k;
+  const body = document.getElementById('mapzr') || (snap && document.getElementById('mapz')),
     m = body && body.getScreenCTM();
   if (!m) return null;
   // (asked several times per mouse move: answered once)
@@ -479,7 +481,7 @@ function unitEl(target) {
     return REP_HIT.k;
   }
   const pt = new DOMPoint(PTR[0], PTR[1]).matrixTransform(m.inverse());
-  const dx = Math.round((pt.x - REP.cx) / REP.per) * REP.per;
+  const dx = REP ? Math.round((pt.x - REP.cx) / REP.per) * REP.per : 0;
   pt.x -= dx;
   const ks = body.querySelectorAll('.k');
   let hit = null;
@@ -524,8 +526,13 @@ function zoomPreview() {
   const z0 = DRAWN.zoom,
     z = S.zoom,
     s = z.k / z0.k;
-  g.setAttribute('transform', `translate(${z.x - z0.x * s} ${z.y - z0.y * s}) scale(${s})`);
-  if (REP && REP.tile) {
+  const tr = `translate(${z.x - z0.x * s} ${z.y - z0.y * s}) scale(${s})`,
+    pic = snapFrame(tr);
+  // the map stands still for a moment while a picture of it is made (69-snapshot.js)
+  if (pic === 1) return true;
+  g.setAttribute('transform', tr);
+  // (while the picture is shown instead of the map, the copies are not painted and stay as they are)
+  if (!pic && REP && REP.tile) {
     // the repeated world never runs out: the copies move to the turns around the one now in the middle
     const tx = z.x - z0.x * s,
       slots = repSlots((FILL[0] - tx) / s, (FILL[2] - tx) / s);
@@ -673,6 +680,8 @@ function pointerEnd(e) {
   drag = null;
   document.getElementById('wrap').classList.remove('panning');
 }
+// (the browser's own drag of a picture or of selected text would take the pointer away in the middle of a pan)
+svg.addEventListener('dragstart', (e) => e.preventDefault());
 window.addEventListener('pointerup', pointerEnd);
 window.addEventListener('pointercancel', pointerEnd);
 // a drag is not a click (capture phase: runs before the selection handler)

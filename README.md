@@ -10,7 +10,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, **topographic (real elevation)**, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
 - **Far-away parts** – Alaska and Hawaii, the Canary Islands, Madeira and the Azores, Svalbard, French overseas regions, Bornholm …: shown in **inset boxes** (each in its own equal-area projection, placed in the emptiest corner), in place, or hidden (main part only). Detected automatically from distance to the main landmass and share of the area.
-- **Zoom and pan** – mouse wheel zooms around the cursor, drag to pan; "Reset zoom" or a new focus resets. Exports and saved projects keep the zoom.
+- **Zoom and pan** – mouse wheel zooms around the cursor, drag to pan; "Reset zoom" or a new focus resets. Exports and saved projects keep the zoom. A detailed map (relief, the repeated world) that would move slowly is shown as a picture of itself while it is moved, so wheel, drag and pinch stay smooth; it is drawn again, sharp, as soon as the view rests.
 - **Go to, zoom and page scale** – three different things: *going to* an area (Focus, Ctrl+click or a double tap, the context menu: "Open Denmark", "Go to Bavaria", "Back to Germany") changes what the map shows; the map's own *zoom* (wheel, pinch) magnifies the map inside the page; the **page scale** (the magnifier on the map) magnifies the whole page on this screen only – the design, projects, links and exports do not change, and the frame scrolls. On a map with a locked zoom, two fingers scale the page; on one with a locked position, dragging scrolls it.
 - **Auto-detail zoom** (on by default, Map tab) – zoom in until a country fills more than half of the page and it opens with its regions; zoom out until a country (or a focus, e.g. a city) is below a quarter of its full-page size and you step up a level. The view stays where it was, and the world map keeps its selections and statistic for when you come back.
 - **Home** – click *MoboMap* in the header to return to the start map; with unsaved changes it first offers to save them as a look in the browser or as a project file.
@@ -196,6 +196,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   55-fx                      effects, picture frames and presets (the map as a sheet in a scene)
   56-workspace               tabs, export menu, looks strip with thumbnails, undo/redo
   60-render                  render(): builds the SVG
+  69-snapshot                the map as a picture while a gesture moves it
   70-ui                      side panel, focus/drill-down, groups, map events
   71-page-items              page items: resize by wheel or corner handle (logo, partner logos, texts), the brand logo's size and link
   72-decor                   decorations: compass, map border, rhumb lines, scale bar, graticule, stamps, corner flourishes
