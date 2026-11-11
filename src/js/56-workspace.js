@@ -134,6 +134,7 @@ function thumbKey() {
     S.ds,
     S.attr,
     S.proj,
+    S.repeat !== false,
     S.far,
     S.lang,
     S.groups.map((g) => [g.color, g.op, g.off, g.sel.size, [...g.hl], g.parent, g.legend, g.nameLabel, g.sepLegend]),

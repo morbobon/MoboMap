@@ -64,6 +64,9 @@ function ui() {
   far.style.display = farParts(S.country ? countryData(S.country) : DATA.world) ? '' : 'none';
   far.value = S.far;
   if (GEO.geo) ps.value = S.proj;
+  // "Repeat the world": only where the world can repeat (41-projections.js: cyl)
+  document.getElementById('repWorldRow').style.display = S.map === 'world' && (PROJS[S.proj] || {}).cyl ? '' : 'none';
+  document.getElementById('repWorld').checked = S.repeat !== false;
   const fsel = document.getElementById('focusSel2');
   const cmp = (a, b) => a[1].localeCompare(b[1], S.lang);
   const ctry = [...new Set([...Object.keys(DATA.adm1i), 'DNK'])].map((c) => [c, countryName(c)]).sort(cmp);
@@ -414,7 +417,7 @@ function focusClick(c) {
 // is undone, so a double-tap only navigates
 let lastTap = null;
 svg.addEventListener('click', (e) => {
-  const p = e.target.closest('.k');
+  const p = unitEl(e.target);
   const touch = lastPointer === 'touch';
   // a locked position: no going to another area
   if (touch && lastTap && lastTap.c === (p ? p.dataset.c : null) && Date.now() - lastTap.t < 350 && !lockOn('pos')) {
@@ -454,6 +457,41 @@ svg.addEventListener('click', (e) => {
   ui();
   render();
 });
+// ---- the unit under the pointer ----
+// In the repeated world a copy of the map (<use class="rp">, 60-render.js) is one element: the unit is then found
+// by where the pointer is, in the main copy one or more turns to the side. REP_DX is how far to the side.
+let PTR = [0, 0],
+  REP_DX = 0,
+  REP_HIT = null;
+for (const ev of ['pointerdown', 'pointermove', 'wheel', 'contextmenu'])
+  addEventListener(ev, (e) => (PTR = [e.clientX, e.clientY]), { capture: true, passive: true });
+function unitEl(target) {
+  REP_DX = 0;
+  if (!target || !target.closest) return null;
+  const k = target.closest('.k');
+  if (k || !REP || !target.classList || !target.classList.contains('rp')) return k;
+  const body = document.getElementById('mapzr'),
+    m = body && body.getScreenCTM();
+  if (!m) return null;
+  // (asked several times per mouse move: answered once)
+  if (REP_HIT && REP_HIT.b === body && REP_HIT.x === PTR[0] && REP_HIT.y === PTR[1]) {
+    REP_DX = REP_HIT.dx;
+    return REP_HIT.k;
+  }
+  const pt = new DOMPoint(PTR[0], PTR[1]).matrixTransform(m.inverse());
+  const dx = Math.round((pt.x - REP.cx) / REP.per) * REP.per;
+  pt.x -= dx;
+  const ks = body.querySelectorAll('.k');
+  let hit = null;
+  for (let i = ks.length; i-- && !hit;) {
+    // a raised highlight is moved by its group
+    const up = ks[i].parentNode.getAttribute('transform') ? 6 : 0;
+    if (ks[i].isPointInFill(up ? new DOMPoint(pt.x, pt.y + up) : pt)) hit = ks[i];
+  }
+  REP_HIT = { b: body, x: PTR[0], y: PTR[1], k: hit, dx };
+  REP_DX = hit ? dx : 0;
+  return hit;
+}
 // ---- wheel zoom (around the cursor) and drag pan; "Reset zoom" or a new focus/country resets ----
 function svgPoint(e) {
   const r = svg.getBoundingClientRect();
@@ -487,6 +525,20 @@ function zoomPreview() {
     z = S.zoom,
     s = z.k / z0.k;
   g.setAttribute('transform', `translate(${z.x - z0.x * s} ${z.y - z0.y * s}) scale(${s})`);
+  if (REP && REP.tile) {
+    // the repeated world never runs out: the copies move to the turns around the one now in the middle
+    const tx = z.x - z0.x * s,
+      slots = repSlots((FILL[0] - tx) / s, (FILL[2] - tx) / s);
+    // (only what changes is written: a copy that is touched is painted again)
+    g.querySelectorAll('use.rp').forEach((u, i) => {
+      const tr = i < slots.length ? 'translate(' + (slots[i] * REP.per).toFixed(2) + ',0)' : null;
+      if (tr === (u.getAttribute('display') ? null : u.getAttribute('transform'))) return;
+      if (tr) {
+        u.removeAttribute('display');
+        u.setAttribute('transform', tr);
+      } else u.setAttribute('display', 'none');
+    });
+  }
   hoverLine(null);
   return true;
 }
@@ -517,7 +569,7 @@ svg.addEventListener(
       by = (sy - z.y) / z.k;
     S.zoom = { k: k2, x: sx - bx * k2, y: sy - by * k2 };
     // auto-detail: a country filling the page opens its regions, a small map steps up a level
-    const under = e.target.closest && e.target.closest('.k');
+    const under = unitEl(e.target);
     if (!lockOn('pos') && typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c, k2 > z.k))
       return;
     zoomChanged(true);
@@ -634,10 +686,14 @@ svg.addEventListener(
   },
   true,
 );
-svg.addEventListener('mousemove', (e) => showTip(e.target, e.clientX, e.clientY));
+svg.addEventListener('mousemove', (e) => {
+  showTip(e.target, e.clientX, e.clientY);
+  // inside a copy of the repeated world no mouseover tells one unit from the next
+  if (e.target.classList.contains('rp')) hoverAt(e.target);
+});
 // the unit's tooltip at a screen point (mouse hover, or a long press on touch screens)
 function showTip(target, cx, cy) {
-  const p = target.closest && target.closest('.k');
+  const p = unitEl(target);
   if (!p) {
     tip.style.display = 'none';
     return;
@@ -684,6 +740,7 @@ function hoverLine(p) {
   // same placement as the unit: the frame/sheet transform, then the unit's own (raised highlight)
   const t = [
     FXL.active ? 'translate(' + FXL.tx + ',' + FXL.ty + ') scale(' + FXL.s + ')' : '',
+    REP_DX ? 'translate(' + REP_DX.toFixed(2) + ',0)' : '',
     p.parentNode.getAttribute('transform') || '',
   ]
     .join(' ')
@@ -696,11 +753,12 @@ svg.addEventListener('mouseleave', () => {
   tip.style.display = 'none';
   hoverLine(null);
 });
-svg.addEventListener('mouseover', (e) => {
+function hoverAt(target) {
   // locked highlights: only areas that do something (a text's trigger, 78-triggers.js) are outlined
-  const k = e.target.closest('.k');
+  const k = unitEl(target);
   hoverLine(k && lockOn('hl') && !(typeof txHot === 'function' && txHot(k.dataset.c)) ? null : k);
-});
+}
+svg.addEventListener('mouseover', (e) => hoverAt(e.target));
 
 // ---- collapsible panel sections (open/closed remembered per browser) ----
 const SEC_KEY = 'mobomap.sections';

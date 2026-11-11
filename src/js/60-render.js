@@ -143,7 +143,9 @@ function render(target) {
   const onCol = (c) => (light(c) ? '#1b1b1b' : '#ffffff');
   // Blur/shadow filters use a fixed region covering the whole artboard (plus a margin for the emboss
   // translate). A bbox-relative region clips the blur to a visible box around small units.
-  const FR = `filterUnits="userSpaceOnUse" x="-50" y="-50" width="${W + 100}" height="${H + 100}"`;
+  // (the world repeated: one whole turn of it, which can reach past the artboard)
+  const frx = REP && REP.tile ? [Math.min(-50, REP.e0 - 50), Math.max(W + 50, REP.e1 + 50)] : [-50, W + 50];
+  const FR = `filterUnits="userSpaceOnUse" x="${frx[0].toFixed(0)}" y="-50" width="${(frx[1] - frx[0]).toFixed(0)}" height="${H + 100}"`;
   let defs = `<defs>
   <filter id="glow" ${FR}><feGaussianBlur stdDeviation="6" result="b1"/><feGaussianBlur stdDeviation="14" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="hlshadow" ${FR}><feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="${dark ? 0.75 : 0.45}"/></filter>
@@ -454,7 +456,7 @@ function render(target) {
     out += '</g>';
   }
   if (sp.sea && !S.focusHide) {
-    const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
+    const sea = (GEO.sea || []).map((x) => [...repPt(worldPt(x[0] + 180, 90 - x[1])), t(x[2]).toUpperCase()]);
     out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
     for (const [fx, fy, t] of sea)
       out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle">${t}</text>`;
@@ -468,11 +470,11 @@ function render(target) {
     out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="9" letter-spacing="2" font-weight="600" opacity="${regOk ? 0.65 : 0.9}" fill="${regCol}" ${!regOk ? `stroke="${light(regCol) ? '#000000' : '#ffffff'}" stroke-opacity=".6" stroke-width="2.4" paint-order="stroke"` : ''}>`;
     for (const r in REGC) {
       if (S.focus) break;
-      const [x, y] = P(REGC[r][0], REGC[r][1]);
+      const [x, y] = repPt(P(REGC[r][0], REGC[r][1]));
       out += `<text x="${x.toFixed(0)}" y="${(y + 3).toFixed(0)}" text-anchor="middle">${GEO.groups[r].toUpperCase()}</text>`;
     }
     if (st === 'atlas' && !S.focusHide) {
-      const sea = (GEO.sea || []).map((x) => [...worldPt(x[0] + 180, 90 - x[1]), t(x[2]).toUpperCase()]);
+      const sea = (GEO.sea || []).map((x) => [...repPt(worldPt(x[0] + 180, 90 - x[1])), t(x[2]).toUpperCase()]);
       for (const [fx, fy, t] of sea)
         out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle" font-style="italic" font-weight="400" letter-spacing="3">${t}</text>`;
     }
@@ -564,7 +566,10 @@ function render(target) {
     const tr = g.hl.has('emboss') ? ' transform="translate(0,-6)"' : '';
     out += `<mask id="om${gi}" maskUnits="userSpaceOnUse" ${bgR}><rect ${bgR} fill="#fff"/><path d="${d}" fill="#000"${tr}/></mask><path d="${d}" fill="none" stroke="${g.color}" stroke-width="6.4" stroke-linejoin="round" mask="url(#om${gi})"${tr} pointer-events="none"/>`;
   });
-  out += fxMap(allPath, ink, ds.accent);
+  out += fxMap(allPath, ink);
+  // up to here the map body: what the repeated world shows in every copy. What follows exists once.
+  const bodyEnd = out.length;
+  out += decoMapTop(ink, ds.accent);
   // major cities (country views, or focused units in the world view)
   const CL =
     S.map !== 'world'
@@ -581,11 +586,11 @@ function render(target) {
     for (const u of [0]) {
       // every dot first, so no label covers a city that is drawn later
       for (const c of CL) {
-        const [dx, dy0] = S.map === 'world' ? P(c.x, c.y) : cityPt(c);
+        const [dx, dy0] = S.map === 'world' ? repPt(P(c.x, c.y)) : cityPt(c);
         cityBoxes.push([dx - 5, dy0 - 5, dx + 5, dy0 + 5]);
       }
       for (const c of CL) {
-        const [x, y] = S.map === 'world' ? P(c.x, c.y) : cityPt(c);
+        const [x, y] = S.map === 'world' ? repPt(P(c.x, c.y)) : cityPt(c);
         const big = c.cap || c.pop > (S.map === 'dk' ? 2e5 : 2e6);
         const fs = big ? 12 : 10,
           tw = c.n.length * fs * 0.56;
@@ -800,11 +805,29 @@ function render(target) {
       pg.fill === 'area'
         ? `<clipPath id="pgmap"><rect x="${PAD.l}" y="${PAD.t}" width="${Math.max(0, W - PAD.l - PAD.r)}" height="${Math.max(0, H - PAD.t - PAD.b)}"/></clipPath><g clip-path="url(#pgmap)">`
         : '';
+  // The world repeated (REP.tile, 42-viewport.js): the body is cut to its span e0–e1, and copies of it, each cut
+  // to one turn, lie to both sides of that span. The copies lie under their neighbours and are cut a little
+  // wider, so no hairline shows where two meet.
+  let body = out.slice(mapStart, bodyEnd);
+  if (REP && REP.tile) {
+    const band = (a, b) => `<rect x="${a.toFixed(2)}" y="-100000" width="${(b - a).toFixed(2)}" height="200000"/>`;
+    const slots = repSlots(FILL[0], FILL[2]);
+    let copies = '';
+    for (let i = 0; i < Math.max(2 * REP.n, slots.length); i++)
+      copies +=
+        '<use class="rp" href="#mapzr" clip-path="url(#rpc1)" ' +
+        (i < slots.length ? `transform="translate(${(slots[i] * REP.per).toFixed(2)},0)"/>` : 'display="none"/>');
+    body =
+      `<clipPath id="rpc">${band(REP.e0, REP.e1)}</clipPath><clipPath id="rpc1">${band(REP.p0 - 0.6, REP.p1 + 0.6)}</clipPath>` +
+      `<clipPath id="rpo">${band(-1e6, REP.e0 + 0.6)}${band(REP.e1 - 0.6, 1e6)}</clipPath>` +
+      `<g clip-path="url(#rpo)">${copies}</g><g clip-path="url(#rpc)"><g id="mapzr">${body}</g></g>`;
+  }
   out =
     out.slice(0, mapStart) +
     mapClip +
     '<g id="mapz">' +
-    out.slice(mapStart) +
+    body +
+    out.slice(bodyEnd) +
     '</g>' +
     (mapClip ? '</g>' : '') +
     '<g pointer-events="none">';
@@ -1065,7 +1088,7 @@ function render(target) {
   const label = document.getElementById('footerLabel').value;
   if (FOOT) {
     const fy = H - FOOT;
-    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page')
+    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page' || S.map === 'world')
       out += `<rect x="0" y="${fy}" width="${W}" height="${FOOT}" fill="${bg}"/>`;
     const dv = D.footer.divider;
     let dcol = dv.color || ds.primary;

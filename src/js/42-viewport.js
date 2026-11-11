@@ -108,12 +108,153 @@ function setLayout(id) {
     ox = ox * z.k + z.x;
     oy = oy * z.k + z.y;
   }
+  setFill(pg, box);
   for (const k in cache) if (!k.startsWith('main|')) delete cache[k];
   const svg = document.getElementById('svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const wrap = document.getElementById('wrap');
   wrap.style.aspectRatio = W + '/' + H;
   wrap.style.width = `min(100%,calc((var(--vh, 100vh) - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`;
+}
+// ---- the world map to the edge of what it fills, and repeated sideways ----
+// FILL: the area the world map fills, in content coordinates [x0, y0, x1, y1] ("Map fills": map area, sheet or
+// whole page); null on country maps. The sea of the relief runs on to its edge (54-relief.js).
+// REP: set when the world repeats sideways – a cylindrical projection with "Repeat the world" on:
+//   per     one turn of the world in page units
+//   cx      the middle of FILL; what exists once is drawn in the copy nearest to it (repPt)
+//   e0, e1  outlines are drawn for every copy that reaches into this span (pathOf, pathLines, reliefPath)
+//   tile    true while one turn is at most 2.5 times as wide as FILL: then <use> copies of the map body (#mapzr),
+//           each cut to the one turn p0–p1 around cx, lie to both sides of e0–e1 (render, zoomPreview), and
+//           panning never runs out of map. e0–e1 is that one turn, or all of FILL when FILL is at most one and a
+//           half turns wide: the outlines of the bit to each side are then written out, which draws faster than a
+//           copy, and the copies only come into view while the map is moved.
+//           Zoomed further in there are no copies: the outlines are written for what is in view.
+//   p0, p1  the one turn a copy shows
+//   n       how many <use> copies to each side
+let FILL = null,
+  REP = null;
+const repeatOn = () => S.map === 'world' && S.repeat !== false && !!(PROJS[S.proj] || {}).cyl;
+function setFill(pg, box) {
+  FILL = REP = null;
+  if (S.map !== 'world') return;
+  const L = fxLayout();
+  FILL =
+    pg.fill === 'area'
+      ? [PAD.l, PAD.t, W - PAD.r, H - PAD.b]
+      : pg.fill === 'page'
+        ? box
+        : L.active && L.P
+          ? [(L.P[0] - L.tx) / L.s, (L.P[1] - L.ty) / L.s, (L.P[2] - L.tx) / L.s, (L.P[3] - L.ty) / L.s]
+          : [0, 0, W, H];
+  if (!repeatOn()) return;
+  const per = 200 * Math.PI * sc,
+    cx = (FILL[0] + FILL[2]) / 2,
+    fw = FILL[2] - FILL[0],
+    m = Math.max(W, H) / 2;
+  // the copy under the middle of the area is the main one: what is not repeated (lines of the decorations) is in it
+  ox += Math.floor((cx - (prj(0, 90)[0] * sc + ox)) / per) * per;
+  const tile = per <= 2.5 * fw,
+    p0 = cx - per / 2,
+    p1 = cx + per / 2,
+    all = fw <= 1.5 * per;
+  REP = {
+    per,
+    cx,
+    tile,
+    p0,
+    p1,
+    e0: !tile ? FILL[0] - m : all ? Math.min(p0, FILL[0] - 8) : p0,
+    e1: !tile ? FILL[2] + m : all ? Math.max(p1, FILL[2] + 8) : p1,
+    n: tile ? Math.ceil((fw / 2 + 40) / per - 0.5) + 1 : 0,
+  };
+}
+// a point that exists once (a name, a pin, a city, a stamp): in the copy nearest the middle
+// The turns, counted from the main one, whose copy shows somewhere in a–b beside the body's span: the one nearest
+// the middle of a–b first. A copy that shows nowhere is not drawn at all (render, zoomPreview): the browser
+// would paint every outline of it only to cut it away.
+function repSlots(a, b) {
+  const js = [];
+  for (let j = Math.floor((a - REP.p1) / REP.per); j <= Math.ceil((b - REP.p0) / REP.per); j++) {
+    const x0 = Math.max(REP.p0 + j * REP.per, j > 0 ? REP.e1 : -Infinity),
+      x1 = Math.min(REP.p1 + j * REP.per, j < 0 ? REP.e0 : Infinity);
+    if (j && x1 > a - 2 && x0 < b + 2 && x1 > x0) js.push(j);
+  }
+  const m = (a + b) / 2 - REP.cx;
+  return js.sort((p, q) => Math.abs(p * REP.per - m) - Math.abs(q * REP.per - m));
+}
+const repPt = (p) => {
+  if (REP) p[0] += Math.round((REP.cx - p[0]) / REP.per) * REP.per;
+  return p;
+};
+// The 180° line cuts Russia, Fiji and the height bands in two. Repeated, the halves meet again: a ring that ends
+// on the east edge is joined with the ring that starts at the same place on the west edge, moved one turn east.
+const STITCHED = new WeakMap();
+function seamRuns(r) {
+  // runs of two or more points in a row on the same edge: [first, last, east]
+  const n = r.length / 2,
+    side = (i) => (r[2 * i] < 0.02 ? 1 : r[2 * i] > 359.98 ? 2 : 0),
+    runs = [];
+  let st = 0;
+  while (st < n && side(st) && side(st) === side((st + n - 1) % n)) st++;
+  if (st === n) return runs;
+  for (let q = 0; q < n; q++) {
+    const i = (st + q) % n,
+      sd = side(i);
+    if (!sd) continue;
+    let len = 1;
+    while (len < n && side((i + len) % n) === sd) len++;
+    if (len > 1) runs.push([i, (i + len - 1) % n, sd === 2]);
+    q += len - 1;
+  }
+  return runs;
+}
+function stitchRings(rings) {
+  if (STITCHED.has(rings)) return STITCHED.get(rings);
+  const out = [],
+    seam = [];
+  for (const r of rings) {
+    let t = false;
+    for (let i = 0; i < r.length && !t; i += 2) t = r[i] < 0.02 || r[i] > 359.98;
+    (t ? seam : out).push(r);
+  }
+  // from point a round to point b (both included), moved dx
+  const arc = (r, a, b, dx) => {
+    const n = r.length / 2,
+      o = [];
+    for (let i = a; ; i = (i + 1) % n) {
+      o.push(r[2 * i] + dx, r[2 * i + 1]);
+      if (i === b) break;
+    }
+    return o;
+  };
+  const runs = seam.map(seamRuns);
+  for (let again = seam.length > 1, guard = 0; again && guard < 400; guard++) {
+    again = false;
+    find: for (let a = 0; a < seam.length; a++)
+      for (const [ai, aj, east] of runs[a]) {
+        if (!east) continue;
+        const A = seam[a];
+        for (let b = 0; b < seam.length; b++) {
+          if (b === a) continue;
+          const B = seam[b];
+          for (const [bi, bj, e2] of runs[b]) {
+            if (e2) continue;
+            if (Math.abs(A[2 * ai + 1] - B[2 * bj + 1]) > 0.35 || Math.abs(A[2 * aj + 1] - B[2 * bi + 1]) > 0.35)
+              continue;
+            // A from the end of its run round to the start, then B the same way, one turn east
+            const m = arc(A, aj, ai, 0).concat(arc(B, bj, bi, 360));
+            for (const l of [seam, runs]) l.splice(Math.max(a, b), 1);
+            seam[Math.min(a, b)] = m;
+            runs[Math.min(a, b)] = seamRuns(m);
+            again = true;
+            break find;
+          }
+        }
+      }
+  }
+  const res = out.concat(seam);
+  STITCHED.set(rings, res);
+  return res;
 }
 // ins: the inset a point belongs to (insOf) – Bornholm is shifted, adm1 insets have their own projection
 const P = (x, y, ins) => {
@@ -133,6 +274,34 @@ const P = (x, y, ins) => {
 function pathOf(rings, ins, cull) {
   const m = Math.max(W, H) / 2;
   let s = '';
+  if (REP && !ins) {
+    // the world repeated: every copy of a ring that reaches into the span
+    const xs = [],
+      ys = [];
+    for (const r of stitchRings(rings)) {
+      let x0 = Infinity,
+        y0 = Infinity,
+        x1 = -Infinity,
+        y1 = -Infinity;
+      const n = r.length / 2;
+      for (let i = 0; i < n; i++) {
+        const [x, y] = P(r[2 * i], r[2 * i + 1]);
+        xs[i] = x;
+        ys[i] = y.toFixed(1);
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+      if (cull && !(y1 > -m && y0 < H + m)) continue;
+      for (let c = Math.ceil((REP.e0 - x1) / REP.per); c <= Math.floor((REP.e1 - x0) / REP.per); c++) {
+        const dx = c * REP.per;
+        for (let i = 0; i < n; i++) s += (i ? 'L' : 'M') + (xs[i] + dx).toFixed(1) + ' ' + ys[i];
+        s += 'Z';
+      }
+    }
+    return s;
+  }
   for (const r of rings) {
     let p = '',
       x0 = Infinity,
@@ -156,6 +325,20 @@ function pathOf(rings, ins, cull) {
 function pathLines(ls) {
   let s = '';
   for (const l of ls) {
+    if (REP) {
+      let x0 = Infinity,
+        x1 = -Infinity;
+      const pts = [];
+      for (let i = 0; i < l.length; i += 2) {
+        const p = P(l[i], l[i + 1]);
+        pts.push(p);
+        if (p[0] < x0) x0 = p[0];
+        if (p[0] > x1) x1 = p[0];
+      }
+      for (let c = Math.ceil((REP.e0 - x1) / REP.per); c <= Math.floor((REP.e1 - x0) / REP.per); c++)
+        pts.forEach(([x, y], i) => (s += (i ? 'L' : 'M') + (x + c * REP.per).toFixed(1) + ' ' + y.toFixed(1)));
+      continue;
+    }
     for (let i = 0; i < l.length; i += 2) {
       const [x, y] = P(l[i], l[i + 1]);
       s += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
@@ -196,7 +379,8 @@ function kp(k, det) {
   return cache[key] || (cache[key] = pathOf(ringsAt(k, det), insOf(k), det === 2));
 }
 function kc(k) {
-  return P(k.p[0], k.p[1], insOf(k));
+  const ins = insOf(k);
+  return ins ? P(k.p[0], k.p[1], ins) : repPt(P(k.p[0], k.p[1]));
 }
 function landPath(det) {
   const m = det === 2 && (GEO.mid.land ||= decRings(GEO.mid.l));

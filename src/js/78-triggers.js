@@ -124,7 +124,7 @@ function txRules() {
 const trSteps = () => Math.max(0, ...txRules().map(([, , r]) => (r.on === 'step' ? r.step : 0)));
 // what the pointer is on: a unit's code and / or a text's key
 function txHit(el) {
-  const k = el && el.closest && el.closest('.k'),
+  const k = unitEl(el),
     d = el && el.closest && el.closest('.drg');
   return { c: k ? k.dataset.c : null, key: d ? d.dataset.drag : null };
 }

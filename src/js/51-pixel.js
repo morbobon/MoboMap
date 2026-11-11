@@ -29,10 +29,14 @@ function pixelCells(det, colorOf) {
         };
       });
     const cells = [];
+    // the world repeated: the cells of the one turn that is drawn (its copies follow), a unit's box in any copy
+    const xa = REP && REP.tile ? REP.e0 : 0,
+      xb = REP && REP.tile ? REP.e1 : W;
     for (let y = cell / 2; y < H - FOOT; y += cell)
-      for (let x = cell / 2; x < W; x += cell) {
+      for (let x = xa + cell / 2; x < xb; x += cell) {
         for (const u of units) {
-          if (x < u.b[0] || x > u.b[2] || y < u.b[1] || y > u.b[3]) continue;
+          const ux = REP ? x - Math.floor((x - u.b[0]) / REP.per) * REP.per : x;
+          if (ux < u.b[0] || ux > u.b[2] || y < u.b[1] || y > u.b[3]) continue;
           if (ctx.isPointInPath(u.p, x, y, 'evenodd')) {
             cells.push([x, y, u.k]);
             break;

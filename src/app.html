@@ -115,6 +115,16 @@
                   render();
                 "
               ></select>
+              <label class="ck" id="repWorldRow" data-i18n-title="rep_world_t"
+                ><input
+                  type="checkbox"
+                  id="repWorld"
+                  onchange="
+                    S.repeat = this.checked;
+                    render();
+                  " />
+                <span data-i18n="rep_world"></span
+              ></label>
               <select id="farSel" onchange="setFar(this.value)">
                 <option value="inset" data-i18n="far_inset"></option>
                 <option value="show" data-i18n="far_show"></option>

@@ -50,7 +50,8 @@ const PROJS = {
     n: 'Mollweide',
     f: (l, p) => {
       let th = p;
-      for (let i = 0; i < 8; i++) {
+      // (at the poles the iteration divides by zero: they are the top and bottom point)
+      for (let i = 0; i < 8 && Math.abs(p) < Math.PI / 2 - 1e-6; i++) {
         const d = (2 * th + Math.sin(2 * th) - Math.PI * Math.sin(p)) / (2 + 2 * Math.cos(2 * th));
         th -= d;
         if (Math.abs(d) < 1e-7) break;
@@ -67,10 +68,12 @@ const PROJS = {
       return [(l * cp + (2 * Math.cos(p) * Math.sin(l / 2)) / sc) / 2, (p + Math.sin(p) / sc) / 2];
     },
   },
+  // cyl: cylindrical – every meridian a straight vertical line, so the world can repeat sideways (42-viewport.js)
   mercator: {
     n: 'Mercator',
+    cyl: 1,
     f: (l, p) => {
-      p = Math.max(-83 * RAD, Math.min(83 * RAD, p));
+      p = Math.max(-85 * RAD, Math.min(85 * RAD, p));
       return [l, Math.log(Math.tan(Math.PI / 4 + p / 2))];
     },
   },
@@ -79,8 +82,8 @@ const PROJS = {
     local: 1,
     f: (l, p) => laeaAt(localCenter(), l, p),
   },
-  equirect: { n: 'Plate carrée', f: (l, p) => [l, p] },
-  miller: { n: 'Miller', f: (l, p) => [l, 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * p))] },
+  equirect: { n: 'Plate carrée', cyl: 1, f: (l, p) => [l, p] },
+  miller: { n: 'Miller', cyl: 1, f: (l, p) => [l, 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * p))] },
 };
 // Lambert azimuthal equal-area centred on C = [lon0, lat0] (radians)
 function laeaAt(C, l, p) {

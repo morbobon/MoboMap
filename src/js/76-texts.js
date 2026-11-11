@@ -179,11 +179,13 @@ function txFromParam(v, p) {
 function worldInv(px, py) {
   let x = 190.5,
     y = 34; // Denmark, for the municipality map
+  // the world repeated: a point in a copy is the same place in the main one
+  if (REP) px -= Math.floor((px - P(0, 90)[0]) / REP.per) * REP.per;
   if (GEO.geo) {
     let bd = Infinity;
     for (const k of GEO.units) {
       if (insOf(k)) continue;
-      const [a, b] = kc(k),
+      const [a, b] = P(k.p[0], k.p[1]),
         d = (a - px) ** 2 + (b - py) ** 2;
       if (d < bd) ((bd = d), ([x, y] = k.p));
     }
@@ -214,7 +216,7 @@ function worldInv(px, py) {
 }
 // where an item is drawn (page units)
 function txPagePos(it) {
-  return it.anchor === 'map' ? worldPt(it.x, it.y) : [it.x * W, it.y * H];
+  return it.anchor === 'map' ? repPt(worldPt(it.x, it.y)) : [it.x * W, it.y * H];
 }
 function txPlace(it, px, py, anchor) {
   if (anchor === 'map') {

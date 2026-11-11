@@ -29,6 +29,8 @@ function projectState() {
     drag: S.drag,
     dsColours: !!S.dsColours,
     guard: S.guard !== false,
+    // (only when switched off: the world repeats unless told not to)
+    ...(S.repeat === false ? { repeat: false } : {}),
     fx: S.fx,
     zoom: S.zoom,
     frame: document.getElementById('frameSel').value,
@@ -98,6 +100,7 @@ function loadProject(p, quiet, noDraw) {
     if (Array.isArray(v) && v.length === 2 && v.every(Number.isFinite)) S.drag[k] = [v[0], v[1]];
   S.dsColours = !!p.dsColours;
   S.guard = p.guard !== false;
+  S.repeat = p.repeat !== false;
   S.fx = Object.assign(
     {
       fx: [],

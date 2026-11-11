@@ -14,6 +14,11 @@ function reliefWindow() {
   const m = Math.max(4, (b[2] - b[0]) * 0.6, (b[3] - b[1]) * 0.6);
   return [b[0] - m, b[1] - m, b[2] + m, b[3] + m];
 }
+// the bands with the halves the 180° line cut apart joined again (the world repeated: stitchRings)
+const ELEV_JOINED = [];
+function elevJoined(i) {
+  return (ELEV_JOINED[i] ||= stitchRings(elevRings(i).map((o) => o.r)).map((r) => ({ r, b: bboxR([r]) })));
+}
 function reliefPath(i) {
   const key = 'elev' + i + '|' + S.focus;
   if (cache[key] != null) return cache[key];
@@ -22,21 +27,25 @@ function reliefPath(i) {
   const cull = !win && S.zoom.k > 1,
     m = Math.max(W, H) / 2;
   let d = '';
-  for (const { r, b } of elevRings(i)) {
+  for (const { r, b } of REP ? elevJoined(i) : elevRings(i)) {
     if (win && (b[2] < win[0] || b[0] > win[2] || b[3] < win[1] || b[1] > win[3])) continue;
     let p = '',
       x0 = Infinity,
       y0 = Infinity,
       x1 = -Infinity,
       y1 = -Infinity;
+    const xs = [],
+      ys = [];
     for (let j = 0; j < r.length; j += 2) {
       // long segments (e.g. along the map edge) are densified so they follow the projection's curve
-      const n = j ? Math.min(40, Math.ceil(Math.hypot(r[j] - r[j - 2], r[j + 1] - r[j - 1]) / 2)) : 1;
+      // (the world repeated has straight edges: nothing to follow)
+      const n = j && !REP ? Math.min(40, Math.ceil(Math.hypot(r[j] - r[j - 2], r[j + 1] - r[j - 1]) / 2)) : 1;
       for (let s = n - 1; s >= 0; s--) {
         const f = s / n;
         const [x, y] = worldPt(r[j] - (r[j] - (r[j - 2] ?? 0)) * f, r[j + 1] - (r[j + 1] - (r[j - 1] ?? 0)) * f);
-        p += (j || s < n - 1 ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
-        if (cull) {
+        if (REP) (xs.push(x), ys.push(y.toFixed(1)));
+        else p += (j || s < n - 1 ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        if (cull || REP) {
           if (x < x0) x0 = x;
           if (x > x1) x1 = x;
           if (y < y0) y0 = y;
@@ -44,9 +53,42 @@ function reliefPath(i) {
         }
       }
     }
-    if (!cull || (x1 > -m && x0 < W + m && y1 > -m && y0 < H + m)) d += p + 'Z';
+    if (REP) {
+      // every copy of the ring that reaches into the span (42-viewport.js)
+      if (cull && !(y1 > -m && y0 < H + m)) continue;
+      for (let c = Math.ceil((REP.e0 - x1) / REP.per); c <= Math.floor((REP.e1 - x0) / REP.per); c++) {
+        const dx = c * REP.per;
+        for (let j = 0; j < xs.length; j++) d += (j ? 'L' : 'M') + (xs[j] + dx).toFixed(1) + ' ' + ys[j];
+        d += 'Z';
+      }
+    } else if (!cull || (x1 > -m && x0 < W + m && y1 > -m && y0 < H + m)) d += p + 'Z';
   }
   return (cache[key] = d);
+}
+// The sea outside the world, to the edge of the area the map fills: drawn with each sea band, so it has the deep
+// sea's look. The repeated world: above the top edge (below the bottom edge lies Antarctica, which the bands leave
+// in the page's colour, and so it stays). Otherwise: all round the outline of the globe.
+function reliefOuter() {
+  if (!FILL || reliefWindow() || (PROJS[S.proj] || {}).local) return '';
+  const f = (v) => v.toFixed(1),
+    x0 = Math.min(FILL[0], REP ? REP.e0 : Infinity) - 60,
+    x1 = Math.max(FILL[2], REP ? REP.e1 : -Infinity) + 60;
+  if (REP) {
+    // (half a unit over the edge: no hairline between the two)
+    const top = P(180, 0)[1] + 0.5;
+    return top > FILL[1] - 60 ? `M${f(x0)} ${f(FILL[1] - 60)}H${f(x1)}V${f(top)}H${f(x0)}Z` : '';
+  }
+  let d = `M${f(x0)} ${f(FILL[1] - 60)}H${f(x1)}V${f(FILL[3] + 60)}H${f(x0)}Z`;
+  const pt = (x, y, i) => {
+    const p = P(x, y);
+    d += (i ? 'L' : 'M') + f(p[0]) + ' ' + f(p[1]);
+  };
+  // (a little inside the left and right edge: no hairline where the bands end)
+  for (let y = 0; y <= 180; y += 2) pt(0.2, y, y);
+  for (let x = 2; x < 360; x += 2) pt(x, 180, 1);
+  for (let y = 180; y >= 0; y -= 2) pt(359.8, y, 1);
+  for (let x = 358; x > 0; x -= 2) pt(x, 0, 1);
+  return d + 'Z';
 }
 // Hypsometric tints for the topographic style (land) and depth tints (sea)
 const HYPSO = {
@@ -68,12 +110,15 @@ function reliefOn(sp) {
 // Sea depths: drawn under the land.
 function reliefSea(sp, bg, dark) {
   let out = '<g pointer-events="none">';
+  const outer = reliefOuter();
   DATA.elev.levels.forEach((lv, i) => {
     if (lv >= 0) return;
     const d = reliefPath(i);
     if (!d) return;
     const fill = sp.relief ? mix(bg, '#4f86b0', lv <= -2000 ? 0.38 : 0.2) : dark ? '#000000' : '#0a2540';
-    out += `<path d="${d}" fill="${fill}" fill-opacity="${sp.relief ? 1 : dark ? 0.18 : 0.06}" fill-rule="evenodd"/>`;
+    for (const q of [d, outer])
+      if (q)
+        out += `<path d="${q}" fill="${fill}" fill-opacity="${sp.relief ? 1 : dark ? 0.18 : 0.06}" fill-rule="evenodd"/>`;
   });
   return out + '</g>';
 }

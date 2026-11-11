@@ -770,7 +770,9 @@
   "dc_fl_curl": "Scroll",
   "dc_fl_deco": "Bracket",
   "dc_fl_leaf": "Leaves",
-  "dc_offmap": "That spot is outside the map"
+  "dc_offmap": "That spot is outside the map",
+  "rep_world": "Repeat the world",
+  "rep_world_t": "The world map continues to the left and right and can be moved round and round. Mercator, Miller and Plate carrée."
  },
  "da": {
   "yes": "Ja",
@@ -1543,7 +1545,9 @@
   "dc_fl_curl": "Snirkel",
   "dc_fl_deco": "Vinkel",
   "dc_fl_leaf": "Blade",
-  "dc_offmap": "Det sted ligger uden for kortet"
+  "dc_offmap": "Det sted ligger uden for kortet",
+  "rep_world": "Gentag verden",
+  "rep_world_t": "Verdenskortet fortsætter til venstre og højre og kan flyttes rundt og rundt. Mercator, Miller og Plate carrée."
  },
  "de": {
   "yes": "Ja",
@@ -2316,7 +2320,9 @@
   "dc_fl_curl": "Schnörkel",
   "dc_fl_deco": "Winkel",
   "dc_fl_leaf": "Blätter",
-  "dc_offmap": "Diese Stelle liegt außerhalb der Karte"
+  "dc_offmap": "Diese Stelle liegt außerhalb der Karte",
+  "rep_world": "Welt wiederholen",
+  "rep_world_t": "Die Weltkarte setzt sich links und rechts fort und lässt sich endlos verschieben. Mercator, Miller und Plate carrée."
  },
  "fr": {
   "yes": "Oui",
@@ -3089,7 +3095,9 @@
   "dc_fl_curl": "Volute",
   "dc_fl_deco": "Équerre",
   "dc_fl_leaf": "Feuilles",
-  "dc_offmap": "Cet endroit est hors de la carte"
+  "dc_offmap": "Cet endroit est hors de la carte",
+  "rep_world": "Répéter le monde",
+  "rep_world_t": "La carte du monde continue à gauche et à droite et se déplace sans fin. Mercator, Miller et Plate carrée."
  },
  "es": {
   "yes": "Sí",
@@ -3862,7 +3870,9 @@
   "dc_fl_curl": "Voluta",
   "dc_fl_deco": "Escuadra",
   "dc_fl_leaf": "Hojas",
-  "dc_offmap": "Ese punto está fuera del mapa"
+  "dc_offmap": "Ese punto está fuera del mapa",
+  "rep_world": "Repetir el mundo",
+  "rep_world_t": "El mapa del mundo continúa a izquierda y derecha y se puede mover sin fin. Mercator, Miller y Plate carrée."
  },
  "sv": {
   "yes": "Ja",
@@ -4635,7 +4645,9 @@
   "dc_fl_curl": "Snirkel",
   "dc_fl_deco": "Vinkel",
   "dc_fl_leaf": "Blad",
-  "dc_offmap": "Den platsen ligger utanför kartan"
+  "dc_offmap": "Den platsen ligger utanför kartan",
+  "rep_world": "Upprepa världen",
+  "rep_world_t": "Världskartan fortsätter åt vänster och höger och kan flyttas runt och runt. Mercator, Miller och Plate carrée."
  },
  "no": {
   "yes": "Ja",
@@ -5408,7 +5420,9 @@
   "dc_fl_curl": "Snirkel",
   "dc_fl_deco": "Vinkel",
   "dc_fl_leaf": "Blader",
-  "dc_offmap": "Det stedet ligger utenfor kartet"
+  "dc_offmap": "Det stedet ligger utenfor kartet",
+  "rep_world": "Gjenta verden",
+  "rep_world_t": "Verdenskartet fortsetter til venstre og høyre og kan flyttes rundt og rundt. Mercator, Miller og Plate carrée."
  },
  "fi": {
   "yes": "Kyllä",
@@ -6181,7 +6195,9 @@
   "dc_fl_curl": "Kiehkura",
   "dc_fl_deco": "Kulma",
   "dc_fl_leaf": "Lehdet",
-  "dc_offmap": "Kohta on kartan ulkopuolella"
+  "dc_offmap": "Kohta on kartan ulkopuolella",
+  "rep_world": "Toista maailma",
+  "rep_world_t": "Maailmankartta jatkuu vasemmalle ja oikealle, ja sitä voi siirtää loputtomasti. Mercator, Miller ja Plate carrée."
  },
  "nl": {
   "yes": "Ja",
@@ -6954,7 +6970,9 @@
   "dc_fl_curl": "Krul",
   "dc_fl_deco": "Hoek",
   "dc_fl_leaf": "Bladeren",
-  "dc_offmap": "Die plek ligt buiten de kaart"
+  "dc_offmap": "Die plek ligt buiten de kaart",
+  "rep_world": "Wereld herhalen",
+  "rep_world_t": "De wereldkaart loopt links en rechts door en kan eindeloos worden verschoven. Mercator, Miller en Plate carrée."
  },
  "it": {
   "yes": "Sì",
@@ -7727,7 +7745,9 @@
   "dc_fl_curl": "Voluta",
   "dc_fl_deco": "Squadra",
   "dc_fl_leaf": "Foglie",
-  "dc_offmap": "Quel punto è fuori dalla mappa"
+  "dc_offmap": "Quel punto è fuori dalla mappa",
+  "rep_world": "Ripeti il mondo",
+  "rep_world_t": "La mappa del mondo continua a sinistra e a destra e si può spostare senza fine. Mercator, Miller e Plate carrée."
  },
  "tr": {
   "yes": "Evet",
@@ -8500,6 +8520,8 @@
   "dc_fl_curl": "Kıvrım",
   "dc_fl_deco": "Köşebent",
   "dc_fl_leaf": "Yapraklar",
-  "dc_offmap": "O nokta haritanın dışında"
+  "dc_offmap": "O nokta haritanın dışında",
+  "rep_world": "Dünyayı tekrarla",
+  "rep_world_t": "Dünya haritası sola ve sağa doğru devam eder ve sonsuzca kaydırılabilir. Mercator, Miller ve Plate carrée."
  }
 }

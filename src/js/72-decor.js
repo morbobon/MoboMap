@@ -384,7 +384,7 @@ function decoHubs() {
 function decoHubPts() {
   return decoHubs().map((h, i) => {
     if (!h) return null;
-    const [x, y] = worldPt(h[0] + 180, 90 - h[1]),
+    const [x, y] = repPt(worldPt(h[0] + 180, 90 - h[1])),
       [dx, dy] = decoDragOf('rh:' + i);
     return Number.isFinite(x) && Number.isFinite(y) ? [x + dx, y + dy] : null;
   });
@@ -663,6 +663,12 @@ function decoGratRange(step) {
   const pad = step * (miss ? 3 : 1);
   let r = [Math.min(...lons) - pad, Math.max(...lons) + pad, Math.min(...lats) - pad, Math.max(...lats) + pad];
   if ((miss && S.map === 'world' && !S.focus && !S.country) || r[1] - r[0] > 300) r = [-180, 180, -90, 90];
+  if (REP) {
+    // the world repeated: the degrees run on past 180, over every copy that is drawn
+    const wx = P(0, 90)[0],
+      lon = (x) => ((x - wx) / REP.per) * 360 - 180;
+    return [lon(REP.e0), lon(REP.e1), Math.max(-85, r[2]), Math.min(85, r[3])];
+  }
   return [Math.max(-180, r[0]), Math.min(180, r[1]), Math.max(-85, r[2]), Math.min(85, r[3])];
 }
 function decoGrat(ink) {
@@ -684,7 +690,12 @@ function decoGrat(ink) {
   };
   if ((r[1] - r[0] + r[3] - r[2]) / step > 160) return '';
   for (let lon = up(r[0]); lon <= r[1] + 1e-9; lon += step)
-    if (lon < 180 || r[0] > -180) lines.push({ deg: lon, mer: true, pts: sample((v) => [lon, v], r[2], r[3], 36) });
+    if (REP || lon < 180 || r[0] > -180)
+      lines.push({
+        deg: REP ? ((((lon + 180) % 360) + 360) % 360) - 180 : lon,
+        mer: true,
+        pts: sample((v) => [lon, v], r[2], r[3], 36),
+      });
   for (let lat = up(r[2]); lat <= r[3] + 1e-9; lat += step)
     lines.push({ deg: lat, mer: false, pts: sample((v) => [v, lat], r[0], r[1], 72) });
   let d = '';
@@ -777,7 +788,7 @@ const decoStampR = (s) => Math.min(W, H) * 0.035 * s.s;
 function decoStamps(ink, accent) {
   return decoOpts()
     .stamps.map((s, i) => {
-      const [x, y] = worldPt(s.x + 180, 90 - s.y),
+      const [x, y] = repPt(worldPt(s.x + 180, 90 - s.y)),
         [dx, dy] = decoDragOf('sm:' + i);
       if (!Number.isFinite(x) || !Number.isFinite(y)) return '';
       return `<g class="drg" data-drag="sm:${i}" pointer-events="all"><g transform="translate(${decoN(x + dx)} ${decoN(y + dy)}) scale(${decoStampR(s).toFixed(2)})">${DECO_STAMP_ART[s.k](ink, accent)}</g></g>`;
@@ -829,7 +840,7 @@ function decoDrop(key) {
   delete rest[key];
   S.drag = rest;
   if (!cur) return;
-  const [px, py] = worldPt(cur[0] + 180, 90 - cur[1]),
+  const [px, py] = repPt(worldPt(cur[0] + 180, 90 - cur[1])),
     w = worldInv(px + d[0], py + d[1]);
   if (!w) return toast(t('dc_offmap'));
   const ll = [w[0] - 180, 90 - w[1]];
@@ -886,7 +897,8 @@ function decoFlourish(ink) {
 
 // ---------- the hooks render() reaches through 55-fx.js ----------
 // in the map group, over the map: graticule, stamps, the grips of the rhumb hubs
-const decoMap = (ink, accent) => decoGrat(ink) + decoStamps(ink, accent) + decoHubGrips();
+// (the graticule is part of the map body, which the repeated world copies: fxMap in 55-fx.js)
+const decoMapTop = (ink, accent) => decoStamps(ink, accent) + decoHubGrips();
 // over everything, in page units: degree numbers, flourishes, scale bar, compass
 const decoTop = (ink, accent) => decoGratLabels(ink) + decoFlourish(ink) + decoScale(ink) + decoCompass(ink, accent);
 

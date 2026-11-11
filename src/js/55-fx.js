@@ -465,11 +465,11 @@ function fxLand(allPath) {
   return `<clipPath id="fxlandclip"><path d="${allPath}"/></clipPath><g clip-path="url(#fxlandclip)" pointer-events="none">${fxTwice('foil', (o) => `<rect width="${W}" height="${H}" filter="url(#fxfoil)" opacity="${o}"/>`)}</g>`;
 }
 // over the map (after the highlight groups): emboss / deboss
-function fxMap(allPath, ink, accent) {
+function fxMap(allPath, ink) {
   let o = '';
   if (fxOn('emboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxemboss)" pointer-events="none"/>`;
   if (fxOn('deboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxdeboss)" pointer-events="none"/>`;
-  return o + decoMap(ink, accent);
+  return o + decoGrat(ink);
 }
 // over everything in content space: the decorations (compass rose, scale bar …)
 const fxContentTop = (ink, accent) => decoTop(ink, accent);

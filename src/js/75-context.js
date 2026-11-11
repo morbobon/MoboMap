@@ -28,7 +28,7 @@ function ctxItems(target, pt) {
     add = (label, go) => items.push({ label, go });
   const drg = target.closest && target.closest('.drg');
   const key = drg ? drg.dataset.drag : '';
-  const unit = target.closest && target.closest('.k');
+  const unit = unitEl(target);
   // labels and callouts belong to their unit, or (#id) to a group showing its name; so does a group's own legend
   const ref = unit
     ? unit.dataset.c
