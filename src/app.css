@@ -1599,10 +1599,16 @@ body.grpdrag .grp-root {
 .lockgrp {
   display: flex;
 }
-#wrap #lockBtn svg {
+#mapCtl svg {
   width: 13px;
   height: 13px;
   flex: none;
+}
+#psBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 #lockBtn {
   white-space: nowrap;
@@ -1618,7 +1624,8 @@ body.grpdrag .grp-root {
   padding-left: 6px;
   padding-right: 7px;
 }
-#lockPop {
+#lockPop,
+#psPop {
   position: absolute;
   top: 44px;
   right: 10px;
@@ -1638,6 +1645,7 @@ body.grpdrag .grp-root {
   font-size: 12.5px;
 }
 #lockPop[hidden],
+#psPop[hidden],
 #lkRange[hidden] {
   display: none;
 }
@@ -1764,4 +1772,26 @@ body.viewer .stage {
   min-width: 32px;
   font-size: 14px;
   line-height: 1;
+}
+
+/* page scale (77-locks.js): the page magnified inside its frame, which then scrolls */
+#pane {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#wrap.scaled #pane {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+#wrap #pane > svg {
+  width: calc(100% * var(--ps, 1));
+  height: calc(100% * var(--ps, 1));
+}
+#psPop .psrow {
+  flex-wrap: nowrap;
+}
+#psPop input[type='range'] {
+  flex: 1;
+  min-width: 60px;
 }

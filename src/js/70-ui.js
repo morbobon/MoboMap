@@ -397,6 +397,11 @@ const svg = document.getElementById('svg'),
 //   world view: open the country's regions (or zoom to it if no detail exists)
 //   country view: zoom to the clicked unit; on empty sea step out (unit -> whole country -> world)
 const hasDetail = (iso) => iso === 'DNK' || !!DATA.adm1i[iso];
+// where "back" goes from a focus: the whole map (a country or the world); from a country without focus: the world
+function backName(fromFocus = !!S.focus) {
+  if (!fromFocus) return t('world');
+  return S.country ? countryName(S.country) : S.map === 'dk' ? countryName('DNK') : t('world');
+}
 function focusClick(c) {
   if (!c) return setFocus(S.focus ? '' : S.country ? 'world' : '');
   if (S.map === 'world') return setFocus(hasDetail(c) ? 'c:' + c : c);
@@ -541,7 +546,7 @@ svg.addEventListener('pointerdown', (e) => {
     }, 500);
   }
   tip.style.display = 'none';
-  drag = { p: svgPoint(e), z: Object.assign({}, S.zoom) };
+  drag = { p: svgPoint(e), z: Object.assign({}, S.zoom), c: [e.clientX, e.clientY] };
   dragged = false;
 });
 const midOf = () => {
@@ -593,7 +598,8 @@ window.addEventListener('pointermove', (e) => {
   if (!dragged && Math.hypot(dx, dy) < 6) return;
   dragged = true;
   tip.style.display = 'none';
-  if (lockOn('pos')) return; // a locked position does not pan (and the press is no click)
+  // a locked position does not pan (and the press is no click); a magnified page scrolls instead
+  if (lockOn('pos')) return paneDrag(e.clientX - drag.c[0], e.clientY - drag.c[1], drag);
   document.getElementById('wrap').classList.add('panning');
   S.zoom = { k: drag.z.k, x: drag.z.x + dx, y: drag.z.y + dy };
   zoomChanged(true);
@@ -605,7 +611,7 @@ function pointerEnd(e) {
     pinch = null;
     // one finger left: it pans on from where it is
     const f = [...fingers.values()][0];
-    drag = f ? { p: svgPoint(f), z: Object.assign({}, S.zoom) } : null;
+    drag = f ? { p: svgPoint(f), z: Object.assign({}, S.zoom), c: [f.clientX, f.clientY] } : null;
     if (!f) document.getElementById('wrap').classList.remove('panning');
     return;
   }
@@ -645,10 +651,9 @@ function showTip(target, cx, cy) {
   }
   // on a touch screen the hints name taps instead of clicks and Ctrl
   const touch = lastPointer === 'touch';
-  const nav =
-    (touch ? 'tip_dbl_' : 'tip_ctrl_') +
-    (S.map === 'world' && hasDetail(k.c) ? 'open' : S.focus === k.c ? 'out' : 'zoom');
-  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc((S.groups[gi].parent ? groupById(S.groups[gi].parent).name + ' › ' : '') + S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(t(nav))}${touch ? '' : '<br>' + esc(t('tip_shift'))}</span>`;
+  const how = S.map === 'world' && hasDetail(k.c) ? 'open' : S.focus === k.c ? 'out' : 'zoom';
+  const nav = t((touch ? 'tip_dbl_' : 'tip_ctrl_') + how).replace('{n}', how === 'out' ? backName() : nm(k));
+  tip.innerHTML = `<b>${nm(k)}</b> · ${GEO.groups[k.r]} · ${gi >= 0 ? t('tip_in') + ' "' + esc((S.groups[gi].parent ? groupById(S.groups[gi].parent).name + ' › ' : '') + S.groups[gi].name) + '"' : t(touch ? 'tip_tap' : 'tip_click') + ' "' + esc(S.groups.length ? S.groups[S.active].name : t('new_group_short')) + '"'}<br><span style="opacity:.75">${esc(nav)}${touch ? '' : '<br>' + esc(t('tip_shift'))}</span>`;
   tip.style.display = 'block';
   // kept on screen (a finger sits near the edge as often as not)
   tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';

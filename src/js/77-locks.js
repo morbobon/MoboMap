@@ -99,6 +99,7 @@ function lockUI() {
   set('lkMax', 'value', L.zr[1]);
   set('lkHl', 'checked', L.hl);
   set('lkEdit', 'checked', L.edit);
+  psUI();
   const rg = document.getElementById('lkRange');
   if (rg) rg.hidden = L.zoom !== 2;
 }
@@ -144,14 +145,20 @@ function lockPop(show) {
   const p = document.getElementById('lockPop');
   if (!p) return;
   p.hidden = show == null ? !p.hidden : !show;
-  if (!p.hidden) lockUI();
+  if (!p.hidden) {
+    lockUI();
+    const q = document.getElementById('psPop');
+    if (q) q.hidden = true;
+  }
 }
 document.addEventListener('pointerdown', (e) => {
   const p = document.getElementById('lockPop');
   if (p && !p.hidden && !e.target.closest('#lockPop, #lockMore')) p.hidden = true;
 });
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') lockPop(false);
+  if (e.key !== 'Escape') return;
+  lockPop(false);
+  psPop(false);
 });
 
 // touch: a double tap with two fingers switches the lock (a double tap with one finger opens / goes to an area).
@@ -195,4 +202,62 @@ document.addEventListener('keydown', (e) => {
   };
   window.addEventListener('pointerup', up);
   window.addEventListener('pointercancel', up);
+}
+
+// ---- page scale: the whole page magnified on screen, scrolled in its frame. A view setting: not in the design,
+// projects, links or exports. Pinching a zoom-locked map scales the page; dragging a position-locked one scrolls it.
+let PS = 1;
+function pageScale(v, at) {
+  v = Math.round(Math.min(4, Math.max(1, +v || 1)) * 100) / 100;
+  const pane = document.getElementById('pane'),
+    wrap = document.getElementById('wrap'),
+    r = pane.getBoundingClientRect();
+  // the point under the fingers (or the frame's centre) stays where it is
+  const ax = at ? at[0] - r.left : r.width / 2,
+    ay = at ? at[1] - r.top : r.height / 2;
+  const fx = (pane.scrollLeft + ax) / PS,
+    fy = (pane.scrollTop + ay) / PS;
+  PS = v;
+  wrap.style.setProperty('--ps', v);
+  wrap.classList.toggle('scaled', v > 1);
+  pane.scrollLeft = fx * v - ax;
+  pane.scrollTop = fy * v - ay;
+  psUI();
+}
+const PS_ICON =
+  '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3 14 14M4.6 6.8h4.4M6.8 4.6V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+function psUI() {
+  const b = document.getElementById('psBtn');
+  if (!b) return;
+  const pc = Math.round(PS * 100) + ' %';
+  b.innerHTML = PS_ICON + (PS > 1 ? '<span>' + pc + '</span>' : '');
+  b.classList.toggle('on', PS > 1);
+  b.title = t('ps_t');
+  document.getElementById('psRange').value = PS;
+  document.getElementById('psVal').textContent = pc;
+}
+function psPop(show) {
+  const p = document.getElementById('psPop');
+  p.hidden = show == null ? !p.hidden : !show;
+  if (!p.hidden) {
+    lockPop(false);
+    psUI();
+  }
+}
+document.addEventListener('pointerdown', (e) => {
+  const p = document.getElementById('psPop');
+  if (p && !p.hidden && !e.target.closest('#psPop, #psBtn')) p.hidden = true;
+});
+// two fingers on a zoom-locked map
+function pinchPage(ratio, pinch) {
+  if (pinch.ps == null) pinch.ps = PS;
+  const [a, b] = [...fingers.values()];
+  pageScale(pinch.ps * ratio, [(a.clientX + b.clientX) / 2, (a.clientY + b.clientY) / 2]);
+}
+// one finger (or the mouse) on a position-locked map: scrolls the magnified page
+function paneDrag(dx, dy, d) {
+  const pane = document.getElementById('pane');
+  if (!d.s) d.s = [pane.scrollLeft, pane.scrollTop];
+  pane.scrollLeft = d.s[0] - dx;
+  pane.scrollTop = d.s[1] - dy;
 }

@@ -73,7 +73,7 @@ function ctxItems(target, pt) {
     }
     const nav =
       S.map === 'world' && hasDetail(c) ? 'ctx_open' : S.focus === c ? 'ctx_out' : S.map === 'world' ? '' : 'ctx_zoom';
-    if (nav) add(t(nav), () => focusClick(c));
+    if (nav) add(t(nav).replace('{n}', nav === 'ctx_out' ? backName() : k ? nm(k) : c), () => focusClick(c));
     if (attrDef()) add(t('sec_data'), () => jumpTo(secOf('data')));
     // a text that a click on this area shows (an info box on a pin, say)
     if (k)
@@ -123,7 +123,7 @@ function ctxItems(target, pt) {
     });
   // the page and the map as a whole (also what the sea or the background offers first)
   if (!title) title = S.country ? countryName(S.country) : t('world');
-  if (!c && !key && (S.focus || S.country)) add(t('ctx_out'), () => focusClick(null));
+  if (!c && !key && (S.focus || S.country)) add(t('ctx_out').replace('{n}', backName()), () => focusClick(null));
   // a new text where the pointer is: on the map it follows the map, beside it the page
   if (pt && !key)
     add(t('tx_add_here'), () => {

@@ -585,13 +585,24 @@
       </aside>
       <div class="stage">
         <div id="wrap">
-          <svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div id="pane"><svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg></div>
           <div id="mapCtl">
             <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+            <button id="psBtn" class="chip" onclick="psPop()"></button>
             <div class="lockgrp">
               <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
               <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
             </div>
+          </div>
+          <div id="psPop" hidden>
+            <div class="row"><b data-i18n="ps_l"></b> <span class="note" id="psVal"></span></div>
+            <div class="row psrow">
+              <button class="chip" onclick="pageScale(PS / 1.25)">−</button>
+              <input type="range" id="psRange" min="1" max="4" step="0.05" value="1" oninput="pageScale(+this.value)" />
+              <button class="chip" onclick="pageScale(PS * 1.25)">+</button>
+              <button class="chip" onclick="pageScale(1)">100 %</button>
+            </div>
+            <div class="note" data-i18n="ps_note"></div>
           </div>
           <div id="stepBar" hidden>
             <button class="chip" onclick="txStep(-1)" data-i18n-title="tr_prev">‹</button>
