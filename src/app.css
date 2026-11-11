@@ -2314,3 +2314,10 @@ body:not(.lv-simple) .lvs {
 #stSave[hidden] {
   display: none;
 }
+/* hand-drawn ink (55-fx.js) is a heavy filter: left out while the map is moved, back when it is drawn again */
+#svg.gest .fxc0 {
+  filter: none;
+}
+#svg.gest .fxc1 {
+  filter: url(#fxcontentg);
+}

@@ -12,6 +12,9 @@
 //                 line weight, strength, solid / dashed / dotted, colour, over or under the land
 //   flourish …    corner flourishes
 //   stamps        [{ k: kind, x: lon, y: lat, s: size }] – they sit on the map and follow it
+//   hills         small drawn hills and mountains where the land is high
+//   auto          drawings the map places by itself: 'off' | 'chart' (ships, sea creatures, depth numbers) |
+//                 'treasure' (ship, palms, skull, a red dashed route to an X)
 const DECO_DEFAULT = {
   compass: 'classic',
   compassSize: 1,
@@ -40,6 +43,8 @@ const DECO_DEFAULT = {
   flourish: 'off',
   flourishSize: 1,
   stamps: [],
+  hills: false,
+  auto: 'off',
 };
 const DECO_COMPASS = ['classic', 'star', 'arrow', 'ring', 'nautical', 'fleur'];
 const DECO_BORDER = ['single', 'double', 'thickthin', 'chart', 'ruler', 'dotted', 'rope', 'meander', 'wave', 'corners'];
@@ -51,6 +56,8 @@ const DECO_GLINE = ['solid', 'dashed', 'dotted'];
 const DECO_GEXT_NOTE = { world: 'dc_ge_world_n', area: 'dc_ge_area_n', land: 'dc_ge_land_n' };
 const DECO_FLOUR = ['off', 'curl', 'deco', 'leaf'];
 const DECO_STAMP = ['ship', 'serpent', 'whale', 'skull', 'anchor', 'flag', 'chest', 'palm', 'cross'];
+const DECO_AUTO = ['off', 'chart', 'treasure'];
+const DECO_AUTO_NAME = { off: 'dc_au_off', chart: 'dc_au_chart', treasure: 'dc_au_treasure' };
 const DECO_NAME = {
   classic: 'dc_cs_classic',
   star: 'dc_cs_star',
@@ -139,6 +146,8 @@ function decoClean(o) {
       .filter((s) => s && DECO_STAMP.includes(s.k) && ll([s.x, s.y]))
       .slice(0, 40)
       .map((s) => ({ k: s.k, x: num(s.x, -180, 180, 0, 1000), y: num(s.y, -89, 89, 0, 1000), s: num(s.s, 0.3, 4, 1) })),
+    hills: !!o.hills,
+    auto: pick(o.auto, DECO_AUTO, D.auto),
   };
 }
 const decoOpts = () => S.deco || DECO_DEFAULT;
@@ -154,7 +163,8 @@ function decoOut() {
 // bd distance in tenths of a percent, bc colour, bk corners; h hubs, l16 sixteen lines, hc a hub at the compass,
 // hp<i>_<lon*100>_<lat*100> a moved hub; s scale bar style, sm miles; g graticule step, gl its numbers, ge its
 // extent (1 map area, 2 land shown), gw line weight %, go strength %, gs line (1 dashed, 2 dotted), gc colour,
-// gu under the land; f flourish, fz its size %; t<kind>_<lon*1000>_<lat*1000>_<size %> a stamp. E.g. "c5.cca.b4.g10.gl"
+// gu under the land; f flourish, fz its size %; t<kind>_<lon*1000>_<lat*1000>_<size %> a stamp; m hill symbols;
+// a the drawings placed by themselves (1 sea chart, 2 treasure map). E.g. "c5.cca.b4.g10.gl"
 function decoCode(o) {
   const p = decoClean(o),
     D = DECO_DEFAULT,
@@ -189,13 +199,15 @@ function decoCode(o) {
   if (p.flourishSize !== 1) a.push('fz' + pct(p.flourishSize));
   for (const s of p.stamps)
     a.push(`t${DECO_STAMP.indexOf(s.k)}_${Math.round(s.x * 1000)}_${Math.round(s.y * 1000)}_${pct(s.s)}`);
+  if (p.hills) a.push('m');
+  if (p.auto !== 'off') a.push('a' + DECO_AUTO.indexOf(p.auto));
   return a.join('.');
 }
 function decoFromCode(str) {
   const o = { hubAt: [], stamps: [] };
   const colD = (v) => (v === 'a' ? 'accent' : '#' + v);
   for (const tok of String(str || '').split('.')) {
-    const m = /^(cz|cc|co|cn|bw|bd|bc|bk|hc|hp|sm|gl|ge|gw|go|gs|gc|gu|fz|[cbhlsgft])(.*)$/.exec(tok);
+    const m = /^(cz|cc|co|cn|bw|bd|bc|bk|hc|hp|sm|gl|ge|gw|go|gs|gc|gu|fz|[cbhlsgftma])(.*)$/.exec(tok);
     if (!m) continue;
     const v = m[2],
       n = v === '' ? NaN : +v,
@@ -226,6 +238,8 @@ function decoFromCode(str) {
     else if (m[1] === 'gu') o.gratUnder = true;
     else if (m[1] === 'f') o.flourish = DECO_FLOUR[n];
     else if (m[1] === 'fz') o.flourishSize = n / 100;
+    else if (m[1] === 'm') o.hills = true;
+    else if (m[1] === 'a') o.auto = DECO_AUTO[n];
     else if (m[1] === 't') o.stamps.push({ k: DECO_STAMP[q[0]], x: q[1] / 1000, y: q[2] / 1000, s: q[3] / 100 });
   }
   return decoClean(o);
@@ -865,17 +879,30 @@ function decoGratDraw(o, step, ink, accent) {
 // the numbers: where a line leaves the map area, or where it ends inside it; none under a legend
 function decoGratLabels(ink, accent) {
   if (!DECO_GRAT_LINES || !decoOpts().gratLabels) return '';
-  const A = decoArea(),
+  // "Whole map area": the lines run to the edge of the map, and so do their numbers
+  const A =
+      decoOpts().gratExt === 'area'
+        ? [
+            Math.max(MAPBOX[0], 0) + 3,
+            Math.max(MAPBOX[1], 0) + 3,
+            Math.min(MAPBOX[2], W) - 3,
+            Math.min(MAPBOX[3], H - FOOT) - 3,
+          ]
+        : decoArea(),
     n = decoN,
-    used = { t: [], b: [], l: [], r: [] };
+    used = { t: [], b: [], l: [], r: [] },
+    boxes = [];
   let s = '';
   const put = (side, x, y, anchor, text) => {
     const at = side === 't' || side === 'b' ? x : y;
     if (used[side].some((v) => Math.abs(v - at) < 24)) return;
     const tw = text.length * 5.2,
       x0 = anchor === 'middle' ? x - tw / 2 : anchor === 'end' ? x - tw : x;
-    if (LEGEND_AT.some((b) => x0 < b[2] + 2 && x0 + tw > b[0] - 2 && y - 9 < b[3] + 2 && y + 2 > b[1] - 2)) return;
+    const hit = (b, m) => x0 < b[2] + m && x0 + tw > b[0] - m && y - 9 < b[3] + m && y + 2 > b[1] - m;
+    // not under a legend, and not on a number of another side (the corners)
+    if (LEGEND_AT.some((b) => hit(b, 2)) || boxes.some((b) => hit(b, 3))) return;
     used[side].push(at);
+    boxes.push([x0, y - 9, x0 + tw, y + 2]);
     s += `<text x="${n(x)}" y="${n(y)}" text-anchor="${anchor}">${text}</text>`;
   };
   const inA = (p) => p && p[0] >= A[0] && p[0] <= A[2] && p[1] >= A[1] && p[1] <= A[3];
@@ -1051,10 +1078,196 @@ function decoFlourish(ink) {
   );
 }
 
+// ---------- hill symbols ----------
+// Small drawn hills and mountains where the land is high (the elevation bands of 54-relief.js: 500, 1500 and
+// 3000 m), on a loose grid that follows the map. One path, part of the map body, so the repeated world copies it.
+// Which cells hold a hill is worked out once per grid step and map.
+const DECO_HILL_LV = [500, 1500, 3000];
+let DECO_HILLS = { key: '', pts: [] };
+const decoMapBox = () => (S.map === 'dk' ? [188, 32.2, 195.2, 35.5] : GEO.main);
+function decoHillPts(step) {
+  const own = S.map === 'world' ? '' : S.country || 'DNK',
+    key = step + '|' + own;
+  if (DECO_HILLS.key === key) return DECO_HILLS.pts;
+  const pts = [],
+    bands = DECO_HILL_LV.map((lv) => DATA.elev.levels.indexOf(lv))
+      .filter((i) => i >= 0)
+      .map(elevRings),
+    unit = own && DATA.world.units.find((u) => u.c === own),
+    b = own ? decoMapBox() : [0, 5, 360, 150];
+  const inBand = (x, y, band) => {
+    let ins = false;
+    for (const o of band)
+      if (x >= o.b[0] && x <= o.b[2] && y >= o.b[1] && y <= o.b[3] && pipRings(x, y, [o.r])) ins = !ins;
+    return ins;
+  };
+  for (let iy = Math.floor(b[1] / step); iy * step < b[3]; iy++)
+    for (let ix = Math.floor(b[0] / step); ix * step < b[2]; ix++) {
+      const h = fxRng(ix * 7919 + iy * 104729 + 17),
+        x = (ix + 0.5 + (iy & 1 ? 0.25 : -0.25) + (h() - 0.5) * 0.5) * step,
+        y = (iy + 0.5 + (h() - 0.5) * 0.5) * step;
+      let lv = 0;
+      while (lv < bands.length && inBand(x, y, bands[lv])) lv++;
+      if (lv && (!unit || pipRings(x, y, unit.s))) pts.push([x, y, lv, h()]);
+    }
+  DECO_HILLS = { key, pts };
+  return pts;
+}
+function decoHills(ink) {
+  if (!decoOpts().hills || !DATA_Z.elev) return '';
+  const g = S.map === 'world' ? [180, 50, 180, 50] : decoMapBox(),
+    c = [(g[0] + g[2]) / 2, (g[1] + g[3]) / 2],
+    a = worldPt(c[0], c[1]),
+    q = worldPt(c[0] + 1, c[1]),
+    px = Math.hypot(q[0] - a[0], q[1] - a[1]) || 1,
+    step = [0.25, 0.5, 1, 1.5, 2, 3, 4, 6, 8, 12].find((v) => v * px >= 14) || 12,
+    s = Math.max(3, Math.min(7, step * px * 0.26)),
+    m = 30,
+    n = decoN;
+  let d = '';
+  for (const [hx, hy, lv, r] of decoHillPts(step)) {
+    const [x, y] = worldPt(hx, hy);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || y < -m || y > H + m) continue;
+    const k = s * (0.85 + r * 0.3) * (lv === 3 ? 1.4 : lv === 2 ? 1.1 : 0.9);
+    // a hill is an arc; a mountain a peak with a stroke of shading down its right side, a high one with two
+    const art =
+      lv === 1
+        ? `q${n(k)} ${n(-k * 1.2)} ${n(2 * k)} 0`
+        : `l${n(0.9 * k)} ${n(-1.6 * k)}l${n(1.1 * k)} ${n(1.6 * k)}m${n(-0.8 * k)} ${n(-1.05 * k)}l${n(-0.1 * k)} ${n(0.7 * k)}` +
+          (lv === 3 ? `m${n(0.45 * k)} ${n(-0.3 * k)}l${n(-0.1 * k)} ${n(0.55 * k)}` : '');
+    // repeated: once for every copy that reaches into the span the outlines are drawn for (42-viewport.js)
+    const c0 = REP ? Math.ceil((REP.e0 - x) / REP.per) : 0,
+      c1 = REP ? Math.floor((REP.e1 - x) / REP.per) : 0;
+    for (let i = c0; i <= c1; i++) {
+      const X = x + (REP ? i * REP.per : 0);
+      if (!REP && (X < -m || X > W + m)) continue;
+      d += `M${n(X - k)} ${n(y)}${art}`;
+    }
+  }
+  return d
+    ? `<path data-hills="1" d="${d}" fill="none" stroke="${ink}" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round" opacity=".85" pointer-events="none"/>`
+    : '';
+}
+
+// ---------- drawings the map places by itself ----------
+// 'chart': ships and sea creatures on open sea, small depth numbers along the coasts. 'treasure': a ship, a sea
+// serpent and an anchor at sea, palms and a skull on land, and a red dashed route from the ship to an X on land.
+// Where they go follows the map and the paper's seed ("New paper" moves them); they are kept per map and seed.
+let DECO_AUTO_PTS = { key: '', it: [] };
+function decoIsLand(x, y) {
+  // (a country map knows its own land better than the world map does: islands)
+  if (S.map !== 'world' && pipRings(x, y, GEO.land.s)) return true;
+  for (const u of DATA.world.units)
+    if (x >= u.b[0] && x <= u.b[2] && y >= u.b[1] && y <= u.b[3] && pipRings(x, y, u.s)) return true;
+  return false;
+}
+function decoAutoPts(theme) {
+  const own = S.map === 'world' ? '' : S.country || 'DNK',
+    key = [theme, own, S.fx.seed, S.layout, S.proj, PAD.l, PAD.t, PAD.b].join('|');
+  if (DECO_AUTO_PTS.key === key) return DECO_AUTO_PTS.it;
+  // candidates: anywhere in a wide box around the map, kept where the page shows them (at no zoom, so that
+  // they stay where they are when the map is moved)
+  const g = own ? decoMapBox() : [25, 22, 335, 140],
+    gw = g[2] - g[0],
+    gh = g[3] - g[1],
+    far = own ? Math.max(gw, gh, 2) : 0,
+    b = [g[0] - far, g[1] - far, g[2] + far, g[3] + far],
+    z = S.zoom,
+    pad = Math.min(W, H) * 0.05;
+  const shown = (x, y) => {
+    const p = repPt(worldPt(x, y)),
+      X = (p[0] - z.x) / z.k,
+      Y = (p[1] - z.y) / z.k;
+    return (REP || (X > PAD.l + pad && X < W - PAD.r - pad)) && Y > PAD.t + pad && Y < H - PAD.b - pad;
+  };
+  const rnd = fxRng(S.fx.seed + 41),
+    w = b[2] - b[0],
+    h = b[3] - b[1],
+    d = Math.max(0.12, Math.min(gw, gh) * 0.06),
+    ring = [[1, 0], [0.7, 0.7], [0, 1], [-0.7, 0.7], [-1, 0], [-0.7, -0.7], [0, -1], [0.7, -0.7]]; // prettier-ignore
+  const sea = [],
+    coast = [],
+    land = [],
+    shore = [];
+  for (let i = 0; i < (own ? 900 : 360); i++) {
+    const x = b[0] + rnd() * w,
+      y = b[1] + rnd() * h;
+    if (!shown(x, y)) continue;
+    const n = ring.filter(([dx, dy]) => decoIsLand(x + dx * d, y + dy * d)).length;
+    if (decoIsLand(x, y)) {
+      if (!own || pipRings(x, y, GEO.land.s)) (n === 8 ? land : shore).push([x, y]);
+    } else if (!n) sea.push([x, y]);
+    else if (n <= 4) coast.push([x, y]);
+  }
+  const it = [],
+    gap = own ? Math.hypot(gw, gh) * 0.2 : Math.hypot(w, h) * 0.12;
+  const take = (list, k, s, far = gap) => {
+    const p = list.find((q) => it.every((o) => Math.hypot(o.x - q[0], o.y - q[1]) > (o.k === 'num' ? far / 3 : far)));
+    if (p) it.push({ k, x: p[0], y: p[1], s });
+    return p;
+  };
+  if (theme === 'chart') {
+    take(sea, 'ship', 1);
+    take(sea, 'whale', 0.8);
+    take(sea, 'serpent', 0.9);
+    take(sea, 'ship', 0.7);
+    for (let i = 0; i < 18; i++) {
+      const p = take(coast, 'num', 1, gap / 2.5);
+      if (p) it[it.length - 1].n = 3 + Math.floor(rnd() * 46);
+    }
+  } else {
+    const ground = land.concat(shore),
+      ship = take(sea, 'ship', 1) || take(coast, 'ship', 1),
+      x = ship && (take(ground, 'cross', 0.55, gap * 2) || take(ground, 'cross', 0.55));
+    take(ground, 'palm', 0.6);
+    take(ground, 'skull', 0.55);
+    take(ground, 'palm', 0.5, gap * 0.7);
+    take(sea, 'serpent', 0.9);
+    take(coast, 'anchor', 0.55);
+    if (x) it.unshift({ k: 'route', a: ship, b: x, w: [rnd(), rnd()] });
+  }
+  DECO_AUTO_PTS = { key, it };
+  return it;
+}
+const DECO_ROUTE = '#b5261c';
+function decoAuto(ink, landInk) {
+  const th = decoOpts().auto;
+  if (th === 'off') return '';
+  const R = Math.min(W, H) * 0.035,
+    n = decoN,
+    at = (p) => repPt(worldPt(p[0], p[1])),
+    ok = (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]);
+  let o = '';
+  for (const q of decoAutoPts(th)) {
+    if (q.k === 'route') {
+      const a = at(q.a),
+        b = at(q.b);
+      if (!ok(a) || !ok(b)) continue;
+      const dx = b[0] - a[0],
+        dy = b[1] - a[1],
+        // a bend to one side, then (mirrored by the curve) to the other
+        c = [a[0] + dx * 0.25 - dy * (q.w[0] - 0.5) * 0.7, a[1] + dy * 0.25 + dx * (q.w[0] - 0.5) * 0.7],
+        m = [a[0] + dx * 0.5 - dy * (q.w[1] - 0.5) * 0.2, a[1] + dy * 0.5 + dx * (q.w[1] - 0.5) * 0.2];
+      o += `<path d="M${n(a[0])} ${n(a[1])}Q${n(c[0])} ${n(c[1])} ${n(m[0])} ${n(m[1])}T${n(b[0])} ${n(b[1])}" fill="none" stroke="${DECO_ROUTE}" stroke-width="2.2" stroke-dasharray="7 6" stroke-linecap="round" opacity=".9"/>`;
+      continue;
+    }
+    const p = at([q.x, q.y]),
+      r = R * q.s;
+    if (!ok(p) || p[0] < MAPBOX[0] + r || p[0] > MAPBOX[2] - r || p[1] < MAPBOX[1] + r || p[1] > MAPBOX[3] - r)
+      continue;
+    if (q.k === 'num')
+      o += `<text x="${n(p[0])}" y="${n(p[1] + 3)}" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="9" fill="${ink}" opacity=".7">${q.n}</text>`;
+    else
+      o += `<g transform="translate(${n(p[0])} ${n(p[1])}) scale(${r.toFixed(2)})">${DECO_STAMP_ART[q.k](q.k === 'palm' || q.k === 'skull' ? landInk : ink, DECO_ROUTE)}</g>`;
+  }
+  return o ? `<g data-auto="${th}" pointer-events="none">${o}</g>` : '';
+}
+
 // ---------- the hooks render() reaches through 55-fx.js ----------
 // in the map group, over the map: graticule, stamps, the grips of the rhumb hubs
 // (the graticule is part of the map body, which the repeated world copies: fxMap in 55-fx.js)
-const decoMapTop = (ink, accent) => decoStamps(ink, accent) + decoHubGrips();
+// (landInk: the ink where it has to be read on the land)
+const decoMapTop = (ink, accent, landInk) => decoAuto(ink, landInk) + decoStamps(ink, accent) + decoHubGrips();
 // over everything, in page units: degree numbers, flourishes, scale bar, compass
 const decoTop = (ink, accent) =>
   decoGratLabels(ink, accent) + decoFlourish(ink) + decoScale(ink) + decoCompass(ink, accent);
@@ -1162,6 +1375,12 @@ function decoUI() {
           `<label class="fxrow decosm"><span>${name(s.k)}</span><input type="range" min="30" max="400" step="1" value="${Math.round(s.s * 100)}" oninput="decoStampSet(${i}, 's', this.value / 100, 1)"/><button class="chip sm" title="${esc(t('dc_sm_del'))}" onclick="decoStampSet(${i}, 'del'); return false">×</button></label>`,
       )
       .join('') +
-    (o.stamps.length ? `<div class="note">${esc(t('dc_sm_note'))}</div>` : '');
+    (o.stamps.length ? `<div class="note">${esc(t('dc_sm_note'))}</div>` : '') +
+    head(t('dc_drawn')) +
+    row(
+      t('dc_autodraw'),
+      sel('auto', DECO_AUTO, o.auto, (id) => esc(t(DECO_AUTO_NAME[id]))),
+    ) +
+    ck('hills', o.hills, t('dc_hills'));
   el.innerHTML = h;
 }

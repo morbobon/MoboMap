@@ -68,6 +68,8 @@ const LV_PAGE_AREAS = ['fill', 'margin', 'wall', 'band', 'mat', 'border'],
 const lvPageDiff = (keys) => keys.some((k) => pageOpts()[k] !== PAGE_DEFAULT[k]);
 const lvPageReset = (keys) =>
   (S.page = pageClean(Object.assign({}, pageOpts(), Object.fromEntries(keys.map((k) => [k, PAGE_DEFAULT[k]])))));
+// the look that is on (56-workspace.js), or nothing
+const lvLook = () => (S.fx.preset && lookOf(S.fx.preset)) || {};
 // section id: { is: a hidden setting differs from its default, reset: put those back (ui and render follow) }
 const LV_CUST = {
   map: {
@@ -99,8 +101,11 @@ const LV_CUST = {
       S.guard === false ||
       document.getElementById('frameSel').value !== 'auto' ||
       // (the user's changes to the style are not hidden: "Custom (from …)" with its own Reset shows in Simple too)
-      !!decoOut().deco ||
-      (lvDecor(S.fx.fx).length > 0 && lvDecor(S.fx.fx).join() !== lvDecor((lvStart().fx || {}).fx).join()),
+      // (the decorations a chosen look brings are the look, not a change to it)
+      (!!decoOut().deco && decoCode(S.deco) !== decoCode(lvLook().deco)) ||
+      (lvDecor(S.fx.fx).length > 0 &&
+        lvDecor(S.fx.fx).join() !== lvDecor((lvStart().fx || {}).fx).join() &&
+        lvDecor(S.fx.fx).join() !== lvDecor(lvLook().fx).join()),
     reset: () => {
       S.guard = true;
       document.getElementById('frameSel').value = 'auto';
@@ -147,8 +152,9 @@ const LV_CUST = {
     is: () =>
       document.getElementById('titlePos').value !== lvTitlePos() ||
       document.getElementById('subPos').value !== 'under' ||
-      !['auto', 'none'].includes(S.fx.title) ||
-      !['auto', 'none'].includes(S.fx.sub),
+      // (the title a chosen look brings is the look, not a change to it)
+      !['auto', 'none', lvLook().title].includes(S.fx.title) ||
+      !['auto', 'none', lvLook().sub].includes(S.fx.sub),
     reset: () => {
       document.getElementById('titlePos').value = lvTitlePos();
       document.getElementById('subPos').value = 'under';

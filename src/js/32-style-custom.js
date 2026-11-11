@@ -6,14 +6,17 @@
 //   bg, land, line, ink   own colours: background, land, borders, text
 //   lc                    own colour of the names on the map
 //   lw                    border width
-//   fill                  how the land is filled: plain | shades | regions | patchwork
-//   lab                   names on the map: std | caps | bold
+//   fill                  how the land is filled: plain | shades | regions | patchwork | wash (hand-coloured
+//                         along the borders, as on an engraved chart)
+//   lab                   names on the map: std | caps | bold | engr (engraved lettering) | hand (handwriting)
 //   ex, gl, rl            depth: extruded land, glow around the land, terrain relief (1 on, 0 off)
+//   wl                    waterlines: fine lines in the sea that follow the coast (1 on, 0 off)
 //   bgk                   background: plain | gradient | stars | waves | concrete
 // Only what differs from the preset is stored. Link parameter "sm", project field "styleMod".
 // A look (55-fx.js) can carry one as its "mod"; saved styles live in this browser (STYLES_KEY).
-const STYLE_FILLS = ['plain', 'shades', 'regions', 'patchwork'];
-const STYLE_LABS = ['std', 'caps', 'bold'];
+// (a link stores the place in these lists: new ones go at the end)
+const STYLE_FILLS = ['plain', 'shades', 'regions', 'patchwork', 'wash'];
+const STYLE_LABS = ['std', 'caps', 'bold', 'engr', 'hand'];
 const STYLE_BGS = ['plain', 'gradient', 'stars', 'waves', 'concrete'];
 const STYLE_COLS = ['bg', 'land', 'line', 'ink'];
 const STYLE_FILL_NAME = {
@@ -21,8 +24,20 @@ const STYLE_FILL_NAME = {
   shades: 'st_shades',
   regions: 'st_regions',
   patchwork: 'st_patchwork',
+  wash: 'stp_fill_wash',
 };
-const STYLE_LAB_NAME = { std: 'stp_lab_std', caps: 'stp_lab_caps', bold: 'stp_lab_bold' };
+const STYLE_LAB_NAME = {
+  std: 'stp_lab_std',
+  caps: 'stp_lab_caps',
+  bold: 'stp_lab_bold',
+  engr: 'stp_lab_engr',
+  hand: 'stp_lab_hand',
+};
+// the lettering of the two drawn kinds of names (system fonts only)
+const STYLE_LAB_FONT = {
+  engr: "Georgia,'Times New Roman',serif",
+  hand: "'Segoe Script','Bradley Hand','Snell Roundhand','Lucida Handwriting','Brush Script MT',cursive",
+};
 const STYLE_BG_NAME = {
   plain: 'stp_bg_plain',
   gradient: 'stp_bg_gradient',
@@ -32,7 +47,7 @@ const STYLE_BG_NAME = {
 };
 const STYLE_COL_NAME = { bg: 'stp_bg', land: 'stp_land', line: 'stp_line', ink: 'stp_ink' };
 // link tokens: one letter and a value (six hex digits, a number or an index)
-const STYLE_CODE = { bg: 'b', land: 'l', line: 's', ink: 'i', lc: 'c', lw: 'w', fill: 'f', lab: 't', ex: 'x', gl: 'g', rl: 'r', bgk: 'k' }; // prettier-ignore
+const STYLE_CODE = { bg: 'b', land: 'l', line: 's', ink: 'i', lc: 'c', lw: 'w', fill: 'f', lab: 't', ex: 'x', gl: 'g', rl: 'r', bgk: 'k', wl: 'v' }; // prettier-ignore
 const STYLE_LISTS = { fill: STYLE_FILLS, lab: STYLE_LABS, bgk: STYLE_BGS };
 const styleHex = (v) => (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : null);
 
@@ -55,6 +70,7 @@ function styleOwn(st) {
     ex: st === 'extrude' || sp.extrude ? 1 : 0,
     gl: sp.landGlow ? 1 : 0,
     rl: sp.relief ? 1 : 0,
+    wl: 0,
     bgk: sp.stars ? 'stars' : sp.bgGradient ? 'gradient' : sp.waves ? 'waves' : sp.concrete ? 'concrete' : 'plain',
   };
 }
@@ -74,7 +90,7 @@ function styleClean(o, st = S.style) {
     if (w !== own.lw) c.lw = w;
   }
   for (const k in STYLE_LISTS) if (STYLE_LISTS[k].includes(o[k]) && o[k] !== own[k]) c[k] = o[k];
-  for (const k of ['ex', 'gl', 'rl'])
+  for (const k of ['ex', 'gl', 'rl', 'wl'])
     if (o[k] != null && o[k] !== '' && (+o[k] ? 1 : 0) !== own[k]) c[k] = +o[k] ? 1 : 0;
   return Object.keys(c).length ? c : null;
 }
@@ -224,6 +240,7 @@ function styleModSp(md, sp, st, bg, bgMod, accent) {
   if (md.lw != null) o.strokeW = md.lw;
   if (md.lab) o.labels = md.lab === 'std' ? undefined : md.lab;
   if (md.lc) o.labelColor = md.lc;
+  if (md.wl != null) o.waterlines = !!md.wl;
   if (md.gl != null) o.landGlow = md.gl ? sp.landGlow || accent : undefined;
   if (md.rl != null) {
     // a style with real elevation tints (topographic) loses them; any other gets neutral shading
@@ -430,6 +447,7 @@ function styleUI() {
           : ''),
     ) +
     row(t('stp_bgk'), sel("styleSet('bgk', this.value)", STYLE_BGS, val('bgk'), STYLE_BG_NAME)) +
+    `<div class="row">${chip('wl', t('stp_waterlines'))}</div>` +
     `<div class="fxcat">${esc(t('stp_depth'))}</div>` +
     `<div class="row">${chip('ex', t('stp_extrude'))}${chip('gl', t('stp_glow'))}${chip('rl', t('stp_relief'))}</div>` +
     `<p class="note">${esc(t('stp_note'))}</p>`;

@@ -212,6 +212,8 @@ const SP = {
 const DOODLE = ['#dStripe', '#dDots', '#dCross', '#dWave', '#dScale', '#dBrick', '#dZig', '#dCheck'];
 
 // Categorical palette (patchwork style, attribute colours, attribute -> groups)
+// the watercolours of the hand-coloured fill (32-style-custom.js: fill 'wash')
+const WASH = ['#d9b23a', '#d98a8a', '#8fb26b', '#e0a060', '#7fa8b8'];
 const PATCH = [
   '#E63946',
   '#F4A261',

@@ -41,15 +41,21 @@ const FX_IDS = [
   'compass',
   'rhumb',
   'border',
+  'edgetone',
+  'holes',
+  'ink',
 ];
 // The groups of the Effects section, in the order they are shown. 'decor' is not a group there: compass, rhumb
 // lines and map border are switched and set up under Decorations (72-decor.js).
 const FX_CATS = [
-  ['paper', ['paper', 'grain', 'speckle', 'crumple', 'dried', 'folds', 'burnt', 'torn', 'curl', 'roll']],
+  [
+    'paper',
+    ['paper', 'grain', 'speckle', 'crumple', 'dried', 'folds', 'edgetone', 'burnt', 'holes', 'torn', 'curl', 'roll'],
+  ],
   ['stains', ['coffee', 'ring2', 'spill', 'drops', 'water', 'blot', 'age']],
   ['light', ['spotlight', 'window', 'blinds', 'leaves', 'sunbeam', 'dusk', 'vignette', 'gradient', 'glass', 'shadow']],
   ['relief', ['emboss', 'deboss', 'foil']],
-  ['colour', ['sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']],
+  ['colour', ['ink', 'sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']],
   ['decor', ['compass', 'rhumb', 'border']],
 ];
 const FXC_IDS = ['paper', 'stains', 'light', 'relief', 'colour'];
@@ -181,6 +187,10 @@ const FX_PRESET_IDS = [
   'treasure',
   'papyrus',
   'portolan',
+  'seachart',
+  'sepiamap',
+  'pirateisle',
+  'tornmap',
   'antique',
   'wallmap',
   'gallery',
@@ -254,6 +264,84 @@ const FX_PRESETS = {
     frame: 'none',
     style: 'atlas',
     surface: '#ddd8cf',
+  },
+  // old charts and treasure maps: the vintage style with its own paper, ink and lettering, and the decorations
+  // (72-decor.js) each one needs
+  seachart: {
+    title: 'cartouche',
+    sub: 'italic',
+    fx: ['paper', 'grain', 'folds', 'rhumb', 'compass', 'border', 'edgetone'],
+    frame: 'none',
+    style: 'vintage',
+    mod: {
+      bg: '#efe6cf',
+      land: '#f4eedd',
+      line: '#3a3226',
+      ink: '#2e281f',
+      lc: '#2e281f',
+      lw: 0.8,
+      fill: 'wash',
+      lab: 'engr',
+    },
+    surface: '#d8d2c6',
+    deco: { compass: 'fleur', border: 'ruler', hubs: 2, grat: 10, gratLabels: true, gratExt: 'area', gratOp: 0.2 },
+  },
+  sepiamap: {
+    title: 'cartouche',
+    sub: 'ornament',
+    fx: ['paper', 'grain', 'crumple', 'dried', 'edgetone', 'ink', 'compass', 'border', 'sepia'],
+    frame: 'none',
+    style: 'vintage',
+    mod: {
+      bg: '#e2c99a',
+      land: '#d9bc86',
+      line: '#4a2f14',
+      ink: '#3d2610',
+      lc: '#3d2610',
+      lw: 1.1,
+      lab: 'hand',
+      wl: 1,
+    },
+    surface: '#3a2a1b',
+    deco: { compass: 'nautical', compassSize: 1.5, border: 'wave', flourish: 'curl', auto: 'chart' },
+  },
+  pirateisle: {
+    title: 'ribbon',
+    sub: 'italic',
+    fx: ['paper', 'grain', 'crumple', 'burnt', 'holes', 'ink', 'compass'],
+    frame: 'none',
+    style: 'vintage',
+    mod: {
+      bg: '#dcc08a',
+      land: '#e6cf9f',
+      line: '#1c1610',
+      ink: '#1c1610',
+      lc: '#1c1610',
+      lw: 1.6,
+      lab: 'hand',
+      wl: 1,
+    },
+    surface: '#2a2018',
+    deco: { compass: 'star', compassSize: 1.4, hills: true, auto: 'treasure' },
+  },
+  tornmap: {
+    title: 'ribbon',
+    sub: 'ornament',
+    fx: ['paper', 'grain', 'torn', 'crumple', 'coffee', 'edgetone', 'ink', 'compass', 'border'],
+    frame: 'none',
+    style: 'vintage',
+    mod: {
+      bg: '#e3b866',
+      land: '#ecc77a',
+      line: '#3b2410',
+      ink: '#3b2410',
+      lc: '#3b2410',
+      lw: 1.2,
+      lab: 'engr',
+      wl: 1,
+    },
+    surface: '#3b2f25',
+    deco: { compass: 'nautical', border: 'double', grat: 15, gratOp: 0.2, hills: true, auto: 'treasure' },
   },
   antique: {
     fx: ['paper', 'grain', 'border', 'compass', 'glass'],
@@ -484,11 +572,11 @@ function fxLand(allPath) {
   return `<clipPath id="fxlandclip"><path d="${allPath}"/></clipPath><g clip-path="url(#fxlandclip)" pointer-events="none">${fxTwice('foil', (o) => `<rect width="${W}" height="${H}" filter="url(#fxfoil)" opacity="${o}"/>`)}</g>`;
 }
 // over the map (after the highlight groups): emboss / deboss
-function fxMap(allPath, ink, accent) {
+function fxMap(allPath, ink, accent, landInk) {
   let o = '';
   if (fxOn('emboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxemboss)" pointer-events="none"/>`;
   if (fxOn('deboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxdeboss)" pointer-events="none"/>`;
-  return o + decoGrat(ink, accent, false);
+  return o + decoHills(landInk) + decoGrat(ink, accent, false);
 }
 // over everything in content space: the decorations (compass rose, scale bar …)
 const fxContentTop = (ink, accent) => decoTop(ink, accent);
@@ -535,46 +623,60 @@ function fxDefs() {
 ${stainDefs(sd)}
 <filter id="fxedge" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34"/></filter>
 <filter id="fxtorn" ${U}><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="${sd + 9}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="12"/></filter>
-<filter id="fxburn" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34" result="d"/><feGaussianBlur in="d" stdDeviation="5"/></filter>
+<filter id="fxburn" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34" result="d"/><feGaussianBlur in="d" stdDeviation="5" result="b"/><feTurbulence type="fractalNoise" baseFrequency=".014" numOctaves="3" seed="${sd + 14}"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  3.4 0 0 0 -1.05" result="m"/><feComposite in="b" in2="m" operator="arithmetic" k1="1" k2=".22"/></filter>
+<filter id="fxchar" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34" result="d"/><feGaussianBlur in="d" stdDeviation="1.1"/></filter>
+<filter id="fxtone" ${U}><feGaussianBlur in="SourceAlpha" stdDeviation="${(Math.min(W, H) * 0.045).toFixed(1)}"/><feColorMatrix type="matrix" values="0 0 0 0 .34  0 0 0 0 .2  0 0 0 0 .07  0 0 0 -2 2" result="e"/><feTurbulence type="fractalNoise" baseFrequency=".0055" numOctaves="3" seed="${sd + 13}"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  3.2 0 0 0 -1" result="m"/><feComposite in="e" in2="m" operator="arithmetic" k1="1" k2=".3" result="t"/><feComposite in="t" in2="SourceAlpha" operator="in"/></filter>
 <filter id="fxfoil" ${U}><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="5" seed="${sd + 10}" result="n"/><feColorMatrix in="n" type="saturate" values="0" result="g"/><feComponentTransfer in="g" result="c"><feFuncR type="table" tableValues=".28 .52 .78 .93 .98 1"/><feFuncG type="table" tableValues=".17 .34 .58 .76 .86 .95"/><feFuncB type="table" tableValues=".07 .13 .26 .4 .55 .78"/><feFuncA type="discrete" tableValues="1"/></feComponentTransfer><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="1" seed="${sd + 11}" result="s"/><feColorMatrix in="s" type="matrix" values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .8  7 0 0 0 -5.2" result="sp"/><feMerge><feMergeNode in="c"/><feMergeNode in="sp"/></feMerge></filter>`;
   const Lt = fxLight();
   const relief = (id, fxid, hi, lo) =>
     `<filter id="${id}" ${U}><feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="b"/><feOffset in="b" dx="${(-Lt.x * 3.1).toFixed(2)}" dy="${(-Lt.y * 3.1).toFixed(2)}" result="o1"/><feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/><feFlood flood-color="${hi}" flood-opacity="${fxOp(fxid, 0.75)}"/><feComposite in2="e1" operator="in" result="H"/><feOffset in="b" dx="${(Lt.x * 3.1).toFixed(2)}" dy="${(Lt.y * 3.1).toFixed(2)}" result="o2"/><feComposite in="SourceAlpha" in2="o2" operator="out" result="e2"/><feFlood flood-color="${lo}" flood-opacity="${fxOp(fxid, 0.5)}"/><feComposite in2="e2" operator="in" result="L"/><feMerge><feMergeNode in="H"/><feMergeNode in="L"/></feMerge></filter>`;
   d += relief('fxemboss', 'emboss', '#ffffff', '#000000') + relief('fxdeboss', 'deboss', '#000000', '#ffffff');
-  // content filter chain (mono, sepia, chroma, glow)
-  let ch = '',
-    last = 'SourceGraphic',
-    n = 0;
-  const step = (s, id) => {
-    const inp = last;
-    ch += s.replace(/\$in/g, inp).replace(/\$out/g, 'c' + ++n);
-    const a = Math.max(0, Math.min(2, fxAmt(id)));
-    if (Math.abs(a - 1) > 0.01) {
-      ch += `<feComposite in="c${n}" in2="${inp}" operator="arithmetic" k2="${a.toFixed(3)}" k3="${(1 - a).toFixed(3)}" result="c${n}m"/>`;
-      last = 'c' + n + 'm';
-    } else last = 'c' + n;
+  // content filter chain (ink, mono, sepia, chroma, glow); withInk false: the chain a moving map gets
+  const chain = (withInk) => {
+    let ch = '',
+      last = 'SourceGraphic',
+      n = 0;
+    const step = (s, id) => {
+      const inp = last;
+      ch += s.replace(/\$in/g, inp).replace(/\$out/g, 'c' + ++n);
+      const a = Math.max(0, Math.min(2, fxAmt(id)));
+      if (Math.abs(a - 1) > 0.01) {
+        ch += `<feComposite in="c${n}" in2="${inp}" operator="arithmetic" k2="${a.toFixed(3)}" k3="${(1 - a).toFixed(3)}" result="c${n}m"/>`;
+        last = 'c' + n + 'm';
+      } else last = 'c' + n;
+    };
+    // drawn by hand in ink: the lines wobble a little, the ink bleeds into the paper and has faded in patches
+    if (withInk && fxOn('ink'))
+      step(
+        `<feTurbulence type="fractalNoise" baseFrequency=".032" numOctaves="2" seed="${sd + 12}" result="n$out"/><feDisplacementMap in="$in" in2="n$out" scale="3.4" xChannelSelector="R" yChannelSelector="G" result="w$out"/><feGaussianBlur in="w$out" stdDeviation=".7" result="b$out"/><feBlend in="w$out" in2="b$out" mode="darken" result="d$out"/><feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="3" seed="${sd + 15}" result="q$out"/><feColorMatrix in="q$out" type="matrix" values="1.5 0 0 0 -.5  1.3 0 0 0 -.45  1 0 0 0 -.36  0 0 0 0 1" result="f$out"/><feBlend in="d$out" in2="f$out" mode="screen" result="$out"/>`,
+        'ink',
+      );
+    if (fxOn('mono'))
+      step(
+        `<feColorMatrix in="$in" type="saturate" values="0" result="m$out"/><feComponentTransfer in="m$out" result="$out"><feFuncR type="linear" slope="1.15" intercept="-.06"/><feFuncG type="linear" slope="1.15" intercept="-.06"/><feFuncB type="linear" slope="1.15" intercept="-.06"/></feComponentTransfer>`,
+        'mono',
+      );
+    if (fxOn('sepia'))
+      step(
+        `<feColorMatrix in="$in" type="matrix" values=".393 .769 .189 0 0  .349 .686 .168 0 0  .272 .534 .131 0 0  0 0 0 1 0" result="$out"/>`,
+        'sepia',
+      );
+    if (fxOn('chroma'))
+      step(
+        `<feColorMatrix in="$in" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r$out"/><feOffset in="r$out" dx="-2" result="ro$out"/><feColorMatrix in="$in" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="g$out"/><feOffset in="g$out" dx="2" result="go$out"/><feBlend in="ro$out" in2="go$out" mode="screen" result="$out"/>`,
+        'chroma',
+      );
+    if (fxOn('glow'))
+      step(
+        `<feGaussianBlur in="$in" stdDeviation="5" result="b$out"/><feBlend in="$in" in2="b$out" mode="screen" result="$out"/>`,
+        'glow',
+      );
+    return ch;
   };
-  if (fxOn('mono'))
-    step(
-      `<feColorMatrix in="$in" type="saturate" values="0" result="m$out"/><feComponentTransfer in="m$out" result="$out"><feFuncR type="linear" slope="1.15" intercept="-.06"/><feFuncG type="linear" slope="1.15" intercept="-.06"/><feFuncB type="linear" slope="1.15" intercept="-.06"/></feComponentTransfer>`,
-      'mono',
-    );
-  if (fxOn('sepia'))
-    step(
-      `<feColorMatrix in="$in" type="matrix" values=".393 .769 .189 0 0  .349 .686 .168 0 0  .272 .534 .131 0 0  0 0 0 1 0" result="$out"/>`,
-      'sepia',
-    );
-  if (fxOn('chroma'))
-    step(
-      `<feColorMatrix in="$in" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r$out"/><feOffset in="r$out" dx="-2" result="ro$out"/><feColorMatrix in="$in" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="g$out"/><feOffset in="g$out" dx="2" result="go$out"/><feBlend in="ro$out" in2="go$out" mode="screen" result="$out"/>`,
-      'chroma',
-    );
-  if (fxOn('glow'))
-    step(
-      `<feGaussianBlur in="$in" stdDeviation="5" result="b$out"/><feBlend in="$in" in2="b$out" mode="screen" result="$out"/>`,
-      'glow',
-    );
+  const ch = chain(true),
+    chG = fxOn('ink') ? chain(false) : '';
   if (ch) d += `<filter id="fxcontent" ${U} color-interpolation-filters="sRGB">${ch}</filter>`;
+  if (chG) d += `<filter id="fxcontentg" ${U} color-interpolation-filters="sRGB">${chG}</filter>`;
   d += `<pattern id="fxscan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="1.6" fill="#000" opacity=".38"/></pattern>
 <pattern id="fxdots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="3" cy="3" r="1.25" fill="#000" opacity=".3"/></pattern>
 <radialGradient id="fxvig" cx=".5" cy=".5" r=".72"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></radialGradient>
@@ -644,7 +746,10 @@ function fxWrap(content, bg, ink, accent, thumb) {
   const edgeMask = fxOn('torn') || fxOn('burnt');
   const P = [px0, py0, px1, py1];
   let sheet = rect(P, `fill="${bg}"`);
-  const cf = /<filter id="fxcontent"/.test(fxDefs()) ? ' filter="url(#fxcontent)"' : '';
+  // (hand-drawn ink is left out while the map is moved: app.css, #svg.gest)
+  const cf =
+    (/<filter id="fxcontent"/.test(fxDefs()) ? ' filter="url(#fxcontent)"' : '') +
+    (fxOn('ink') ? ` class="${/<filter id="fxcontentg"/.test(fxDefs()) ? 'fxc1' : 'fxc0'}"` : '');
   // the content – a zoomed map included – never leaves the sheet
   const clip = L.active || S.zoom.k !== 1 || S.zoom.x || S.zoom.y;
   sheet += `${clip ? `<clipPath id="fxclip">${rect(P)}</clipPath><g clip-path="url(#fxclip)">` : '<g>'}<g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g></g>`;
@@ -659,6 +764,11 @@ function fxWrap(content, bg, ink, accent, thumb) {
     sheet += ov('#fff', `filter="url(#fxdried)" style="mix-blend-mode:multiply" opacity="${fxOp('dried', 0.55)}"`);
   if (fxOn('crumple'))
     sheet += ov('#fff', `filter="url(#fxcrumple)" style="mix-blend-mode:multiply" opacity="${fxOp('crumple', 0.6)}"`);
+  // the edges of an old sheet have darkened unevenly: more in the corners, in patches along the sides
+  if (fxOn('edgetone'))
+    sheet += fxTwice('edgetone', (o) =>
+      ov('#000', `filter="url(#fxtone)" style="mix-blend-mode:multiply" opacity="${o}"`),
+    );
   sheet += stainsSVG(P, S0, !thumb);
   if (fxOn('folds')) {
     const xs = [0.25, 0.5, 0.75].map((k) => px0 + pw * k),
@@ -678,7 +788,25 @@ function fxWrap(content, bg, ink, accent, thumb) {
   if (fxOn('vignette')) sheet += fxTwice('vignette', (o) => ov('url(#fxvig)', `opacity="${o}"`));
   if (fxOn('burnt')) {
     const qi = [px0 + 4, py0 + 4, px1 - 4, py1 - 4];
-    sheet += `<g pointer-events="none">${rect(qi, `fill="none" stroke="#7a4a1c" stroke-width="${r1(S0 * 0.09)}" opacity="${fxOp('burnt', 0.55)}" filter="url(#fxburn)"`)}${rect(qi, `fill="none" stroke="#2a1406" stroke-width="${r1(S0 * 0.03)}" opacity="${fxOp('burnt', 0.9)}" filter="url(#fxburn)"`)}</g>`;
+    // scorched in patches, charred where the fire stopped: a thin black line right at the edge
+    sheet += `<g pointer-events="none"><g filter="url(#fxburn)" style="mix-blend-mode:multiply">${rect(qi, `fill="none" stroke="#6b3d14" stroke-width="${r1(S0 * 0.11)}" opacity="${fxOp('burnt', 0.7)}"`)}${rect(qi, `fill="none" stroke="#2a1406" stroke-width="${r1(S0 * 0.04)}" opacity="${fxOp('burnt', 0.9)}"`)}</g>${rect(P, `fill="none" stroke="#150903" stroke-width="${r1(S0 * 0.013)}" opacity="${fxOp('burnt', 0.95)}" filter="url(#fxchar)"`)}</g>`;
+  }
+  // burnt holes: the table shows through, with a charred rim and a scorched ring around it
+  if (fxOn('holes')) {
+    const rnd = fxRng(S.fx.seed + 31),
+      back = L.active ? f.mat || surface : surface,
+      a = Math.max(0.4, Math.min(2, fxAmt('holes')));
+    const h = ['', '', ''];
+    for (let i = 0; i < 2; i++) {
+      const cx = px0 + pw * (0.1 + 0.8 * rnd()),
+        cy = py0 + ph * (i ? 0.72 + 0.14 * rnd() : 0.14 + 0.14 * rnd()),
+        r = S0 * (0.016 + 0.016 * rnd()) * a,
+        c = (k, at) => `<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(r * k)}" ${at}/>`;
+      h[0] += c(2.6, 'fill="#6b3d14" opacity=".6"');
+      h[1] += c(1.45, 'fill="#150903"');
+      h[2] += c(1, `fill="${back}"`);
+    }
+    sheet += `<g pointer-events="none"><g filter="url(#fxburn)" style="mix-blend-mode:multiply">${h[0]}</g><g filter="url(#fxchar)">${h[1]}</g><g filter="url(#fxedge)">${h[2]}</g></g>`;
   }
   if (edgeMask) {
     const flt = fxOn('burnt') ? 'fxedge' : 'fxtorn';

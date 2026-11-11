@@ -202,6 +202,22 @@ function render(target) {
           .map((k) => kp(k, det))
           .join('')
       : landPath(det) + (GEO.xland || []).map((k) => kp(k, det)).join('');
+  // waterlines: fine lines in the sea that follow the coast, fainter further out (each a wide stroke of the
+  // land's outline with a slightly narrower one in the sea's colour over it; the land covers the inner half)
+  if (sp.waterlines && isHex(bg) && !relief)
+    out +=
+      '<g data-waterlines fill="none" stroke-linejoin="round" pointer-events="none">' +
+      [
+        [9, 0.3],
+        [6, 0.42],
+        [3, 0.6],
+      ]
+        .map(
+          ([dist, op]) =>
+            `<path d="${allPath}" stroke="${mix(bg, ink0, op)}" stroke-width="${dist * 2 + 0.5}"/><path d="${allPath}" stroke="${bg}" stroke-width="${dist * 2 - 0.7}"/>`,
+        )
+        .join('') +
+      '</g>';
   // neighbouring countries as grey context (country views)
   if (S.map !== 'world' && document.getElementById('showNeighbours').checked && !S.focusHide) {
     const nb = neighboursPath();
@@ -314,6 +330,19 @@ function render(target) {
     out += `<path class="k" data-c="${k.c}" d="${kp(k, det)}${mkTail.get(k) || ''}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim || fo ? 'opacity=".3"' : ''} ${st === 'outline' || sp.pixel || (sp.flag && S.map !== 'world') ? 'fill-opacity="0"' : sp.network ? 'fill-opacity=".55"' : ''} ${sp.flag && S.map !== 'world' ? 'stroke-opacity=".45"' : ''}/>`;
   }
   out += '</g>';
+  // hand-coloured: a wash of watercolour along the inside of every border, in a few colours that neighbours
+  // rarely share (per colour one outline, clipped to itself and stroked twice: wide and pale, narrow and stronger)
+  if (fillK === 'wash' && !styleFillFixed(st)) {
+    const cls = WASH.map(() => '');
+    for (const k of unsel)
+      if (inFocus(k) || !S.focusHide) cls[(codeNum(k.c) * 13 + (REGI[k.r] || 0)) % WASH.length] += kp(k, det);
+    out += '<g data-wash fill="none" stroke-linejoin="round" pointer-events="none">';
+    cls.forEach((d, i) => {
+      if (d)
+        out += `<defs><path id="washp${i}" d="${d}"/></defs><clipPath id="washc${i}"><use href="#washp${i}"/></clipPath><g clip-path="url(#washc${i})" stroke="${WASH[i]}"><use href="#washp${i}" stroke-width="13" stroke-opacity=".3"/><use href="#washp${i}" stroke-width="5.5" stroke-opacity=".5"/></g>`;
+    });
+    out += '</g>';
+  }
   out += fxLand(allPath);
   if (relief) {
     const borders =
@@ -403,7 +432,7 @@ function render(target) {
   }
   if (sp.dotted) {
     const rl = rlPath(det);
-    out += `<path d="${rl}" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`;
+    out += `<path d="${rl}" fill="none" stroke="${cols.mod.line ? stroke : '#fff'}" stroke-width="1.6" stroke-dasharray="1 3" pointer-events="none"/>`;
   }
   if (sp.text) {
     out += '<g pointer-events="none">';
@@ -448,8 +477,14 @@ function render(target) {
     out += '</g>';
   }
   if (sp.sea && !S.focusHide) {
-    const sea = (GEO.sea || []).map((x) => [...repPt(worldPt(x[0] + 180, 90 - x[1])), t(x[2]).toUpperCase()]);
-    out += `<g pointer-events="none" font-family="'${ds.body}'" font-size="10" letter-spacing="3" fill="${ink}" opacity="${tOp(0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic ? 'font-style="italic"' : ''}>`;
+    // (engraved: spaced italic capitals; handwriting: as written, larger)
+    const seaHand = sp.labels === 'hand',
+      seaFont = STYLE_LAB_FONT[sp.labels] || `'${ds.body}'`;
+    const sea = (GEO.sea || []).map((x) => [
+      ...repPt(worldPt(x[0] + 180, 90 - x[1])),
+      seaHand ? t(x[2]) : t(x[2]).toUpperCase(),
+    ]);
+    out += `<g pointer-events="none" font-family="${seaFont}" font-size="${seaHand ? 13 : sp.labels === 'engr' ? 11 : 10}" letter-spacing="${seaHand ? 0.5 : sp.labels === 'engr' ? 4 : 3}" fill="${ink}" opacity="${tOp(sp.labels === 'engr' || seaHand ? 0.8 : 0.7)}" ${guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : ''} ${sp.seaItalic || sp.labels === 'engr' ? 'font-style="italic"' : ''}>`;
     for (const [fx, fy, t] of sea)
       out += `<text x="${fx.toFixed(0)}" y="${fy.toFixed(0)}" text-anchor="middle">${t}</text>`;
     out += '</g>';
@@ -558,10 +593,12 @@ function render(target) {
     const tr = g.hl.has('emboss') ? ' transform="translate(0,-6)"' : '';
     out += `<mask id="om${gi}" maskUnits="userSpaceOnUse" ${bgR}><rect ${bgR} fill="#fff"/><path d="${d}" fill="#000"${tr}/></mask><path d="${d}" fill="none" stroke="${g.color}" stroke-width="6.4" stroke-linejoin="round" mask="url(#om${gi})"${tr} pointer-events="none"/>`;
   });
-  out += fxMap(allPath, ink, ds.accent);
+  // the ink where a drawing lies on the land (hill symbols, palms)
+  const landInk = isHex(land) && contrast(ink, land) < 3 ? (light(land) ? '#222222' : '#ffffff') : ink;
+  out += fxMap(allPath, ink, ds.accent, landInk);
   // up to here the map body: what the repeated world shows in every copy. What follows exists once.
   const bodyEnd = out.length;
-  out += decoMapTop(ink, ds.accent);
+  out += decoMapTop(ink, ds.accent, landInk);
   // major cities (country views, or focused units in the world view)
   const CL =
     S.map !== 'world'
@@ -716,14 +753,15 @@ function render(target) {
       if (S.focusHide && !inFocus(k)) continue;
       const [x, y] = kc(k);
       if (k.a < (sp.labels ? TH.h : TH.l) && !isBH(k)) continue;
-      const caps = sp.labels === 'caps';
+      const caps = sp.labels === 'caps' || sp.labels === 'engr',
+        hand = sp.labels === 'hand';
       // a unit label gives way to a city label it would run into
-      const lfs = caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5,
+      const lfs = hand ? (k.a > TH.big ? 10.5 : 8.5) : caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5,
         lw = caps ? nm(k).length * (lfs * 0.68 + 1.2) : nm(k).length * lfs * 0.6;
       const nb = [x - lw / 2 - 1, y - lfs, x + lw / 2 + 1, y + 2];
       if (cityBoxes.some((b) => boxHit(b, nb))) continue;
       cityBoxes.push(nb);
-      out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="'${lf}'" font-size="${caps ? (k.a > TH.big ? 7.5 : 6.5) : k.a > TH.big ? 8 : 6.5}" ${caps ? 'letter-spacing="1.2"' : 'font-weight="700"'} text-anchor="middle" fill="${labelFill}" ${labelHalo} opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
+      out += `<text x="${x.toFixed(0)}" y="${(y - (sp.cityDots ? 2 : 0)).toFixed(0)}" font-family="${STYLE_LAB_FONT[sp.labels] || `'${lf}'`}" font-size="${lfs}" ${hand ? '' : caps ? `letter-spacing="${sp.labels === 'engr' ? 1.6 : 1.2}"` : 'font-weight="700"'} text-anchor="middle" fill="${labelFill}" ${labelHalo} opacity=".9">${esc(caps ? nm(k).toUpperCase() : nm(k))}</text>`;
     }
   const margin = { l: [], r: [] };
   groups.forEach((g) => {
