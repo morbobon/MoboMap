@@ -34,6 +34,7 @@ const S = {
   active: 0,
   partners: [],
   texts: [], // custom text items (76-texts.js)
+  lock: { on: false, pos: true, zoom: 1, zr: [1, 4], hl: true, edit: false }, // map locks (77-locks.js)
   tb: { title: {}, sub: {} }, // the title's and subtitle's own font, size, colour … (76-texts.js)
   visited: new Set(), // maps opened this session (example selection only on first visit)
 };

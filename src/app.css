@@ -660,9 +660,6 @@ header small {
   color: var(--mute);
 }
 #zoomReset {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   display: none;
 }
 #wrap.zoomed #zoomReset {
@@ -1584,4 +1581,104 @@ body.grpdrag .grp-root {
 }
 .txc .txdel {
   margin-left: auto;
+}
+
+/* controls on the map: reset zoom, the lock (77-locks.js) */
+#mapCtl {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  z-index: 3;
+}
+#mapCtl .chip {
+  box-shadow: 0 2px 8px #0003;
+}
+.lockgrp {
+  display: flex;
+}
+#wrap #lockBtn svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+#lockBtn {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px 0 0 999px;
+  font-weight: 600;
+}
+#lockMore {
+  border-radius: 0 999px 999px 0;
+  border-left-width: 0;
+  padding-left: 6px;
+  padding-right: 7px;
+}
+#lockPop {
+  position: absolute;
+  top: 44px;
+  right: 10px;
+  z-index: 4;
+  width: 250px;
+  max-height: calc(100% - 54px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px #0005;
+  font-size: 12.5px;
+}
+#lockPop[hidden],
+#lkRange[hidden] {
+  display: none;
+}
+#lockPop .lkz {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--mute);
+}
+#lockPop input[type='number'] {
+  width: 100%;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--field);
+  color: var(--ink);
+}
+#wrap.lock-pos #zoomReset,
+body.viewer-link .lockgrp {
+  display: none !important;
+}
+#wrap.lock-hl .k {
+  cursor: default;
+}
+#wrap.lock-hl .k:hover {
+  filter: none;
+}
+/* viewer mode (editing locked): the map alone */
+body.viewer header,
+body.viewer aside,
+body.viewer .rail,
+body.viewer .looksbar,
+body.viewer .looks,
+body.viewer .stripshow {
+  display: none !important;
+}
+body.viewer {
+  --chrome: 36px;
+}
+body.viewer .stage {
+  padding: 18px;
 }

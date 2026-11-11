@@ -55,6 +55,7 @@ function projectState() {
     titlePos: document.getElementById('titlePos').value,
     subPos: document.getElementById('subPos').value,
     ...txOut(),
+    ...lockOut(),
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
     footer: footerOpts(),
@@ -173,6 +174,7 @@ function loadProject(p, quiet, noDraw) {
   S.active = Math.min(p.active || 0, S.groups.length - 1);
   orderGroups();
   txLoad(p);
+  S.lock = lockClean(p.lock);
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',
     link: q.link || '',

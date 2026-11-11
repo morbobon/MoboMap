@@ -121,6 +121,9 @@ function ctxItems(target, pt) {
   add(t('sec_display'), () => jumpTo(secOf('display')));
   add(t('sec_fx'), () => jumpTo(secOf('fx')));
   add(t('sec_layout'), () => jumpTo('#layouts'));
+  add(t(S.lock.on ? 'lock_unlock' : 'lock_map'), () => toggleLock());
+  // viewer mode: the editor is hidden; the one way back to it
+  if (lockOn('edit')) return { title, items: [{ label: t('lock_edit_map'), go: () => toggleLock(false) }] };
   return { title, items };
 }
 function showCtx(target, cx, cy) {
@@ -152,7 +155,7 @@ function hideCtx() {
   svgEl.addEventListener(
     'click',
     (e) => {
-      if (!e.shiftKey) return;
+      if (!e.shiftKey || lockOn('edit')) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       const first = ctxItems(e.target).items[0];

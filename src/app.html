@@ -583,7 +583,49 @@
       <div class="stage">
         <div id="wrap">
           <svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg>
-          <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+          <div id="mapCtl">
+            <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+            <div class="lockgrp">
+              <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
+              <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
+            </div>
+          </div>
+          <div id="lockPop" hidden>
+            <label class="ck"
+              ><input type="checkbox" id="lkOn" onchange="toggleLock(this.checked)" /> <b data-i18n="lock_on"></b
+            ></label>
+            <div class="note" data-i18n="lock_what"></div>
+            <label class="ck"
+              ><input type="checkbox" id="lkPos" onchange="setLock('pos', this.checked)" />
+              <span data-i18n="lock_pos"></span
+            ></label>
+            <label class="lkz"
+              ><span data-i18n="lock_zoom"></span
+              ><select id="lkZoom" onchange="setLock('zoom', +this.value)">
+                <option value="0" data-i18n="lock_z_free"></option>
+                <option value="1" data-i18n="lock_z_none"></option>
+                <option value="2" data-i18n="lock_z_range"></option></select
+            ></label>
+            <div class="row2" id="lkRange">
+              <label
+                ><span data-i18n="lock_min"></span
+                ><input type="number" id="lkMin" min="0.3" max="40" step="0.5" onchange="setLockRange()"
+              /></label>
+              <label
+                ><span data-i18n="lock_max"></span
+                ><input type="number" id="lkMax" min="0.3" max="40" step="0.5" onchange="setLockRange()"
+              /></label>
+            </div>
+            <label class="ck"
+              ><input type="checkbox" id="lkHl" onchange="setLock('hl', this.checked)" />
+              <span data-i18n="lock_hl"></span
+            ></label>
+            <label class="ck"
+              ><input type="checkbox" id="lkEdit" onchange="setLock('edit', this.checked)" />
+              <span data-i18n="lock_edit"></span
+            ></label>
+            <div class="note" data-i18n="lock_note"></div>
+          </div>
           <button id="fsExit" class="chip" onclick="toggleFullscreen()" data-i18n="fs_exit"></button>
         </div>
         <div class="looksbar">

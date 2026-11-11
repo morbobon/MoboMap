@@ -189,6 +189,7 @@ function ui() {
   document.getElementById('addSubBtn').disabled = !S.groups.length;
   partnersUI();
   textsUI();
+  lockUI();
 }
 function setDS(v) {
   if (typeof PENDING_LINK !== 'undefined' && PENDING_LINK && PENDING_LINK.ds !== v) PENDING_LINK = null;
@@ -407,7 +408,8 @@ let lastTap = null;
 svg.addEventListener('click', (e) => {
   const p = e.target.closest('.k');
   const touch = lastPointer === 'touch';
-  if (touch && lastTap && lastTap.c === (p ? p.dataset.c : null) && Date.now() - lastTap.t < 350) {
+  // a locked position: no going to another area
+  if (touch && lastTap && lastTap.c === (p ? p.dataset.c : null) && Date.now() - lastTap.t < 350 && !lockOn('pos')) {
     const u = lastTap;
     lastTap = null;
     if (u.c) {
@@ -424,7 +426,7 @@ svg.addEventListener('click', (e) => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
     tip.style.display = 'none';
-    return focusClick(p && p.dataset.c);
+    return lockOn('pos') ? undefined : focusClick(p && p.dataset.c);
   }
   if (!p) {
     lastTap = touch ? { c: null, t: Date.now() } : null;
@@ -432,6 +434,8 @@ svg.addEventListener('click', (e) => {
   }
   const c = p.dataset.c;
   if (touch) lastTap = { c, t: Date.now(), gi: S.groups.findIndex((o) => o.sel.has(c)), groups: S.groups.length };
+  // locked highlights: a click selects nothing
+  if (lockOn('hl')) return;
   const g = activeGroup();
   if (g.sel.has(c)) g.sel.delete(c);
   else {
@@ -485,8 +489,11 @@ function resetZoom() {
 svg.addEventListener(
   'wheel',
   (e) => {
+    // a locked zoom leaves the wheel to the page
+    if (lockOn('zoom') === 1) return;
     e.preventDefault();
-    const [sx, sy] = svgPoint(e);
+    // a locked position zooms around the page centre
+    const [sx, sy] = lockOn('pos') ? lockCentre() : svgPoint(e);
     const z = S.zoom;
     const step = Math.max(-0.12, Math.min(0.12, -e.deltaY * 0.0006));
     // with auto-detail a country or focus can be zoomed out far enough to step up a level
@@ -495,13 +502,16 @@ svg.addEventListener(
     const kMax = autoDetailOn() && S.map === 'world' ? 400 : 40;
     let k2 = Math.min(kMax, Math.max(kMin, z.k * Math.exp(step)));
     if (Math.abs(k2 - 1) < 0.03) k2 = 1;
+    if (lockOn('zoom') === 2) k2 = Math.min(S.lock.zr[1], Math.max(S.lock.zr[0], k2));
+    if (k2 === z.k) return;
     // keep the point under the cursor in place: screen = unzoomed * k + offset
     const bx = (sx - z.x) / z.k,
       by = (sy - z.y) / z.k;
     S.zoom = { k: k2, x: sx - bx * k2, y: sy - by * k2 };
     // auto-detail: a country filling the page opens its regions, a small map steps up a level
     const under = e.target.closest && e.target.closest('.k');
-    if (typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c, k2 > z.k)) return;
+    if (!lockOn('pos') && typeof autoDetailCheck === 'function' && autoDetailCheck(under && under.dataset.c, k2 > z.k))
+      return;
     zoomChanged(true);
   },
   { passive: false },
@@ -553,13 +563,22 @@ window.addEventListener('pointermove', (e) => {
     const m = midOf(),
       z0 = pinch.z,
       kMax = autoDetailOn() && S.map === 'world' ? 400 : 40;
-    const k = Math.min(kMax, Math.max(0.3, (z0.k * m.d) / pinch.d));
-    // the map point under the first midpoint stays under the current one
-    const bx = (pinch.p[0] - z0.x) / z0.k,
-      by = (pinch.p[1] - z0.y) / z0.k,
+    // a locked zoom: the fingers scale the page instead (77-locks.js / page scale)
+    if (lockOn('zoom') === 1) {
+      if (typeof pinchPage === 'function') pinchPage(m.d / pinch.d, pinch);
+      return;
+    }
+    let k = Math.min(kMax, Math.max(0.3, (z0.k * m.d) / pinch.d));
+    if (lockOn('zoom') === 2) k = Math.min(S.lock.zr[1], Math.max(S.lock.zr[0], k));
+    // the map point under the first midpoint stays under the current one (a locked position: the page centre)
+    const c = lockOn('pos') ? lockCentre() : null,
+      p0 = c || pinch.p,
+      p1 = c || m.p;
+    const bx = (p0[0] - z0.x) / z0.k,
+      by = (p0[1] - z0.y) / z0.k,
       prev = S.zoom.k;
-    S.zoom = { k, x: m.p[0] - bx * k, y: m.p[1] - by * k };
-    if (typeof autoDetailCheck === 'function' && Math.abs(k - prev) > 1e-3 && autoDetailCheck(null, k > prev)) {
+    S.zoom = { k, x: p1[0] - bx * k, y: p1[1] - by * k };
+    if (!c && typeof autoDetailCheck === 'function' && Math.abs(k - prev) > 1e-3 && autoDetailCheck(null, k > prev)) {
       // another map now: the fingers start over from here
       pinch = null;
       return;
@@ -574,6 +593,7 @@ window.addEventListener('pointermove', (e) => {
   if (!dragged && Math.hypot(dx, dy) < 6) return;
   dragged = true;
   tip.style.display = 'none';
+  if (lockOn('pos')) return; // a locked position does not pan (and the press is no click)
   document.getElementById('wrap').classList.add('panning');
   S.zoom = { k: drag.z.k, x: drag.z.x + dx, y: drag.z.y + dy };
   zoomChanged(true);
@@ -615,6 +635,14 @@ function showTip(target, cx, cy) {
   }
   const k = GEO.units.find((k) => k.c === p.dataset.c);
   const gi = groupOf(k.c);
+  // locked highlights: the name and its group, no hints about clicking
+  if (lockOn('hl')) {
+    tip.innerHTML = `<b>${nm(k)}</b>${gi >= 0 && S.groups[gi].legend !== false ? ' · ' + esc(S.groups[gi].name) : ''}`;
+    tip.style.display = 'block';
+    tip.style.left = Math.max(4, Math.min(cx + 14, innerWidth - tip.offsetWidth - 4)) + 'px';
+    tip.style.top = Math.max(4, cy - 10) + 'px';
+    return;
+  }
   // on a touch screen the hints name taps instead of clicks and Ctrl
   const touch = lastPointer === 'touch';
   const nav =
@@ -661,7 +689,9 @@ svg.addEventListener('mouseleave', () => {
   hoverLine(null);
 });
 svg.addEventListener('mouseover', (e) => {
-  hoverLine(e.target.closest('.k'));
+  // locked highlights: only areas that do something (a text's trigger, 78-triggers.js) are outlined
+  const k = e.target.closest('.k');
+  hoverLine(k && lockOn('hl') && !(typeof txHot === 'function' && txHot(k.dataset.c)) ? null : k);
 });
 
 // ---- collapsible panel sections (open/closed remembered per browser) ----
@@ -723,7 +753,7 @@ svg.addEventListener(
   'pointerdown',
   (e) => {
     const g = e.target.closest && e.target.closest('.drg');
-    if (!g || e.button !== 0) return;
+    if (!g || e.button !== 0 || lockOn('edit')) return; // viewer mode: nothing moves
     e.stopImmediatePropagation(); // not a map pan
     e.preventDefault();
     const key = g.dataset.drag;
@@ -816,6 +846,7 @@ window.addEventListener('pointerup', (e) => {
 });
 svg.addEventListener('dblclick', (e) => {
   const g = e.target.closest && e.target.closest('.drg');
+  if (lockOn('edit')) return;
   if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
   if (!g || !S.drag || !S.drag[g.dataset.drag]) return;
   const d = Object.assign({}, S.drag);

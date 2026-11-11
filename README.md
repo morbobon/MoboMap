@@ -17,6 +17,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Title & subtitle flair** – optional title effects (drop shadow, long shadow, 3D block, retro outline, letterpress, soft glow, neon sign, gold foil, colour gradient, rubber stamp, highlighter, brush swash, ribbon banner, old-map cartouche, brass plaque) and subtitle effects (side rules, ornaments, pill, accent bar, underline, spaced capitals, italic serif). *Auto* follows the design system (`defaults.titleFx` / `subFx`), else the map style (vintage → cartouche, neon → neon sign …); choosing a design system, a style or a look sets them again, and the Page tab overrides them.
 - **Colour only part of the map** – "Colour by" can be limited to one continent or region, the focused area, or the highlighted areas; everything else keeps the map style.
 - **Text items** – besides the title and the subtitle, any number of texts of your own (Page → Text on the map → *Add text*, or right-click the map → *Add text here*): several lines, font (the design system's or any embedded one), size, weight, colour, alignment, any title effect, an optional background box. A text follows either **the page** or **the map** (it then moves with zoom, pan, focus and projection); drag it where it should be. The title and the subtitle are two built-in items with the same font, size, weight and colour settings. Saved in projects and links (`tx=`).
+- **Map lock / viewer mode** – the lock button on the map (or a double tap with two fingers on a touch screen) locks the map; ▾ chooses what: the position (no panning, no going to other areas; zooming keeps the centre), the zoom (none, or within a range), the highlights (clicks select nothing) and editing (viewer mode: only the map is shown). Saved in projects and links (`lk=`), so a map can be sent as an interactive map that cannot be messed up by accident. A lock in a link is a presentation setting, not protection: the receiver can remove it (right-click / long press → *Edit this map*).
 - **Contrast guard** – title, text, labels and dividers pick the profile colour that stays readable on what is really behind them; **design-system colours** let styles with their own palette use the profile instead.
 - **Cities** – zoom to a city from Focus (31 Danish towns, Natural Earth cities elsewhere), with markers that avoid each other.
 - **Frame** – the thin frame around the page follows the map style or can be switched on/off for any style; the legend stays inside it.
@@ -191,6 +192,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   60-render                  render(): builds the SVG
   70-ui                      side panel, focus/drill-down, groups, map events
   76-texts                   text items: the list, placing (page / map), drawing, link parameter
+  77-locks                   map locks and viewer mode, the lock button, two-finger double tap
   80-export, 81-project      PNG/JPG/PDF export, project save/open
   99-start                   boot
 src/i18n.json, i18n-extra.json   UI strings per language

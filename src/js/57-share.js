@@ -114,6 +114,8 @@ function shareParams() {
   }
   const tx = txParam(p);
   if (tx !== txParam(d)) q.set('tx', tx);
+  const lk = lockParam(p.lock);
+  if (lk) q.set('lk', lk);
   const gs = p.groups.map((g, i) => {
     const f = [
       String(g.color).replace('#', ''),
@@ -157,6 +159,7 @@ function projectFromUrl(search) {
   const q = new URLSearchParams(search || '');
   const known = [
     'tx',
+    'lk',
     'c',
     'f',
     'st',
@@ -310,6 +313,7 @@ function projectFromUrl(search) {
     p.sub = g('sub') || '';
   }
   if (q.has('tx')) txFromParam(g('tx'), p);
+  if (q.has('lk')) p.lock = lockFromParam(g('lk'));
   if (q.has('g'))
     p.groups = g('g')
       ? g('g')
