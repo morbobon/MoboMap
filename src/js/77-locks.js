@@ -1,9 +1,9 @@
 // Map locks ("viewer mode"): position (no panning), zoom (none, or within a range), highlights (clicks do not
-// select) and editing (the editor is hidden), each on its own, switched on and off together by the lock button on
+// select), the items on the page (nothing can be dragged) and editing (the editor is hidden), each on its own, switched on and off together by the lock button on
 // the map or, on touch screens, a double tap with two fingers. Saved in projects and links (lk=). A lock in a link is
 // a presentation setting, not protection: whoever gets the link can remove the parameter.
-const LOCK_DEFAULT = { on: false, pos: true, zoom: 1, zr: [1, 4], hl: true, edit: false };
-// what a lock holds while the map is locked: pos, hl, edit → true / false; zoom → 0 free, 1 locked, 2 a range
+const LOCK_DEFAULT = { on: false, pos: true, zoom: 1, zr: [1, 4], hl: true, edit: false, items: true };
+// what a lock holds while the map is locked: pos, hl, edit, items → true / false; zoom → 0 free, 1 locked, 2 a range
 const lockOn = (what) => (S.lock.on ? S.lock[what] : what === 'zoom' ? 0 : false);
 // opened from a link in viewer mode: the receiver sees no lock button (to edit: the context menu)
 let LOCK_LINK = false;
@@ -25,13 +25,15 @@ function lockClean(o) {
     zr: [lo, hi],
     hl: o.hl !== false,
     edit: !!o.edit,
+    // the items on the page keep their place. A lock stored before this option existed does not have it.
+    items: 'items' in o ? !!o.items : !Object.keys(o).length,
   };
 }
 // what a project stores: nothing while the locks are as they come
 function lockOut() {
   return JSON.stringify(S.lock) === JSON.stringify(LOCK_DEFAULT) ? {} : { lock: Object.assign({}, S.lock) };
 }
-// link: lk=<tokens> only while locked; p position, z zoom (z1-4: within 1–4), h highlights, e editing ('-': none)
+// link: lk=<tokens> only while locked; p position, z zoom (z1-4: within 1–4), h highlights, e editing, i items ('-': none)
 function lockParam(l) {
   if (!l || !l.on) return '';
   const f = [];
@@ -40,14 +42,16 @@ function lockParam(l) {
   if (l.zoom === 2) f.push('z' + l.zr[0] + '-' + l.zr[1]);
   if (l.hl) f.push('h');
   if (l.edit) f.push('e');
+  if (l.items) f.push('i');
   return f.join('.') || '-';
 }
 function lockFromParam(v) {
-  const o = { on: true, pos: false, zoom: 0, hl: false, edit: false };
+  const o = { on: true, pos: false, zoom: 0, hl: false, edit: false, items: false };
   for (const f of String(v || '').split('.')) {
     if (f === 'p') o.pos = true;
     else if (f === 'h') o.hl = true;
     else if (f === 'e') o.edit = true;
+    else if (f === 'i') o.items = true;
     else if (f === 'z') o.zoom = 1;
     else {
       const m = /^z(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/.exec(f);
@@ -82,6 +86,7 @@ function lockUI() {
   wrap.classList.toggle('locked', on);
   wrap.classList.toggle('lock-pos', on && (L.pos || L.zoom === 1));
   wrap.classList.toggle('lock-hl', on && L.hl);
+  wrap.classList.toggle('lock-items', on && (L.items || L.edit));
   const b = document.getElementById('lockBtn');
   if (!b) return;
   b.classList.toggle('on', on);
@@ -99,6 +104,7 @@ function lockUI() {
   set('lkMax', 'value', L.zr[1]);
   set('lkHl', 'checked', L.hl);
   set('lkEdit', 'checked', L.edit);
+  set('lkItems', 'checked', L.items);
   psUI();
   const rg = document.getElementById('lkRange');
   if (rg) rg.hidden = L.zoom !== 2;

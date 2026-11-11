@@ -454,28 +454,12 @@
             </div>
           </section>
           <section class="sec" data-sec="footer">
-            <h2 onclick="toggleSec('footer')">
-              <span class="chev"></span><span data-i18n="sec_footer"></span><span class="sum" id="partnerCount"></span>
-            </h2>
+            <h2 onclick="toggleSec('footer')"><span class="chev"></span><span data-i18n="sec_footer"></span></h2>
             <div class="body">
               <label class="ck" data-i18n-title="pg_footer_t"
                 ><input type="checkbox" id="pgFooter" checked onchange="pageSet('footer', this.checked)" />
                 <span data-i18n="pg_footer"></span
               ></label>
-              <label class="ck"
-                ><input type="checkbox" id="showFooter" checked onchange="render()" />
-                <span data-i18n="show_footer"></span
-              ></label>
-              <input
-                type="text"
-                id="footerLabel"
-                value=""
-                oninput="
-                  this.dataset.auto = '0';
-                  render();
-                "
-                data-i18n-ph="ph_footer"
-              />
               <div class="row2">
                 <label
                   ><span data-i18n="pt_rows"></span
@@ -511,30 +495,7 @@
                 ><input type="checkbox" id="ptAuto" checked onchange="setFooterOpt('autoScale', this.checked)" />
                 <span data-i18n="pt_auto"></span
               ></label>
-              <div id="partners"></div>
-              <details>
-                <summary data-i18n="add_partner"></summary>
-                <input type="text" id="pName" data-i18n-ph="ph_name" />
-                <input type="url" id="pLink" data-i18n-ph="ph_link" />
-                <div class="row">
-                  <button class="chip" onclick="document.getElementById('pFile').click()">
-                    <span data-i18n="pick_logo_p"></span>
-                  </button>
-                  <input
-                    type="file"
-                    id="pFile"
-                    accept="image/*"
-                    hidden
-                    onchange="
-                      pickPartnerLogo(this.files[0]);
-                      this.value = '';
-                    "
-                  />
-                  <span id="pFileName" class="note"></span>
-                  <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
-                </div>
-                <p class="note" data-i18n="partner_note"></p>
-              </details>
+              <button class="chip" onclick="jumpTo(secOf('partners'))"><span data-i18n="pg_to_partners"></span></button>
             </div>
           </section>
         </div>
@@ -641,6 +602,95 @@
               <p class="note" data-i18n="logo_note"></p>
             </div>
           </section>
+          <section class="sec" data-sec="partners">
+            <h2 onclick="toggleSec('partners')">
+              <span class="chev"></span><span data-i18n="sec_partners"></span
+              ><span class="sum" id="partnerCount"></span>
+            </h2>
+            <div class="body">
+              <label class="ck"
+                ><input type="checkbox" id="showFooter" checked onchange="render()" />
+                <span data-i18n="show_footer"></span
+              ></label>
+              <input
+                type="text"
+                id="footerLabel"
+                value=""
+                oninput="
+                  this.dataset.auto = '0';
+                  render();
+                "
+                data-i18n-ph="ph_footer"
+              />
+              <div id="partners"></div>
+              <details>
+                <summary data-i18n="add_partner"></summary>
+                <input type="text" id="pName" data-i18n-ph="ph_name" />
+                <input type="url" id="pLink" data-i18n-ph="ph_link" />
+                <div class="row">
+                  <button class="chip" onclick="document.getElementById('pFile').click()">
+                    <span data-i18n="pick_logo_p"></span>
+                  </button>
+                  <input
+                    type="file"
+                    id="pFile"
+                    accept="image/*"
+                    hidden
+                    onchange="
+                      pickPartnerLogo(this.files[0]);
+                      this.value = '';
+                    "
+                  />
+                  <span id="pFileName" class="note"></span>
+                  <button class="chip on" onclick="addPartner()"><span data-i18n="add"></span></button>
+                </div>
+                <p class="note" data-i18n="partner_note"></p>
+              </details>
+              <label class="ck" data-i18n-title="pb_bd_t"
+                ><input type="checkbox" id="pbBd" onchange="pbSet('bd', this.checked)" /> <span data-i18n="pb_bd"></span
+              ></label>
+              <div id="pbBorder" hidden>
+                <div class="row2">
+                  <label
+                    ><span data-i18n="dc_thick"></span> <b id="pbWV"></b
+                    ><input type="range" id="pbW" min="0.5" max="12" step="0.5" oninput="pbSet('bw', +this.value)"
+                  /></label>
+                  <label
+                    ><span data-i18n="pb_round"></span> <b id="pbRV"></b
+                    ><input type="range" id="pbR" min="0" max="60" step="1" oninput="pbSet('br', +this.value)"
+                  /></label>
+                </div>
+                <div class="row2">
+                  <label
+                    ><span data-i18n="pb_line"></span
+                    ><select id="pbLine" onchange="pbSet('bs', this.value)"></select
+                  ></label>
+                  <label
+                    ><span data-i18n="dc_colour"></span
+                    ><select id="pbColMode" onchange="pbSet('bc', this.value === 'own' ? pbOwnColour() : '')">
+                      <option value="ink" data-i18n="dc_col_ink"></option>
+                      <option value="own" data-i18n="dc_col_own"></option></select
+                    ><input type="color" id="pbCol" hidden oninput="pbSet('bc', this.value)"
+                  /></label>
+                </div>
+              </div>
+              <div class="row2">
+                <label class="wide"
+                  ><span data-i18n="pb_size"></span> <b id="pbSizeV"></b
+                  ><input
+                    type="range"
+                    id="pbSize"
+                    min="30"
+                    max="300"
+                    step="1"
+                    value="100"
+                    oninput="pbSet('scale', this.value / 100)"
+                /></label>
+              </div>
+              <button class="chip on" id="pbBack" onclick="pbBack()" hidden><span data-i18n="pt_back"></span></button>
+              <p class="note" data-i18n="pb_note"></p>
+            </div>
+          </section>
         </div>
         <div class="about">
           MoboMap © 2026 Morten Bonding · AGPL-3.0 ·
@@ -651,13 +701,19 @@
         <div id="wrap">
           <div id="pane"><svg id="svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg"></svg></div>
           <div id="pih" hidden></div>
-          <div id="mapCtl">
-            <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
-            <button id="psBtn" class="chip" onclick="psPop()"></button>
-            <div class="lockgrp">
-              <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
-              <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
-            </div>
+          <div id="stepBar" hidden>
+            <button class="chip" onclick="txStep(-1)" data-i18n-title="tr_prev">‹</button>
+            <span id="stepN"></span>
+            <button class="chip" onclick="txStep(1)" data-i18n-title="tr_next">›</button>
+          </div>
+        </div>
+        <div id="mapCtl">
+          <button id="fsExit" class="chip" onclick="toggleFullscreen()" data-i18n="fs_exit"></button>
+          <button id="zoomReset" class="chip" onclick="resetZoom()" data-i18n="zoom_reset"></button>
+          <button id="psBtn" class="chip" onclick="psPop()"></button>
+          <div class="lockgrp">
+            <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
+            <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
           </div>
           <div id="psPop" hidden>
             <div class="row"><b data-i18n="ps_l"></b> <span class="note" id="psVal"></span></div>
@@ -668,11 +724,6 @@
               <button class="chip" onclick="pageScale(1)">100 %</button>
             </div>
             <div class="note" data-i18n="ps_note"></div>
-          </div>
-          <div id="stepBar" hidden>
-            <button class="chip" onclick="txStep(-1)" data-i18n-title="tr_prev">‹</button>
-            <span id="stepN"></span>
-            <button class="chip" onclick="txStep(1)" data-i18n-title="tr_next">›</button>
           </div>
           <div id="lockPop" hidden>
             <label class="ck"
@@ -705,12 +756,15 @@
               <span data-i18n="lock_hl"></span
             ></label>
             <label class="ck"
+              ><input type="checkbox" id="lkItems" onchange="setLock('items', this.checked)" />
+              <span data-i18n="lock_items"></span
+            ></label>
+            <label class="ck"
               ><input type="checkbox" id="lkEdit" onchange="setLock('edit', this.checked)" />
               <span data-i18n="lock_edit"></span
             ></label>
             <div class="note" data-i18n="lock_note"></div>
           </div>
-          <button id="fsExit" class="chip" onclick="toggleFullscreen()" data-i18n="fs_exit"></button>
         </div>
         <div class="looksbar">
           <div id="looks" class="looks"></div>

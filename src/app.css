@@ -652,6 +652,9 @@ header small {
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+.row2 label.wide {
+  grid-column: 1 / -1;
+}
 .row2 label {
   display: flex;
   flex-direction: column;
@@ -662,7 +665,7 @@ header small {
 #zoomReset {
   display: none;
 }
-#wrap.zoomed #zoomReset {
+#wrap.zoomed ~ #mapCtl #zoomReset {
   display: block;
 }
 #wrap.panning,
@@ -727,7 +730,7 @@ aside .tab.on {
 .stage {
   flex-direction: column;
   gap: 14px;
-  padding: 18px 24px 12px;
+  padding: 8px 24px 12px;
 }
 .stage #wrap {
   flex-shrink: 0;
@@ -837,14 +840,15 @@ header button:disabled {
 }
 
 /* ---- hidden panel / strip, fullscreen ---- */
+/* (what is not the page, top to bottom: header, the map's buttons, the looks strip and the gaps between them) */
 body {
-  --chrome: 250px;
+  --chrome: 276px;
 }
 body.no-strip {
-  --chrome: 160px;
+  --chrome: 186px;
 }
 body.strip-min {
-  --chrome: 120px;
+  --chrome: 146px;
 }
 body.no-panel aside,
 body.fs header,
@@ -854,18 +858,16 @@ body.fs .looks {
   display: none !important;
 }
 body.fs {
-  --chrome: 36px;
+  --chrome: 62px;
 }
 body.fs .stage {
-  padding: 18px;
+  padding: 8px 18px 18px;
 }
 header button.hdr.on {
   background: color-mix(in srgb, var(--on-primary) 18%, transparent);
 }
 #fsExit {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+  margin-right: auto;
   display: none;
   opacity: 0.55;
 }
@@ -1252,7 +1254,7 @@ header h1 a.home {
   body,
   body.no-strip {
     --tabbar: calc(58px + env(safe-area-inset-bottom));
-    --chrome: calc(76px + var(--tabbar));
+    --chrome: calc(112px + var(--tabbar));
   }
   header {
     position: relative;
@@ -1351,6 +1353,9 @@ header h1 a.home {
   .stage {
     padding: 8px;
     gap: 8px;
+  }
+  #mapCtl {
+    margin-bottom: 0;
   }
   /* tile grids fit the sheet's width (no sideways scrolling) */
   .grid4 {
@@ -1615,18 +1620,22 @@ body.grpdrag .grp-root {
   margin-left: auto;
 }
 
-/* controls on the map: reset zoom, the lock (77-locks.js) */
+/* the map's buttons: reset zoom, page scale, the lock (77-locks.js). A bar of their own above the page, as wide
+   as the page (--ww, 42-viewport.js), so they never cover it. It follows #wrap in the markup: the page's state
+   classes reach the buttons (#wrap.zoomed ~ #mapCtl …). */
 #mapCtl {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  order: -1;
+  position: relative;
+  flex: none;
+  width: var(--ww, 100%);
+  max-width: 100%;
+  min-height: 28px;
+  margin-bottom: -6px;
   display: flex;
+  justify-content: flex-end;
   gap: 6px;
   align-items: center;
-  z-index: 3;
-}
-#mapCtl .chip {
-  box-shadow: 0 2px 8px #0003;
+  z-index: 5;
 }
 .lockgrp {
   display: flex;
@@ -1659,11 +1668,13 @@ body.grpdrag .grp-root {
 #lockPop,
 #psPop {
   position: absolute;
-  top: 44px;
-  right: 10px;
+  top: calc(100% + 6px);
+  right: 0;
   z-index: 4;
-  width: 250px;
-  max-height: calc(100% - 54px);
+  width: 270px;
+  max-width: 100%;
+  box-sizing: border-box;
+  max-height: calc(var(--vh, 100vh) - var(--chrome, 250px) - 20px);
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -1697,7 +1708,7 @@ body.grpdrag .grp-root {
   background: var(--field);
   color: var(--ink);
 }
-#wrap.lock-pos #zoomReset,
+#wrap.lock-pos ~ #mapCtl #zoomReset,
 body.viewer-link .lockgrp {
   display: none !important;
 }
@@ -1717,10 +1728,41 @@ body.viewer .stripshow {
   display: none !important;
 }
 body.viewer {
-  --chrome: 36px;
+  --chrome: 62px;
 }
 body.viewer .stage {
-  padding: 18px;
+  padding: 8px 18px 18px;
+}
+/* locked items: nothing on the page invites a drag */
+#wrap.lock-items #svg .drg {
+  cursor: inherit;
+}
+#wrap.lock-items #svg .drg:hover {
+  filter: none;
+}
+/* the partner block (74-partners.js): under the pointer its area lights up – not while one of its logos is */
+#svg .drg.ptb:hover {
+  filter: none;
+}
+#svg .ptb > .ptb-hl {
+  stroke: transparent;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  vector-effect: non-scaling-stroke;
+  transition: fill 0.12s;
+}
+#svg .ptb:hover:not(:has(.ptn:hover)) > .ptb-hl,
+#wrap.dragging .ptb:hover > .ptb-hl {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+  stroke: var(--accent);
+}
+#pbCol {
+  width: 100%;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
 }
 
 /* text visibility rules (78-triggers.js): the transitions switch with the class "off" */

@@ -60,6 +60,7 @@ function projectState() {
     ...lockOut(),
     ...logoOut(),
     ...pageOut(),
+    ...pbOut(),
     ...decoOut(),
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
@@ -183,6 +184,7 @@ function loadProject(p, quiet, noDraw) {
   S.lock = lockClean(p.lock);
   S.logo = logoClean(p.logo);
   S.page = pageClean(p.page);
+  S.pblock = pbClean(p.pblock);
   S.deco = decoClean(p.deco);
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',

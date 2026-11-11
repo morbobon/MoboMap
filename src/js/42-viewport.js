@@ -114,7 +114,12 @@ function setLayout(id) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const wrap = document.getElementById('wrap');
   wrap.style.aspectRatio = W + '/' + H;
-  wrap.style.width = `min(100%,calc((var(--vh, 100vh) - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`;
+  // (the bar with the map's buttons above the page is as wide as the page: --ww)
+  wrap.parentNode.style.setProperty(
+    '--ww',
+    `min(100%,calc((var(--vh, 100vh) - var(--chrome, 250px)) * ${(W / H).toFixed(4)}))`,
+  );
+  wrap.style.width = 'var(--ww)';
 }
 // ---- the world map to the edge of what it fills, and repeated sideways ----
 // FILL: the area the world map fills, in content coordinates [x0, y0, x1, y1] ("Map fills": map area, sheet or

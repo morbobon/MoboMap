@@ -117,6 +117,9 @@ function shareParams() {
   if (tx !== txParam(d)) q.set('tx', tx);
   const lk = lockParam(p.lock);
   if (lk) q.set('lk', lk);
+  // the partner block (74-partners.js): its border, place and size
+  const pbc = pbCode(p.pblock);
+  if (pbc !== pbCode(d.pblock)) q.set('pb', pbc);
   // the brand logo: its size in % and its own link
   const lgo = logoClean(p.logo),
     lgd = logoClean(d.logo);
@@ -172,6 +175,7 @@ function projectFromUrl(search) {
   const known = [
     'tx',
     'lk',
+    'pb',
     'lg',
     'll',
     'pg',
@@ -333,6 +337,7 @@ function projectFromUrl(search) {
   if (q.has('tx')) txFromParam(g('tx'), p);
   if (q.has('lk')) p.lock = lockFromParam(g('lk'));
   if (q.has('pg')) p.page = pageFromCode(g('pg'));
+  if (q.has('pb')) p.pblock = pbFromCode(g('pb'));
   if (q.has('dc')) p.deco = decoFromCode(g('dc'));
   if (q.has('lg') || q.has('ll'))
     p.logo = logoClean({

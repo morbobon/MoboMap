@@ -3,6 +3,8 @@ function exportSvg() {
   const el = document.getElementById('svg').cloneNode(true);
   el.querySelectorAll('.pulse').forEach((c) => c.removeAttribute('class'));
   el.querySelector('#hoverwrap')?.remove();
+  // the partner block's hover area and the drop targets of a drag are for the screen only
+  el.querySelectorAll('.ptb-hl, .dropband').forEach((e) => e.remove());
   // texts left out of exports; the others are drawn whatever their rule (the page's styles do not reach the image)
   el.querySelectorAll('[data-exp="0"]').forEach((e) => e.remove());
   el.insertAdjacentHTML('afterbegin', `<style>${allFontCSS()}</style>`);

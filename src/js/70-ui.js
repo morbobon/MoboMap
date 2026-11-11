@@ -819,7 +819,7 @@ svg.addEventListener(
   'pointerdown',
   (e) => {
     const g = e.target.closest && e.target.closest('.drg');
-    if (!g || e.button !== 0 || lockOn('edit')) return; // viewer mode: nothing moves
+    if (!g || e.button !== 0 || lockOn('edit') || lockOn('items')) return; // viewer mode, locked items: nothing moves
     e.stopImmediatePropagation(); // not a map pan
     e.preventDefault();
     const key = g.dataset.drag;
@@ -873,6 +873,29 @@ window.addEventListener('pointermove', (e) => {
     if (Math.abs(bxS[1] - ox) < T) ((ox = bxS[1]), (SNAP_GUIDES.x = bxS[0]));
     if (Math.abs(byS[1] - oy) < T) ((oy = byS[1]), (SNAP_GUIDES.y = byS[0]));
   }
+  // the page's header and footer are drop targets while a page item is dragged: inside one the item snaps to the
+  // area's centre line, the margins and the middle of the page (a partner in the footer: its row and slot, on drop)
+  DROP_BANDS = dropBands(textDrag.key);
+  if (DROP_BANDS && textDrag.box) {
+    const [bx0, by0, bx1, by1] = textDrag.box;
+    const cy = (by0 + by1) / 2 + oy;
+    const hot = DROP_BANDS.bands.find((b) => cy >= b.y0 && cy <= b.y1);
+    DROP_BANDS.hot = hot ? hot.id : '';
+    if (hot && snapOn() && !e.ctrlKey && !e.metaKey && !(hot.id === 'f' && /^pt/.test(textDrag.key))) {
+      const mx = Math.max(10, PAD.l - 12),
+        mid = (hot.y0 + hot.y1) / 2,
+        T = 16;
+      const g = SNAP_GUIDES || (SNAP_GUIDES = {});
+      if (Math.abs(cy - mid) < Math.max(T, (hot.y1 - hot.y0) / 4)) ((oy += mid - cy), (g.y = mid));
+      if (g.x == null)
+        for (const [target, edge] of [
+          [mx, bx0],
+          [W / 2, (bx0 + bx1) / 2],
+          [W - mx, bx1],
+        ])
+          if (g.x == null && Math.abs(target - edge - ox) < T) ((ox = target - edge), (g.x = target));
+    }
+  }
   // at least part of the element stays on the page, so it can always be grabbed again
   if (textDrag.box) {
     const [bx0, by0, bx1, by1] = textDrag.box,
@@ -890,6 +913,9 @@ window.addEventListener('pointerup', (e) => {
   // dropped anywhere else it becomes a free logo
   if (textDrag.moved && textDrag.key.startsWith('pt:'))
     partnerDrop(textDrag.key, textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
+  // the partner block goes back into the footer when dropped there, anywhere else it keeps its own place
+  if (textDrag.moved && textDrag.key === 'ptblock')
+    pbDrop(textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
   // a text item keeps the place it was dropped at (page- or map-anchored)
   // a rhumb hub or a stamp keeps the place on the map it was dropped at
   if (textDrag.moved && /^(rh|sm):/.test(textDrag.key)) {
@@ -901,8 +927,8 @@ window.addEventListener('pointerup', (e) => {
     txDrop(textDrag.key);
     zoomChanged();
   }
-  if (SNAP_GUIDES) {
-    SNAP_GUIDES = null;
+  if (SNAP_GUIDES || DROP_BANDS) {
+    SNAP_GUIDES = DROP_BANDS = null;
     zoomChanged();
   }
   // one undo step per drag
@@ -921,7 +947,10 @@ svg.addEventListener('dblclick', (e) => {
   const g = e.target.closest && e.target.closest('.drg');
   if (lockOn('edit')) return;
   if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
+  if (lockOn('items')) return;
   if (g && decoDbl(g.dataset.drag)) return;
+  // the partner block goes back to the footer (a logo in it: see below)
+  if (g && g.dataset.drag === 'ptblock') return pbFree() && pbBack();
   // a free partner logo goes back to the footer
   const pi = g ? S.partners.findIndex((p) => 'pt:' + p.id === g.dataset.drag && partnerFree(p)) : -1;
   if (pi >= 0) return partnerBack(pi);
@@ -938,6 +967,22 @@ function resetDrag() {
 // snapping: page elements only; on by default, the checkbox in the Page tab turns it off, Ctrl overrides
 const SNAP_KEYS = ['title', 'sub', 'legend', 'logo'];
 let SNAP_GUIDES = null;
+// the header and the footer of the page as drop targets while a page item is dragged (drawn by render, on screen
+// only): { bands: [{ id: 'h' | 'f', y0, y1 }], hot: the id of the one the item is in }. Not for what belongs to the
+// map (labels, hubs, stamps, texts that follow the map).
+let DROP_BANDS = null;
+function dropBands(key) {
+  if (/^(rh|sm|co|lb):/.test(key)) return null;
+  if (key.startsWith('tx:') && (txOf(key) || {}).anchor === 'map') return null;
+  const pg = pageOpts(),
+    pt = /^pt/.test(key),
+    bands = [];
+  if (pg.header && PAD.t > 20) bands.push({ id: 'h', y0: 0, y1: PAD.t });
+  // the footer: the room it has now – or, for the partners, the room it gets when they come back to it
+  const fh = FOOT || (pt && pg.footer && (key === 'ptblock' || !pbFree()) ? footerBand() : 0);
+  if (pg.footer && fh) bands.push({ id: 'f', y0: H - fh, y1: H });
+  return bands.length ? { bands, hot: '' } : null;
+}
 const snapOn = () => localStorage.getItem('mobomap.snap') !== '0';
 function setSnap(on) {
   localStorage.setItem('mobomap.snap', on ? '1' : '0');

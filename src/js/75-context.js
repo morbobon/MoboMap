@@ -105,17 +105,21 @@ function ctxItems(target, pt) {
     add(t('sec_logo'), () => jumpTo(secOf('logo')));
   } else if (key.startsWith('pt:')) {
     const p = S.partners.find((p) => 'pt:' + p.id === key);
-    title = p ? p.name : t('sec_footer');
-    add(t('sec_footer'), () =>
+    title = p ? p.name : t('sec_partners');
+    add(t('sec_partners'), () =>
       jumpTo(
         () =>
           document.querySelector(`.partner[data-pid="${CSS.escape(key.slice(3))}"]`) ||
-          document.querySelector(secOf('footer')),
+          document.querySelector(secOf('partners')),
       ),
     );
-    if (p && partnerFree(p)) add(t('pt_back'), () => partnerBack(S.partners.indexOf(p)));
+    if (p && partnerFree(p) && !lockOn('items')) add(t('pt_back'), () => partnerBack(S.partners.indexOf(p)));
+  } else if (key === 'ptblock') {
+    title = t('sec_partners');
+    add(t('sec_partners'), () => jumpTo(secOf('partners')));
+    if (pbFree()) add(t('pt_back'), pbBack);
   }
-  if (key && S.drag && S.drag[key])
+  if (key && S.drag && S.drag[key] && !lockOn('items'))
     add(t('ctx_reset_one'), () => {
       const d = Object.assign({}, S.drag);
       delete d[key];

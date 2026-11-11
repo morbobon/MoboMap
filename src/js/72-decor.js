@@ -409,7 +409,7 @@ function decoRhumb(ink) {
 }
 // the grips of the hubs, over the map (not on a map that cannot be edited)
 function decoHubGrips() {
-  if (!fxOn('rhumb') || lockOn('edit')) return '';
+  if (!fxOn('rhumb') || lockOn('edit') || lockOn('items')) return '';
   return decoHubPts()
     .map((p, i) =>
       p

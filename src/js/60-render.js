@@ -830,13 +830,18 @@ function render(target) {
     out.slice(bodyEnd) +
     '</g>' +
     (mapClip ? '</g>' : '') +
+    // the footer's ground covers the map, and lies under everything placed on the page: an item dropped in the
+    // footer shows there
+    (FOOT && (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page' || S.map === 'world')
+      ? `<rect x="0" y="${H - FOOT}" width="${W}" height="${FOOT}" fill="${bg}"/>`
+      : '') +
     '<g pointer-events="none">';
   // the sheet margin moves what sits at the page edges: pmx = the side the texts and the logo line up on,
   // pdy = how far the header's content moves down (0 with the standard margin), pfoot = the room kept free at
   // the bottom for partner logos (the footer, or their row when the footer is switched off)
   const pmx = Math.max(10, PAD.l - 12),
     pdy = pageShift(),
-    pfoot = FOOT || (!pg.footer && partnersInRows() ? footerBand() : 0);
+    pfoot = FOOT || (!pg.footer && partnersInRows() && !pbFree() ? footerBand() : 0);
   // signaturforklaring
   // Title/subtitle text and positions (computed before the legend, which moves up to make room).
   // Positions: t/b (top/bottom) + l/c/r. Title "auto" follows the map style; subtitle "under" sits below the title.
@@ -1088,8 +1093,6 @@ function render(target) {
   const label = document.getElementById('footerLabel').value;
   if (FOOT) {
     const fy = H - FOOT;
-    if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page' || S.map === 'world')
-      out += `<rect x="0" y="${fy}" width="${W}" height="${FOOT}" fill="${bg}"/>`;
     const dv = D.footer.divider;
     let dcol = dv.color || ds.primary;
     // the brand divider keeps its colour unless it would disappear on this background
@@ -1144,6 +1147,10 @@ function render(target) {
     if (SNAP_GUIDES.y != null)
       out += `<line x1="0" y1="${SNAP_GUIDES.y}" x2="${W}" y2="${SNAP_GUIDES.y}" stroke="${gcol}" stroke-width="1" stroke-dasharray="5 4" pointer-events="none"/>`;
   }
+  // header and footer as drop targets while a page item is dragged (70-ui.js): the one the item is in is stronger
+  if (!target && typeof DROP_BANDS !== 'undefined' && DROP_BANDS)
+    for (const b of DROP_BANDS.bands)
+      out += `<rect class="dropband" x="3" y="${(b.y0 + 3).toFixed(1)}" width="${W - 6}" height="${(b.y1 - b.y0 - 6).toFixed(1)}" rx="6" fill="${ds.accent}" fill-opacity="${DROP_BANDS.hot === b.id ? 0.16 : 0.06}" stroke="${ds.accent}" stroke-width="${DROP_BANDS.hot === b.id ? 2 : 1}" stroke-dasharray="5 4" pointer-events="none"/>`;
   if (target) {
     target.setAttribute('viewBox', `0 0 ${W} ${H}`);
     target.innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
