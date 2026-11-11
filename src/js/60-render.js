@@ -564,7 +564,7 @@ function render(target) {
     const tr = g.hl.has('emboss') ? ' transform="translate(0,-6)"' : '';
     out += `<mask id="om${gi}" maskUnits="userSpaceOnUse" ${bgR}><rect ${bgR} fill="#fff"/><path d="${d}" fill="#000"${tr}/></mask><path d="${d}" fill="none" stroke="${g.color}" stroke-width="6.4" stroke-linejoin="round" mask="url(#om${gi})"${tr} pointer-events="none"/>`;
   });
-  out += fxMap(allPath);
+  out += fxMap(allPath, ink, ds.accent);
   // major cities (country views, or focused units in the world view)
   const CL =
     S.map !== 'world'

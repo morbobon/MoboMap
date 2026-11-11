@@ -190,6 +190,7 @@ function ui() {
   partnersUI();
   pageUI();
   logoUI();
+  decoUI();
   textsUI();
   lockUI();
 }
@@ -832,6 +833,12 @@ window.addEventListener('pointerup', (e) => {
   if (textDrag.moved && textDrag.key.startsWith('pt:'))
     partnerDrop(textDrag.key, textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
   // a text item keeps the place it was dropped at (page- or map-anchored)
+  // a rhumb hub or a stamp keeps the place on the map it was dropped at
+  if (textDrag.moved && /^(rh|sm):/.test(textDrag.key)) {
+    decoDrop(textDrag.key);
+    decoUI();
+    zoomChanged();
+  }
   if (textDrag.moved && textDrag.key.startsWith('tx:')) {
     txDrop(textDrag.key);
     zoomChanged();
@@ -856,6 +863,7 @@ svg.addEventListener('dblclick', (e) => {
   const g = e.target.closest && e.target.closest('.drg');
   if (lockOn('edit')) return;
   if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
+  if (g && decoDbl(g.dataset.drag)) return;
   // a free partner logo goes back to the footer
   const pi = g ? S.partners.findIndex((p) => 'pt:' + p.id === g.dataset.drag && partnerFree(p)) : -1;
   if (pi >= 0) return partnerBack(pi);

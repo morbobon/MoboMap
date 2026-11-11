@@ -47,7 +47,9 @@ const FX_CATS = [
   ['colour', ['sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']],
   ['decor', ['compass', 'rhumb', 'border']],
 ];
-const FXC_IDS = ['paper', 'light', 'relief', 'colour', 'decor'];
+// (the 'decor' effects are switched and set up under Decorations: 72-decor.js)
+const FXC_IDS = ['paper', 'light', 'relief', 'colour'];
+const FX_DECOR = FX_CATS.find((c) => c[0] === 'decor')[1];
 // Frames, sizes as a share of min(W, H): m = wall margin, b = frame band, t = mat (or paper border)
 const FRAME_IDS = [
   'none',
@@ -420,7 +422,7 @@ function fxLayout() {
   let P = [O[0] + t, O[1] + t, O[2] - t, O[3] - t - (f.bottom || 0) * S0]; // the sheet
   P = [P[0] + edge, P[1] + edge + roll, P[2] - edge, P[3] - edge - roll];
   // the decorative map border: content (title, footer, logos) fits inside it, the sheet keeps its size
-  const bd = fxOn('border') ? 0.055 * S0 : 0;
+  const bd = decoBorderRoom(S0);
   const Pc = [P[0] + bd, P[1] + bd, P[2] - bd, P[3] - bd];
   const pw = Pc[2] - Pc[0],
     ph = Pc[3] - Pc[1];
@@ -448,21 +450,8 @@ const fxToArt = (x, y) => [x * FXL.s + FXL.tx, y * FXL.s + FXL.ty];
 // under the map: drop shadow, rhumb lines
 function fxUnder(allPath, ink) {
   let o = '';
-  if (fxOn('rhumb')) {
-    // hubs at real places (like the compass-rose hubs of old sea charts): they follow projection, zoom and pan
-    const centres = rhumbHubs().map(([lon, lat]) => worldPt(lon + 180, 90 - lat));
-    const L = (W + H) * 3;
-    o += `<g stroke="${ink}" stroke-opacity="${fxOp('rhumb', 0.22)}" stroke-width=".6" pointer-events="none">`;
-    for (const [cx, cy] of centres) {
-      if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
-      for (let i = 0; i < 32; i++) {
-        const a = (i * Math.PI) / 16;
-        o += `<line x1="${cx.toFixed(1)}" y1="${cy.toFixed(1)}" x2="${(cx + Math.cos(a) * L).toFixed(1)}" y2="${(cy + Math.sin(a) * L).toFixed(1)}" ${i % 4 ? 'stroke-dasharray="4 3"' : ''}/>`;
-      }
-      o += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="none" stroke-dasharray="none"/>`;
-    }
-    o += '</g>';
-  }
+  // hubs at real places (like the compass-rose hubs of old sea charts): they follow projection, zoom and pan
+  o += decoRhumb(ink);
   if (fxOn('shadow')) {
     const d = Math.min(W, H) * 0.011 * Math.max(0.4, Math.min(1.6, fxAmt('shadow'))),
       Lt = fxLight();
@@ -476,19 +465,14 @@ function fxLand(allPath) {
   return `<clipPath id="fxlandclip"><path d="${allPath}"/></clipPath><g clip-path="url(#fxlandclip)" pointer-events="none">${fxTwice('foil', (o) => `<rect width="${W}" height="${H}" filter="url(#fxfoil)" opacity="${o}"/>`)}</g>`;
 }
 // over the map (after the highlight groups): emboss / deboss
-function fxMap(allPath) {
+function fxMap(allPath, ink, accent) {
   let o = '';
   if (fxOn('emboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxemboss)" pointer-events="none"/>`;
   if (fxOn('deboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxdeboss)" pointer-events="none"/>`;
-  return o;
+  return o + decoMap(ink, accent);
 }
-// over everything in content space (compass rose)
-function fxContentTop(ink, accent) {
-  if (!fxOn('compass')) return '';
-  const [cx, cy] = compassPos();
-  const svg = compassSVG(cx, cy, Math.min(W, H) * 0.075 * (0.75 + 0.25 * Math.min(2, fxAmt('compass'))), ink, accent);
-  return fxTwice('compass', (o) => `<g opacity="${o}">${svg}</g>`);
-}
+// over everything in content space: the decorations (compass rose, scale bar …)
+const fxContentTop = (ink, accent) => decoTop(ink, accent);
 function compassPos() {
   return [W - PAD.r - Math.min(W, H) * 0.05, H - FOOT - PAD.b - Math.min(W, H) * 0.09];
 }
@@ -681,21 +665,7 @@ function fxWrap(content, bg, ink, accent) {
       sheet += `<line x1="${r1(x)}" y1="${r1(py0)}" x2="${r1(x)}" y2="${r1(py1)}" stroke="#fff" stroke-opacity=".5" stroke-width="1"/><line x1="${r1(x + 1)}" y1="${r1(py0)}" x2="${r1(x + 1)}" y2="${r1(py1)}" stroke="#000" stroke-opacity=".16" stroke-width="1"/>`;
     sheet += `<line x1="${r1(px0)}" y1="${r1(ym)}" x2="${r1(px1)}" y2="${r1(ym)}" stroke="#fff" stroke-opacity=".5"/><line x1="${r1(px0)}" y1="${r1(ym + 1)}" x2="${r1(px1)}" y2="${r1(ym + 1)}" stroke="#000" stroke-opacity=".16"/></g>`;
   }
-  if (fxOn('border')) {
-    const e = S0 * 0.03,
-      bw = S0 * 0.012;
-    const q = [px0 + e, py0 + e, px1 - e, py1 - e],
-      qi = [q[0] + bw, q[1] + bw, q[2] - bw, q[3] - bw];
-    let ticks = '';
-    const seg = S0 * 0.03;
-    for (let x = q[0], i = 0; x < q[2] - seg / 2; x += seg, i++)
-      if (i % 2)
-        ticks += `M${r1(x)} ${r1(q[1])}h${r1(seg)}v${r1(bw)}h${r1(-seg)}ZM${r1(x)} ${r1(qi[3])}h${r1(seg)}v${r1(bw)}h${r1(-seg)}Z`;
-    for (let y = q[1], i = 0; y < q[3] - seg / 2; y += seg, i++)
-      if (i % 2)
-        ticks += `M${r1(q[0])} ${r1(y)}h${r1(bw)}v${r1(seg)}h${r1(-bw)}ZM${r1(qi[2])} ${r1(y)}h${r1(bw)}v${r1(seg)}h${r1(-bw)}Z`;
-    sheet += `<g pointer-events="none" opacity="${fxOp('border', 1)}"><path d="${ticks}" fill="${ink}" opacity=".55"/>${rect(q, `fill="none" stroke="${ink}" stroke-width="1.4"`)}${rect(qi, `fill="none" stroke="${ink}" stroke-width=".8"`)}${rect([q[0] - 4, q[1] - 4, q[2] + 4, q[3] + 4], `fill="none" stroke="${ink}" stroke-width=".6" opacity=".7"`)}</g>`;
-  }
+  sheet += decoBorder(P, S0, ink, accent);
   if (fxOn('grain')) sheet += ov('#000', `filter="url(#fxgrain)" opacity="${fxOp('grain', 0.55)}"`);
   if (fxOn('speckle')) sheet += ov('#000', `filter="url(#fxspeckle)" opacity="${fxOp('speckle', 0.8)}"`);
   if (fxOn('halftone'))
@@ -949,7 +919,7 @@ function fxUI() {
     (S.fx.fx.length
       ? `<div class="fxcat">${esc(t('fx_amounts'))}</div>` +
         S.fx.fx
-          .filter((id) => !FX_NO_AMT.includes(id))
+          .filter((id) => !FX_NO_AMT.includes(id) && !FX_DECOR.includes(id))
           .map((id) => {
             const v = Math.round((S.fx.amt && S.fx.amt[id] != null ? S.fx.amt[id] : 1) * 100);
             return `<label class="fxrow"><span>${esc(t('fx_' + id))}</span><input type="range" min="0" max="200" step="5" value="${v}" oninput="setFxAmt('${id}', +this.value); this.nextElementSibling.textContent = this.value + ' %'"/><b>${v} %</b></label>`;

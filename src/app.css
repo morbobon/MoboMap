@@ -1926,3 +1926,27 @@ body.viewer .stage {
 #pgRingNa[hidden] {
   display: none;
 }
+
+/* ---- decorations (Look tab, under Map style) ---- */
+.pgr-border {
+  border-style: double;
+  border-width: 4px;
+}
+#decoUI .fxrow input[type='color'] {
+  grid-column: span 2;
+  width: 100%;
+  height: 24px;
+  padding: 0;
+}
+#decoUI .decosm {
+  grid-template-columns: 1fr 1.3fr 44px;
+}
+#decoUI .decosm .chip {
+  padding: 1px 0;
+}
+#decoUI .ck {
+  margin: 3px 0;
+}
+#decoUI + #frameSel {
+  margin-top: 8px;
+}

@@ -124,6 +124,9 @@ function shareParams() {
   // page areas (79-page.js): only when they differ from the start map's
   const pgc = pageCode(p.page);
   if (pgc !== pageCode(d.page)) q.set('pg', pgc);
+  // decorations (72-decor.js)
+  const dcc = decoCode(p.deco);
+  if (dcc !== decoCode(d.deco)) q.set('dc', dcc);
   const gs = p.groups.map((g, i) => {
     const f = [
       String(g.color).replace('#', ''),
@@ -171,6 +174,7 @@ function projectFromUrl(search) {
     'lg',
     'll',
     'pg',
+    'dc',
     'c',
     'f',
     'st',
@@ -326,6 +330,7 @@ function projectFromUrl(search) {
   if (q.has('tx')) txFromParam(g('tx'), p);
   if (q.has('lk')) p.lock = lockFromParam(g('lk'));
   if (q.has('pg')) p.page = pageFromCode(g('pg'));
+  if (q.has('dc')) p.deco = decoFromCode(g('dc'));
   if (q.has('lg') || q.has('ll'))
     p.logo = logoClean({
       scale: q.has('lg') ? +g('lg') / 100 : (p.logo || {}).scale,

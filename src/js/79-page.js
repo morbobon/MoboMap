@@ -1,5 +1,5 @@
 // Page areas (Page tab): header and footer as areas that keep room for themselves, what the map fills, and the
-// spacing as nested rings around the map: wall, frame band, mat, sheet margin. Everything lives in S.page and is
+// spacing as nested rings around the map: wall, frame band, mat, map border, sheet margin. Everything lives in S.page and is
 // stored (project, link "pg=") only where it differs from PAGE_DEFAULT, so older maps are drawn as they always were.
 //   fill:    'area'  the map is cut off at header, footer and margins
 //            'sheet' fitted between them but not cut off: zoomed in it runs behind title and footer (as always)
@@ -17,6 +17,7 @@ const PAGE_DEFAULT = {
   wall: null,
   band: null,
   mat: null,
+  border: null,
 };
 const PAGE_FILLS = ['area', 'sheet', 'page'];
 function pageClean(o) {
@@ -32,6 +33,7 @@ function pageClean(o) {
     wall: num(o.wall, 20, null),
     band: num(o.band, 20, null),
     mat: num(o.mat, 20, null),
+    border: num(o.border, 10, null),
   };
 }
 const pageOpts = () => S.page || PAGE_DEFAULT;
@@ -43,8 +45,9 @@ function pageOut() {
   return Object.keys(d).length ? { page: d } : {};
 }
 // link form: tokens joined by dots – fa / fp (map fills area / page), ho / fo (header / footer off), and a letter
-// with tenths of a percent: m (margin), h (header height), w (wall), b (frame band), t (mat). E.g. "fa.m80.w25"
-const PAGE_CODE = { m: 'margin', h: 'headerH', w: 'wall', b: 'band', t: 'mat' };
+// with tenths of a percent: m (margin), h (header height), w (wall), b (frame band), t (mat), d (the gap inside
+// the map border). E.g. "fa.m80.w25"
+const PAGE_CODE = { m: 'margin', h: 'headerH', w: 'wall', b: 'band', t: 'mat', d: 'border' };
 function pageCode(o) {
   const p = pageClean(o),
     a = [];
@@ -57,7 +60,7 @@ function pageCode(o) {
 function pageFromCode(s) {
   const o = {};
   for (const k of String(s || '').split('.')) {
-    const m = /^([mhwbt])(\d{1,3})$/.exec(k);
+    const m = /^([mhwbtd])(\d{1,3})$/.exec(k);
     if (m) o[PAGE_CODE[m[1]]] = +m[2] / 10;
     else if (k === 'fa') o.fill = 'area';
     else if (k === 'fp') o.fill = 'page';
@@ -72,20 +75,30 @@ function pageShift() {
   return m === PAGE_DEFAULT.margin ? 0 : Math.max(-30, Math.round((H * m) / 100) - Math.round(H * 0.06));
 }
 
-// ---- the spacing rings, outside in. A later ring (the map border) joins the list here ----
-const PAGE_RINGS = ['wall', 'band', 'mat', 'margin'];
-const RING_NAME = { wall: 'pg_r_wall', band: 'pg_r_band', mat: 'pg_r_mat', margin: 'pg_r_margin' };
+// ---- the spacing rings, outside in. "border" is the gap between the map border (a decoration, 72-decor.js) and
+// the content; the ring exists while the border is on ----
+const PAGE_RINGS = ['wall', 'band', 'mat', 'border', 'margin'];
+const RING_NAME = {
+  wall: 'pg_r_wall',
+  band: 'pg_r_band',
+  mat: 'pg_r_mat',
+  border: 'pg_r_border',
+  margin: 'pg_r_margin',
+};
+const RING_BORDER_GAP = 1.3;
 // does the current frame have this ring? (no frame: no band, no mat; the wall and the margin always exist)
 function ringOn(id) {
   const f = FRAME_SPEC[S.fx.frame] || {};
   if (id === 'band') return FRAMED.includes(f.kind);
   if (id === 'mat') return FRAMED.includes(f.kind) || !!f.t;
+  if (id === 'border') return fxOn('border');
   return PAGE_RINGS.includes(id);
 }
 // the width a ring has when the page does not set one, in % (the frame's own; 6 for the margin)
 function ringDef(id) {
   if (id === 'margin') return PAGE_DEFAULT.margin;
   if (!ringOn(id)) return 0;
+  if (id === 'border') return RING_BORDER_GAP;
   const f = FRAME_SPEC[S.fx.frame] || {};
   const free = !f.m && (fxOn('torn') || fxOn('burnt') || fxOn('roll')) ? 0.04 : 0;
   const v = id === 'wall' ? f.m || free : id === 'band' ? f.b : f.t;
@@ -104,6 +117,7 @@ function ringSet(id, v) {
 function pageSet(k, v) {
   S.page = pageClean(Object.assign({}, pageOpts(), { [k]: v }));
   pageUI();
+  decoUI();
   render();
 }
 const PG = { ring: 'margin' }; // the ring picked in the diagram
