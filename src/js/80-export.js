@@ -1,7 +1,15 @@
 // the page as an SVG to rasterize: no pulsing pins or hover outline, fonts embedded
 function exportSvg() {
   snapSettle(); // the drawing itself, not a gesture's picture of it
-  const el = document.getElementById('svg').cloneNode(true);
+  // the MoboMap mark (61-mark.js) has to be in the page as it was drawn: if not, the page is drawn again
+  const page = document.getElementById('svg');
+  if (!marked.ok(page, true)) render();
+  const el = page.cloneNode(true);
+  if (!marked.ok(page, true)) unmarked.add(el);
+  // in a picture the pale marks are a little clearer than on screen
+  const byD = new Map([...el.querySelectorAll('path')].map((e) => [e.getAttribute('d'), e]));
+  for (const p of marked.list())
+    if (p.own && p.o < 0.3 && byD.has(p.d)) byD.get(p.d).setAttribute('stroke-opacity', (p.o * 1.7).toFixed(3));
   el.querySelectorAll('.pulse').forEach((c) => c.removeAttribute('class'));
   el.querySelector('#hoverwrap')?.remove();
   // the partner block's hover area and the drop targets of a drag are for the screen only
@@ -11,6 +19,8 @@ function exportSvg() {
   el.insertAdjacentHTML('afterbegin', `<style>${allFontCSS()}</style>`);
   return el;
 }
+// copies of the page whose mark could not be put right: their pictures get it painted on (renderPart)
+const unmarked = new WeakSet();
 async function renderCanvas(scale) {
   return renderPart(exportSvg(), [0, 0, W, H], W * scale, H * scale);
 }
@@ -30,7 +40,22 @@ async function renderPart(el, box, w, h) {
     img.onerror = rej;
     img.src = url;
   });
-  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  const g = c.getContext('2d');
+  g.drawImage(img, 0, 0, c.width, c.height);
+  if (unmarked.has(el) || !marked.ok(el, false)) {
+    // the mark is not in the page that was drawn: it is painted on the picture instead
+    const u = Math.max(16, Math.min(c.width, c.height) / 26);
+    g.font = '600 ' + u + 'px sans-serif';
+    g.rotate(-0.35);
+    for (let y = 0, i = 0; y < (c.width + c.height) * 1.2; y += u * 7, i++)
+      for (let x = -c.height + (i % 2) * u * 6; x < c.width; x += u * 13) {
+        g.fillStyle = 'rgba(255,255,255,.22)';
+        g.fillText('\u00a9 MoboMap', x + u / 14, y + u / 14);
+        g.fillStyle = 'rgba(0,0,0,.2)';
+        g.fillText('\u00a9 MoboMap', x, y);
+      }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  }
   URL.revokeObjectURL(url);
   return c;
 }

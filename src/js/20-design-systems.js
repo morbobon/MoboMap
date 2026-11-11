@@ -34,6 +34,8 @@ function normDS(d, source) {
     footer.divider || {},
   );
   return {
+    // a licence token travels with the profile, when it has one (see licensed below)
+    ...(d.licence ? { licence: String(d.licence) } : {}),
     id: String(d.id),
     name: d.name || d.id,
     note: d.note || '',
@@ -63,6 +65,38 @@ function addDS(d, source) {
     return null;
   }
 }
+// Licensed brand profiles: a map drawn with one of them carries no MoboMap mark (61-mark.js). A profile is known by
+// a fingerprint of its content – SHA-256 over its id and its main logo – so another profile that is given the same
+// id does not count, and nothing but the fingerprint is kept here. A profile can also carry a licence token
+// ("licence": "…" in its JSON): it counts when SHA-256 over the token and the profile's fingerprint is listed in
+// tokens. A signed token can be checked in the same place later.
+const licensed = (() => {
+  const prints = [
+    '2b94336fc6b7dacb0d16f4b85372159d1eae704edf78a5391ce7b0c619386b01',
+    'a0a177f0e66d4237d0ae6e4183991910114d453fe98771ab1bb5c4e68c64f7a8',
+    '2fad3a85c8b447b3b92d4533499ac967ba1aeef00e6c9df2db08df19ce2d74d2',
+    '1e48ba9e2c2e37d3596b0fc048971c82a0acaaec68c0f6cf400c93be0fe09f19',
+  ];
+  const tokens = [];
+  const seen = new WeakMap();
+  return (d) => {
+    const src = d && d.company && d.company.logo && d.company.logo.src;
+    // a logo that is a picture in the file itself: a short text or a link is too little to tell a profile by
+    if (typeof src !== 'string' || src.length < 2000) return false;
+    let r = seen.get(d);
+    if (!r || r.src !== src || r.id !== d.id || r.licence !== d.licence) {
+      const print = sha256(d.id + '\n' + src);
+      r = {
+        src,
+        id: d.id,
+        licence: d.licence,
+        ok: prints.includes(print) || (!!d.licence && tokens.includes(sha256(d.licence + '\n' + print))),
+      };
+      seen.set(d, r);
+    }
+    return r.ok;
+  };
+})();
 const extraFaces = {};
 function injectFace(f) {
   if (!f || !f.family || !f.src) return;

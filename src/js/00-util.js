@@ -59,3 +59,48 @@ const codeNum = (c) => {
   for (const ch of String(c)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return h;
 };
+// SHA-256 of a text (UTF-8), as hex. Synchronous and self-contained: crypto.subtle is missing on file:// pages.
+function sha256(text) {
+  const rr = (v, n) => (v >>> n) | (v << (32 - n));
+  // the constants: fractional parts of the square and cube roots of the first primes
+  const K = [],
+    Hs = [];
+  for (let n = 2; K.length < 64; n++) {
+    let prime = true;
+    for (let d = 2; d * d <= n; d++) if (n % d === 0) prime = false;
+    if (!prime) continue;
+    if (Hs.length < 8) Hs.push((Math.sqrt(n) * 4294967296) | 0);
+    K.push((Math.cbrt(n) * 4294967296) | 0);
+  }
+  const bytes = new TextEncoder().encode(text),
+    n = bytes.length,
+    w = new Int32Array((((n + 8) >> 6) + 1) << 4),
+    m = new Int32Array(64);
+  for (let i = 0; i < n; i++) w[i >> 2] |= bytes[i] << (24 - (i % 4) * 8);
+  w[n >> 2] |= 0x80 << (24 - (n % 4) * 8);
+  w[w.length - 2] = Math.floor(n / 0x20000000);
+  w[w.length - 1] = n << 3;
+  for (let o = 0; o < w.length; o += 16) {
+    let [a, b, c, d, e, f, g, h] = Hs;
+    for (let i = 0; i < 64; i++) {
+      if (i < 16) m[i] = w[o + i];
+      else {
+        const x = m[i - 15],
+          y = m[i - 2];
+        m[i] = (m[i - 16] + (rr(x, 7) ^ rr(x, 18) ^ (x >>> 3)) + m[i - 7] + (rr(y, 17) ^ rr(y, 19) ^ (y >>> 10))) | 0;
+      }
+      const t1 = (h + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + m[i]) | 0,
+        t2 = ((rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g;
+      g = f;
+      f = e;
+      e = (d + t1) | 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) | 0;
+    }
+    [a, b, c, d, e, f, g, h].forEach((v, i) => (Hs[i] = (Hs[i] + v) | 0));
+  }
+  return Hs.map((v) => (v >>> 0).toString(16).padStart(8, '0')).join('');
+}

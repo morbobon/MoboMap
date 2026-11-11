@@ -232,6 +232,25 @@ function render(target) {
   // the map itself (not page, title, legend, footer) goes in <g id="mapz">: during a wheel or drag gesture it is
   // only moved and scaled (zoomPreview), and drawn again once the view settles
   const mapStart = out.length;
+  // The MoboMap mark (61-mark.js), on every map that is not made with a licensed brand profile. It is drawn in
+  // several places further down: at the end of a few outlines of the map, in the map body, over the page and as
+  // a small line at the page's edge. Where the pieces go follows from the design and not from the view, so they
+  // stay put while the map is moved; mk collects them for the exports (marked).
+  const mk = [],
+    mkRnd = fxRng(
+      [...[S.map, S.country, S.focus, st, S.layout, S.ds, (S.fx || {}).seed].join('|')].reduce(
+        (h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) | 0,
+        7,
+      ),
+    ),
+    mkPath = (d, c, o, w) => {
+      mk.push({ d, c, o, w, own: true });
+      return `<path d="${d}" fill="none" stroke="${c}" stroke-opacity="${o}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>`;
+    },
+    // the two tones of a pale mark: a dark line with a light one beside it shows on any ground
+    mkPair = (x, y, s, deg, o) =>
+      mkPath(markLine(x, y, s, deg, mkRnd), '#000', o, +(0.75 * s).toFixed(2)) +
+      mkPath(markLine(x + 0.5 * s, y + 0.5 * s, s, deg, mkRnd), '#fff', +(o * 1.25).toFixed(3), +(0.75 * s).toFixed(2));
   const relief = reliefOn(sp);
   // 'hide the rest' also drops the sea around the map: depths and sea names
   if (relief && !S.focusHide) out += reliefSea(sp, bg, dark);
@@ -322,10 +341,37 @@ function render(target) {
       const k = GEO.units.find((k) => k.c === c);
       if (k) out += `<path d="${kp(k, det)}" fill="${baseFill(k)}" stroke="none" pointer-events="none"/>`;
     }
+  // the mark's place in the map: the largest units in view. Two of them get the words at the end of their own
+  // outline (drawn back and forth, so the fill is as before), two more carry a pale mark in the map body.
+  const mkAt = [],
+    mkTail = new Map();
+  if (!licensed(D)) {
+    for (const k of unsel) {
+      if (!k.b || insOf(k) || !inFocus(k)) continue;
+      const [x, y] = kc(k),
+        a = P(k.b[0], k.b[1]),
+        b = P(k.b[2], k.b[3]),
+        w = Math.abs(b[0] - a[0]),
+        h = Math.abs(b[1] - a[1]);
+      if (x > 70 && x < W - 70 && y > 60 && y < H - FOOT - 60 && w > 110 && w < W && h > 55)
+        mkAt.push({ k, x, y, w, h });
+    }
+    mkAt.sort((p, q) => q.w * q.h - p.w * p.h);
+    mkAt.length = Math.min(mkAt.length, 8);
+    mkAt.forEach((m) => (m.r = mkRnd()));
+    mkAt.sort((p, q) => p.r - q.r);
+    if (strokeBase !== 'none' && swBase > 0)
+      for (const m of mkAt.slice(0, 2)) {
+        if (!kp(m.k, det)) continue;
+        const d = markLine(m.x, m.y + 15, 0.55, 0, mkRnd, true);
+        mkTail.set(m.k, d);
+        mk.push({ d, own: false });
+      }
+  }
   for (const k of unsel) {
     const fo = !inFocus(k);
     if (fo && S.focusHide) continue;
-    out += `<path class="k" data-c="${k.c}" d="${kp(k, det)}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim || fo ? 'opacity=".3"' : ''} ${st === 'outline' || sp.pixel || (sp.flag && S.map !== 'world') ? 'fill-opacity="0"' : sp.network ? 'fill-opacity=".55"' : ''} ${sp.flag && S.map !== 'world' ? 'stroke-opacity=".45"' : ''}/>`;
+    out += `<path class="k" data-c="${k.c}" d="${kp(k, det)}${mkTail.get(k) || ''}" fill="${baseFill(k)}" stroke="${strokeBase}" stroke-width="${swBase}" stroke-linejoin="round" ${dim || fo ? 'opacity=".3"' : ''} ${st === 'outline' || sp.pixel || (sp.flag && S.map !== 'world') ? 'fill-opacity="0"' : sp.network ? 'fill-opacity=".55"' : ''} ${sp.flag && S.map !== 'world' ? 'stroke-opacity=".45"' : ''}/>`;
   }
   out += '</g>';
   out += fxLand(allPath);
@@ -336,8 +382,14 @@ function render(target) {
         : unsel
             .filter((k) => !(S.focusHide && !inFocus(k)))
             .map((k) => kp(k, det))
-            .join('');
+            .join('') + [...mkTail.values()].join('');
     out += reliefLand(sp, allPath, borders, strokeBase, swBase, land);
+  }
+  if (!licensed(DS[S.ds])) {
+    const at = mkAt.slice(2, 4).map((m) => [m.x + (mkRnd() - 0.5) * 0.2 * m.w, m.y - 22 - mkRnd() * 0.08 * m.h]);
+    while (at.length < 2)
+      at.push([W * (0.2 + 0.6 * mkRnd()), PAD.t + (H - FOOT - PAD.t - PAD.b) * (0.25 + 0.5 * mkRnd())]);
+    for (const [x, y] of at) out += mkPair(x, y, 1.3 + 0.4 * mkRnd(), -20 + 12 * mkRnd(), 0.07);
   }
   if (sp.network) {
     out += `<path d="${allPath}" fill="none" stroke="${net.glow}" stroke-width="5" filter="url(#landglow)" opacity=".55" pointer-events="none"/><path d="${allPath}" fill="none" stroke="${net.line}" stroke-width="1.2" pointer-events="none"/>`;
@@ -822,6 +874,25 @@ function render(target) {
       `<clipPath id="rpo">${band(-1e6, REP.e0 + 0.6)}${band(REP.e1 - 0.6, 1e6)}</clipPath>` +
       `<g clip-path="url(#rpo)">${copies}</g><g clip-path="url(#rpc)"><g id="mapzr">${body}</g></g>`;
   }
+  // the mark over the page: a few pale ones in rows that are pushed against each other, under the legend, the
+  // texts and the logos
+  let mkPage = '';
+  if (!licensed(D)) {
+    const cols = Math.max(2, Math.round(W / 430)),
+      rows = Math.max(2, Math.round((H - FOOT) / 330));
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        mkPage += mkPair(
+          ((c + 0.5 + (r % 2 ? 0.2 : -0.2) + (mkRnd() - 0.5) * 0.3) / cols) * W,
+          ((r + 0.5 + (mkRnd() - 0.5) * 0.4) / rows) * (H - FOOT),
+          1.7 + 0.5 * mkRnd(),
+          -24 + 12 * mkRnd(),
+          0.06,
+        );
+  }
+  // and one small, clear line up the right edge of the page; it goes in with the legend or with the title
+  const mkEdge = licensed(DS[S.ds]) ? '' : mkPath(markLine(W - 8, H - FOOT - 44, 0.7, -90, mkRnd), ink, 0.5, 0.8),
+    mkLow = mkRnd() < 0.5;
   out =
     out.slice(0, mapStart) +
     mapClip +
@@ -835,6 +906,7 @@ function render(target) {
     (FOOT && (S.zoom.k !== 1 || S.zoom.x || S.zoom.y || pg.fill === 'page' || S.map === 'world')
       ? `<rect x="0" y="${H - FOOT}" width="${W}" height="${FOOT}" fill="${bg}"/>`
       : '') +
+    mkPage +
     '<g pointer-events="none">';
   // the sheet margin moves what sits at the page edges: pmx = the side the texts and the logo line up on,
   // pdy = how far the header's content moves down (0 with the standard margin), pfoot = the room kept free at
@@ -957,7 +1029,7 @@ function render(target) {
     if (items.length) bottom = box(items, 'legend') - 16;
     for (const a of apart) bottom = box(a.items, 'legend:#' + a.g.id) - 16;
   }
-  out += '</g>';
+  out += (mkLow ? mkEdge : '') + '</g>';
   out += '<g pointer-events="none">';
   if (showText) {
     const t = sp.titleCaps ? title.toUpperCase() : title;
@@ -1075,7 +1147,7 @@ function render(target) {
       }
     }
   }
-  out += '</g>';
+  out += (mkLow ? '' : mkEdge) + '</g>';
   // footer with partner logos
   window._links = [];
   // the logo's link (its own, else the profile's) is clickable in the PDF export, as the partners' links are
@@ -1160,6 +1232,7 @@ function render(target) {
   // (a gesture's picture of the last drawing goes with it: 69-snapshot.js)
   snapDrop();
   gestureEnd();
+  marked.note(mk);
   document.getElementById('svg').innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
   DRAWN = { view: S.map + '|' + S.country + '|' + S.focus, zoom: Object.assign({}, S.zoom) };
   const wrap = document.getElementById('wrap');
