@@ -259,6 +259,23 @@
           </section>
         </div>
         <div class="tab" data-tab="look">
+          <section class="sec" data-sec="look">
+            <h2 onclick="toggleSec('look')">
+              <span class="chev"></span><span data-i18n="sec_look"></span><span class="sum" id="lookInfo"></span>
+            </h2>
+            <div class="body">
+              <select id="fxPreset" class="strong" onchange="pickLook(this.value)"></select>
+              <div class="row">
+                <button
+                  class="chip"
+                  onclick="randomLook()"
+                  data-i18n="look_random"
+                  data-i18n-title="look_random_t"
+                ></button>
+                <button class="chip" onclick="saveLook()" data-i18n="look_save"></button>
+              </div>
+            </div>
+          </section>
           <section class="sec" data-sec="style">
             <h2 onclick="toggleSec('style')">
               <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
@@ -290,10 +307,30 @@
               <span class="chev"></span><span data-i18n="sec_fx"></span><span class="sum" id="fxInfo"></span>
             </h2>
             <div class="body">
-              <select id="fxPreset" onchange="applyFxPreset(this.value)"></select>
+              <label class="fxrow"
+                ><span data-i18n="fx_strength"></span
+                ><input
+                  type="range"
+                  id="fxStrength"
+                  min="0"
+                  max="200"
+                  step="5"
+                  oninput="
+                    S.fx.strength = this.value / 100;
+                    fxRenderSoon();
+                    this.nextElementSibling.textContent = this.value + ' %';
+                  " /><b id="fxStrengthV"></b
+              ></label>
+              <div id="fxList" data-lv="adv"></div>
+            </div>
+          </section>
+          <section class="sec" data-sec="frame">
+            <h2 onclick="toggleSec('frame')">
+              <span class="chev"></span><span data-i18n="sec_frame"></span><span class="sum" id="frameInfo"></span>
+            </h2>
+            <div class="body">
               <select
                 id="fxFrame"
-                data-lv="adv"
                 onchange="
                   S.fx.frame = this.value;
                   S.fx.preset = '';
@@ -301,9 +338,7 @@
                   render();
                 "
               ></select>
-              <div id="fxLight" data-lv="adv"></div>
-              <div id="fxList" data-lv="adv"></div>
-              <div class="row" data-lv="adv">
+              <div class="row">
                 <label class="ck"
                   ><span data-i18n="fx_surface"></span>
                   <input
@@ -314,7 +349,43 @@
                       render();
                     "
                 /></label>
-                <button class="chip" onclick="fxShuffle()" data-i18n="fx_shuffle"></button>
+              </div>
+              <div id="fxFrameOpt" data-lv="adv">
+                <div class="fxcat" data-i18n="frame_opts"></div>
+                <label class="ck"
+                  ><input type="checkbox" id="fxGlass" onchange="setFx('glass')" /> <span data-i18n="fx_glass"></span
+                ></label>
+                <label class="fxrow"
+                  ><span data-i18n="pg_r_wall"></span
+                  ><input
+                    type="range"
+                    id="frW_wall"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    oninput="ringSet('wall', +this.value)" /><b id="frV_wall"></b
+                ></label>
+                <label class="fxrow"
+                  ><span data-i18n="pg_r_band"></span
+                  ><input
+                    type="range"
+                    id="frW_band"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    oninput="ringSet('band', +this.value)" /><b id="frV_band"></b
+                ></label>
+                <label class="fxrow"
+                  ><span data-i18n="pg_r_mat"></span
+                  ><input
+                    type="range"
+                    id="frW_mat"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    oninput="ringSet('mat', +this.value)" /><b id="frV_mat"></b
+                ></label>
+                <button class="chip sm" id="frStd" onclick="frameStd()" data-i18n="frame_std"></button>
               </div>
             </div>
           </section>

@@ -37,18 +37,17 @@ const FX_IDS = [
   'rhumb',
   'border',
 ];
+// The groups of the Effects section, in the order they are shown. 'decor' is not a group there: compass, rhumb
+// lines and map border are switched and set up under Decorations (72-decor.js).
 const FX_CATS = [
-  [
-    'paper',
-    ['paper', 'grain', 'speckle', 'crumple', 'dried', 'folds', 'coffee', 'water', 'burnt', 'torn', 'curl', 'roll'],
-  ],
+  ['paper', ['paper', 'grain', 'speckle', 'crumple', 'dried', 'folds', 'burnt', 'torn', 'curl', 'roll']],
+  ['stains', ['coffee', 'water']],
   ['light', ['spotlight', 'window', 'blinds', 'leaves', 'sunbeam', 'dusk', 'vignette', 'gradient', 'glass', 'shadow']],
   ['relief', ['emboss', 'deboss', 'foil']],
   ['colour', ['sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']],
   ['decor', ['compass', 'rhumb', 'border']],
 ];
-// (the 'decor' effects are switched and set up under Decorations: 72-decor.js)
-const FXC_IDS = ['paper', 'light', 'relief', 'colour'];
+const FXC_IDS = ['paper', 'stains', 'light', 'relief', 'colour'];
 const FX_DECOR = FX_CATS.find((c) => c[0] === 'decor')[1];
 // Frames, sizes as a share of min(W, H): m = wall margin, b = frame band, t = mat (or paper border)
 const FRAME_IDS = [
@@ -79,6 +78,21 @@ const FRAME_IDS = [
   'neon',
   'brutal',
 ];
+// the frames as the Frame & wall section lists them ('none' stands alone, first)
+const FRAME_GROUPS = [
+  ['lines', ['line', 'double']],
+  ['wood', ['oak', 'ash', 'walnut', 'black', 'blacktaupe', 'white', 'oakreal', 'walnutreal', 'driftwood', 'ebony']],
+  ['metal', ['gold', 'floater', 'snap', 'steel', 'brass', 'copper']],
+  ['paper', ['card', 'polaroid', 'stamp', 'tape', 'pins']],
+  ['other', ['neon', 'brutal']],
+];
+const FRAME_GROUP_NAME = {
+  lines: 'frg_lines',
+  wood: 'frg_wood',
+  metal: 'frg_metal',
+  paper: 'frg_paper',
+  other: 'frg_other',
+};
 const FRAMED = ['wood', 'gold', 'metal', 'realwood', 'realmetal'];
 const FRAME_SPEC = {
   oak: { kind: 'wood', m: 0.05, b: 0.04, t: 0.075, wood: '#c9a272', mat: '#f7f4ee' },
@@ -892,54 +906,132 @@ function fxShuffle() {
   S.fx.seed = 1 + Math.floor(Math.random() * 9999);
   render();
 }
-function fxUI() {
-  document.getElementById('fxPreset').innerHTML =
-    `<option value="">${esc(t('fx_custom'))}</option>` +
-    FX_PRESET_IDS.map((id) => `<option value="${id}">${esc(t('pre_' + id))}</option>`).join('');
-  document.getElementById('fxPreset').value = S.fx.preset || '';
-  document.getElementById('fxFrame').innerHTML = FRAME_IDS.map(
-    (id) => `<option value="${id}">${esc(t('frame'))}: ${esc(t('fr_' + id))}</option>`,
-  ).join('');
-  document.getElementById('fxFrame').value = S.fx.frame;
-  document.getElementById('fxSurface').value = S.fx.surface;
-  const Lu = S.fx.light || {};
-  const dNow = Lu.dir != null ? Lu.dir : 250;
-  const angDist = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
-  const dirOf = Object.entries(LIGHT_DIRS).sort((a, b) => angDist(a[1], dNow) - angDist(b[1], dNow))[0];
-  document.getElementById('fxLight').innerHTML =
-    `<label class="fxrow"><span>${esc(t('fx_strength'))}</span><input type="range" min="0" max="200" step="5" value="${Math.round((S.fx.strength != null ? S.fx.strength : 1) * 100)}" oninput="S.fx.strength = this.value / 100; fxRenderSoon(); this.nextElementSibling.textContent = this.value + ' %'"/><b>${Math.round((S.fx.strength != null ? S.fx.strength : 1) * 100)} %</b></label>` +
-    `<label class="fxrow"><span>${esc(t('light_dir'))}</span><select onchange="setFxLight('dir', +this.value)">${Object.entries(
-      LIGHT_DIRS,
-    )
-      .map(
-        ([k, v]) => `<option value="${v}" ${dirOf && dirOf[0] === k ? 'selected' : ''}>${esc(t('dir_' + k))}</option>`,
+// ---- panel: Look (the whole-look preset), Effects (groups that fold), Frame & wall ----
+// the Look dropdown: the built-in looks and the saved ones (56-workspace.js); "" = an own mix
+function pickLook(id) {
+  if (id === 'random') return randomLook();
+  if (id) return applyLook(id);
+  S.fx.preset = '';
+  ui();
+  render();
+}
+// which effect groups are unfolded: what the user chose (remembered in this browser), else those with something on
+const FX_FOLD_KEY = 'mobomap.fxgroups';
+function fxFolds() {
+  try {
+    return JSON.parse(localStorage.getItem(FX_FOLD_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function fxFold(g, e) {
+  e.preventDefault();
+  const d = e.currentTarget.parentNode,
+    f = fxFolds();
+  d.open = !d.open;
+  f[g] = d.open ? 1 : 0;
+  localStorage.setItem(FX_FOLD_KEY, JSON.stringify(f));
+}
+const fxPct = (id) => Math.round((S.fx.amt && S.fx.amt[id] != null ? S.fx.amt[id] : 1) * 100);
+// one effect: its chip and, while it is on, its own amount beside it
+function fxChip(id) {
+  const on = S.fx.fx.includes(id);
+  const chip = `<button class="chip sm ${on ? 'on' : ''}" onclick="setFx('${id}')">${esc(t('fx_' + id))}</button>`;
+  if (!on || FX_NO_AMT.includes(id)) return chip;
+  const v = fxPct(id);
+  return `<div class="fxe">${chip}<input type="range" min="0" max="200" step="5" value="${v}" aria-label="${esc(t('fx_' + id))}" oninput="setFxAmt('${id}', +this.value); this.nextElementSibling.textContent = this.value + ' %'"/><b>${v} %</b></div>`;
+}
+// what a group holds besides its effects: above them (FX_GROUP_TOP) or below (FX_GROUP_END). Each returns HTML.
+const FX_GROUP_TOP = {
+  // where the light comes from and how warm it is: shadows, relief, spotlight, glass and frame shading follow
+  light: () => {
+    const Lu = S.fx.light || {};
+    const dNow = Lu.dir != null ? Lu.dir : 250;
+    const angDist = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
+    const dirOf = Object.entries(LIGHT_DIRS).sort((a, b) => angDist(a[1], dNow) - angDist(b[1], dNow))[0];
+    const warm = Math.round((Lu.warm || 0) * 100);
+    return (
+      `<label class="fxrow"><span>${esc(t('light_dir'))}</span><select onchange="setFxLight('dir', +this.value)">${Object.entries(
+        LIGHT_DIRS,
       )
-      .join('')}</select></label>` +
-    `<label class="fxrow"><span>${esc(t('light_warm'))}</span><input type="range" min="-100" max="100" step="5" value="${Math.round((Lu.warm || 0) * 100)}" oninput="setFxLight('warm', this.value / 100); this.nextElementSibling.textContent = (this.value > 0 ? '+' : '') + this.value"/><b>${(Lu.warm > 0 ? '+' : '') + Math.round((Lu.warm || 0) * 100)}</b></label>` +
-    (S.fx.fx.length
-      ? `<div class="fxcat">${esc(t('fx_amounts'))}</div>` +
-        S.fx.fx
-          .filter((id) => !FX_NO_AMT.includes(id) && !FX_DECOR.includes(id))
-          .map((id) => {
-            const v = Math.round((S.fx.amt && S.fx.amt[id] != null ? S.fx.amt[id] : 1) * 100);
-            return `<label class="fxrow"><span>${esc(t('fx_' + id))}</span><input type="range" min="0" max="200" step="5" value="${v}" oninput="setFxAmt('${id}', +this.value); this.nextElementSibling.textContent = this.value + ' %'"/><b>${v} %</b></label>`;
-          })
-          .join('')
-      : '');
-  document.getElementById('fxList').innerHTML = FXC_IDS.map((c) => FX_CATS.find((x) => x[0] === c))
-    .map(
-      ([c, ids]) =>
-        `<div class="fxcat">${esc(t('fxc_' + c))}</div><div class="row">${ids.map((id) => `<button class="chip sm ${fxOn(id) ? 'on' : ''}" onclick="setFx('${id}')">${esc(t('fx_' + id))}</button>`).join('')}</div>`,
-    )
+        .map(([k, v]) => `<option value="${v}" ${dirOf[0] === k ? 'selected' : ''}>${esc(t('dir_' + k))}</option>`)
+        .join('')}</select></label>` +
+      `<label class="fxrow"><span>${esc(t('light_warm'))}</span><input type="range" min="-100" max="100" step="5" value="${warm}" oninput="setFxLight('warm', this.value / 100); this.nextElementSibling.textContent = (this.value > 0 ? '+' : '') + this.value"/><b>${(warm > 0 ? '+' : '') + warm}</b></label>`
+    );
+  },
+};
+const FX_GROUP_END = {
+  stains: () => `<button class="chip sm" onclick="fxShuffle()">${esc(t('fx_shuffle'))}</button>`,
+};
+const fxPlain = () => S.fx.fx.filter((id) => !FX_DECOR.includes(id));
+const fxCap = (s) => s.charAt(0).toLocaleUpperCase(S.lang) + s.slice(1);
+function fxUI() {
+  const el = (id) => document.getElementById(id);
+  // Look
+  const looks = allLooks(),
+    opt = (l) => `<option value="${esc(l.id)}">${esc(l.name)}</option>`,
+    mine = looks.filter((l) => !l.builtin);
+  el('fxPreset').innerHTML =
+    `<option value="">${esc(t('fx_custom'))}</option>` +
+    (S.fx.preset === 'random' ? `<option value="random">${esc(t('look_random'))}</option>` : '') +
+    looks
+      .filter((l) => l.builtin)
+      .map(opt)
+      .join('') +
+    (mine.length ? `<optgroup label="${esc(t('look_saved'))}">${mine.map(opt).join('')}</optgroup>` : '');
+  const look = S.fx.preset === 'random' ? { id: 'random', name: t('look_random') } : lookOf(S.fx.preset);
+  el('fxPreset').value = look ? look.id : '';
+  el('lookInfo').textContent = look ? look.name : '';
+  // Effects: overall strength, then the groups
+  const st = Math.round((S.fx.strength != null ? S.fx.strength : 1) * 100);
+  el('fxStrength').value = st;
+  el('fxStrengthV').textContent = st + ' %';
+  const folds = fxFolds();
+  el('fxList').innerHTML = FXC_IDS.map((c) => FX_CATS.find((x) => x[0] === c))
+    .map(([c, ids]) => {
+      const n = ids.filter((id) => S.fx.fx.includes(id)).length;
+      const open = c in folds ? !!folds[c] : n > 0;
+      return (
+        `<details class="fxg" data-g="${c}"${open ? ' open' : ''}><summary onclick="fxFold('${c}', event)"><span>${esc(t('fxc_' + c))}</span>${n ? `<b class="fxn">${n}</b>` : ''}</summary>` +
+        (FX_GROUP_TOP[c] ? FX_GROUP_TOP[c]() : '') +
+        `<div class="fxes">${ids.map(fxChip).join('')}</div>` +
+        (FX_GROUP_END[c] ? `<div class="row">${FX_GROUP_END[c]()}</div>` : '') +
+        '</details>'
+      );
+    })
     .join('');
-  document.getElementById('fxInfo').textContent =
-    (S.fx.preset === 'random'
-      ? t('look_random')
-      : S.fx.preset && FX_PRESETS[S.fx.preset]
-        ? t('pre_' + S.fx.preset)
-        : S.fx.fx.length
-          ? S.fx.fx.length + ' fx'
-          : t('off')) + (S.fx.frame !== 'none' ? ' · ' + t('fr_' + S.fx.frame) : '');
+  el('fxInfo').textContent = fxPlain().length ? fxPlain().length : t('off');
+  // Frame & wall
+  const fr = (id) => `<option value="${id}">${esc(fxCap(t('fr_' + id)))}</option>`;
+  el('fxFrame').innerHTML =
+    fr('none') +
+    FRAME_GROUPS.map(
+      ([g, ids]) => `<optgroup label="${esc(t(FRAME_GROUP_NAME[g]))}">${ids.map(fr).join('')}</optgroup>`,
+    ).join('');
+  el('fxFrame').value = S.fx.frame;
+  el('fxSurface').value = S.fx.surface;
+  el('frameInfo').textContent = S.fx.frame !== 'none' ? fxCap(t('fr_' + S.fx.frame)) : '';
+  fxFrameSync();
+}
+// frame options: glass, and the widths of wall, frame and mat (the same rings as Page → Areas & spacing)
+const FRAME_RINGS = ['wall', 'band', 'mat'];
+function fxFrameSync() {
+  const el = (id) => document.getElementById(id);
+  el('fxGlass').checked = S.fx.fx.includes('glass');
+  for (const id of FRAME_RINGS) {
+    const on = ringOn(id),
+      w = el('frW_' + id);
+    if (+w.value !== ringVal(id)) w.value = ringVal(id);
+    w.disabled = !on;
+    el('frV_' + id).textContent = on ? pgPct(ringVal(id)) : '–';
+  }
+  el('frStd').disabled = FRAME_RINGS.every((id) => pageOpts()[id] == null);
+}
+function frameStd() {
+  S.page = pageClean(Object.assign({}, pageOpts(), { wall: null, band: null, mat: null }));
+  pageUI();
+  decoUI();
+  render();
 }
 
 // A random but sensible look: style + effects from different families + frame + wall colour

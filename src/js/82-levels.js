@@ -50,18 +50,17 @@ const lvCkReset = (...ks) => ks.forEach((k) => (document.getElementById(k).check
 const lvProj = () => (S.country ? 'local' : lvStart().proj || DEFAULT_PROJ);
 const lvDecor = (fx) => (fx || []).filter((id) => FX_DECOR.includes(id)).sort();
 const lvPlain = (fx) => (fx || []).filter((id) => !FX_DECOR.includes(id)).sort();
-// the effects without the decorations: what the Effects section hides
+// what the Effects section hides: the effects (not the decorations), their amounts and the light.
+// The overall strength is shown in Simple; the frame has its own section.
 const lvFxState = (f) =>
   JSON.stringify([
     lvPlain(f.fx),
-    f.frame || 'none',
     Object.entries(f.amt || {})
       .filter(([id]) => !FX_DECOR.includes(id) && (f.fx || []).includes(id))
       .sort(),
-    f.strength != null ? f.strength : 1,
     f.light || { dir: 250, warm: 0 },
   ]);
-const LV_FX_NONE = { fx: [], frame: 'none', amt: {}, strength: 1, light: { dir: 250, warm: 0 } };
+const LV_FX_NONE = { fx: [], amt: {}, light: { dir: 250, warm: 0 } };
 const lvTitlePos = () => lvStart().titlePos || 'auto';
 const LV_PAGE_AREAS = ['fill', 'margin', 'wall', 'band', 'mat', 'border'],
   LV_PAGE_HEAD = ['header', 'headerH', 'footer'],
@@ -118,6 +117,8 @@ const LV_CUST = {
         preset: '',
       })),
   },
+  // the widths of wall, frame and mat (also in the Areas & spacing diagram)
+  frame: { is: () => lvPageDiff(FRAME_RINGS), reset: () => lvPageReset(FRAME_RINGS) },
   areas: { is: () => lvPageDiff(LV_PAGE_AREAS), reset: () => lvPageReset(LV_PAGE_AREAS) },
   headfoot: {
     is: () => {

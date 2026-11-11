@@ -146,6 +146,7 @@ function ctxItems(target, pt) {
   add(t('sec_style'), () => jumpTo('#styles'));
   add(t('sec_display'), () => jumpTo(secOf('display')));
   add(t('sec_fx'), () => jumpTo(secOf('fx')));
+  add(t('sec_frame'), () => jumpTo(secOf('frame')));
   add(t('sec_layout'), () => jumpTo('#layouts'));
   add(t(S.lock.on ? 'lock_unlock' : 'lock_map'), () => toggleLock());
   // viewer mode: the editor is hidden; the one way back to it

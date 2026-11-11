@@ -776,7 +776,10 @@ svg.addEventListener('mouseover', (e) => hoverAt(e.target));
 
 // ---- collapsible panel sections (open/closed remembered per browser) ----
 const SEC_KEY = 'mobomap.sections';
-const SEC_DEFAULT_OPEN = ['map', 'groups'];
+const SEC_DEFAULT_OPEN = ['map', 'groups', 'look'];
+// sections that came later: the first time a remembered state meets them they get a sensible state
+// (Look starts open; Frame & wall inherits from Effects, where the frame used to be)
+const SEC_SINCE = '+look';
 function secState() {
   try {
     return JSON.parse(localStorage.getItem(SEC_KEY)) || null;
@@ -786,6 +789,10 @@ function secState() {
 }
 function applySections() {
   const open = secState() || SEC_DEFAULT_OPEN;
+  if (!open.includes(SEC_SINCE) && open !== SEC_DEFAULT_OPEN) {
+    open.push('look');
+    if (open.includes('fx')) open.push('frame');
+  }
   document.querySelectorAll('.sec').forEach((s) => s.classList.toggle('closed', !open.includes(s.dataset.sec)));
 }
 function toggleSec(id) {
@@ -793,7 +800,8 @@ function toggleSec(id) {
   el.classList.toggle('closed');
   const open = [...document.querySelectorAll('.sec')]
     .filter((s) => !s.classList.contains('closed'))
-    .map((s) => s.dataset.sec);
+    .map((s) => s.dataset.sec)
+    .concat(SEC_SINCE);
   localStorage.setItem(SEC_KEY, JSON.stringify(open));
 }
 

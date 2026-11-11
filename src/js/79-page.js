@@ -158,4 +158,5 @@ function pageUI() {
   w.disabled = !on;
   el('pgRingStd').disabled = !on || (id === 'margin' ? p.margin === PAGE_DEFAULT.margin : p[id] == null);
   el('pgRingNa').hidden = on;
+  fxFrameSync();
 }
