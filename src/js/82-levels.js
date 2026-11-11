@@ -110,12 +110,20 @@ const LV_CUST = {
   fx: {
     // a chosen preset names what is on; without one the effects are compared with none and with the start map's
     is: () =>
-      !S.fx.preset && lvFxState(S.fx) !== lvFxState(LV_FX_NONE) && lvFxState(S.fx) !== lvFxState(lvStart().fx || {}),
-    reset: () =>
-      (S.fx = Object.assign({}, S.fx, JSON.parse(JSON.stringify(LV_FX_NONE)), {
+      (!S.fx.preset &&
+        lvFxState(S.fx) !== lvFxState(LV_FX_NONE) &&
+        lvFxState(S.fx) !== lvFxState(lvStart().fx || {})) ||
+      // the stains' own settings (73-stains.js) count where a stain is drawn
+      (!!S.stains &&
+        STAIN_KINDS.some((k) => S.fx.fx.includes(k)) &&
+        stainCode(S.stains) !== stainCode(stainClean(lvStart().stains))),
+    reset: () => {
+      S.fx = Object.assign({}, S.fx, JSON.parse(JSON.stringify(LV_FX_NONE)), {
         fx: S.fx.fx.filter((id) => FX_DECOR.includes(id)),
         preset: '',
-      })),
+      });
+      S.stains = null;
+    },
   },
   // the widths of wall, frame and mat (also in the Areas & spacing diagram)
   frame: { is: () => lvPageDiff(FRAME_RINGS), reset: () => lvPageReset(FRAME_RINGS) },

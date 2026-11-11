@@ -9,7 +9,12 @@ const FX_IDS = [
   'dried',
   'folds',
   'coffee',
+  'ring2',
+  'spill',
+  'drops',
   'water',
+  'blot',
+  'age',
   'burnt',
   'torn',
   'curl',
@@ -41,7 +46,7 @@ const FX_IDS = [
 // lines and map border are switched and set up under Decorations (72-decor.js).
 const FX_CATS = [
   ['paper', ['paper', 'grain', 'speckle', 'crumple', 'dried', 'folds', 'burnt', 'torn', 'curl', 'roll']],
-  ['stains', ['coffee', 'water']],
+  ['stains', ['coffee', 'ring2', 'spill', 'drops', 'water', 'blot', 'age']],
   ['light', ['spotlight', 'window', 'blinds', 'leaves', 'sunbeam', 'dusk', 'vignette', 'gradient', 'glass', 'shadow']],
   ['relief', ['emboss', 'deboss', 'foil']],
   ['colour', ['sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']],
@@ -527,8 +532,7 @@ function fxDefs() {
 <filter id="fxpaper" ${U}><feTurbulence type="fractalNoise" baseFrequency=".008" numOctaves="4" seed="${sd + 1}"/><feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .27  0 0 0 0 .1  -1.1 0 0 0 .62"/><feComposite in2="SourceAlpha" operator="in"/></filter>
 <filter id="fxcrumple" ${U}><feTurbulence type="turbulence" baseFrequency=".011" numOctaves="4" seed="${sd + 2}" result="n"/><feDiffuseLighting in="n" surfaceScale="2.6" lighting-color="#fff"><feDistantLight azimuth="235" elevation="52"/></feDiffuseLighting><feComponentTransfer><feFuncR type="linear" slope="1.25"/><feFuncG type="linear" slope="1.25"/><feFuncB type="linear" slope="1.25"/></feComponentTransfer><feComposite in2="SourceAlpha" operator="in"/></filter>
 <filter id="fxdried" ${U}><feTurbulence type="fractalNoise" baseFrequency=".0045" numOctaves="2" seed="${sd + 4}" result="n"/><feDiffuseLighting in="n" surfaceScale="9" lighting-color="#fff"><feDistantLight azimuth="225" elevation="58"/></feDiffuseLighting><feComponentTransfer><feFuncR type="linear" slope="1.18"/><feFuncG type="linear" slope="1.18"/><feFuncB type="linear" slope="1.18"/></feComponentTransfer><feComposite in2="SourceAlpha" operator="in"/></filter>
-<filter id="fxrough" ${U}><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="${sd + 5}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="14"/></filter>
-<filter id="fxblob" ${U}><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="3" seed="${sd + 6}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="70"/></filter>
+${stainDefs(sd)}
 <filter id="fxedge" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34"/></filter>
 <filter id="fxtorn" ${U}><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="${sd + 9}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="12"/></filter>
 <filter id="fxburn" ${U}><feTurbulence type="fractalNoise" baseFrequency=".022" numOctaves="4" seed="${sd + 8}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="34" result="d"/><feGaussianBlur in="d" stdDeviation="5"/></filter>
@@ -581,7 +585,7 @@ function fxDefs() {
 }
 
 // ---------- the scene around the content ----------
-function fxWrap(content, bg, ink, accent) {
+function fxWrap(content, bg, ink, accent, thumb) {
   const Lv = fxLight();
   const L = FXL,
     f = L.f,
@@ -644,7 +648,6 @@ function fxWrap(content, bg, ink, accent) {
   // the content – a zoomed map included – never leaves the sheet
   const clip = L.active || S.zoom.k !== 1 || S.zoom.x || S.zoom.y;
   sheet += `${clip ? `<clipPath id="fxclip">${rect(P)}</clipPath><g clip-path="url(#fxclip)">` : '<g>'}<g${cf}>${L.active ? `<g transform="translate(${r1(L.tx)},${r1(L.ty)}) scale(${L.s.toFixed(4)})">${content}</g>` : content}</g></g>`;
-  const R = fxRng(S.fx.seed);
   const pw = px1 - px0,
     ph = py1 - py0;
   const ov = (fill, a = '') => rect(P, `fill="${fill}" pointer-events="none" ${a}`);
@@ -656,21 +659,7 @@ function fxWrap(content, bg, ink, accent) {
     sheet += ov('#fff', `filter="url(#fxdried)" style="mix-blend-mode:multiply" opacity="${fxOp('dried', 0.55)}"`);
   if (fxOn('crumple'))
     sheet += ov('#fff', `filter="url(#fxcrumple)" style="mix-blend-mode:multiply" opacity="${fxOp('crumple', 0.6)}"`);
-  if (fxOn('water'))
-    for (let i = 0; i < 3; i++) {
-      const cx = px0 + pw * (0.15 + R() * 0.7),
-        cy = py0 + ph * (0.15 + R() * 0.7),
-        rr = S0 * (0.07 + R() * 0.09);
-      sheet += `<ellipse cx="${r1(cx)}" cy="${r1(cy)}" rx="${r1(rr * 1.3)}" ry="${r1(rr)}" fill="#7d6a48" fill-opacity="${fxOp('water', 0.07)}" stroke="#6b5534" stroke-opacity="${fxOp('water', 0.28)}" stroke-width="2.5" filter="url(#fxblob)" pointer-events="none"/>`;
-    }
-  if (fxOn('coffee'))
-    for (let i = 0; i < 2; i++) {
-      const corner = R() < 0.5;
-      const cx = corner ? px0 + pw * (R() < 0.5 ? 0.12 : 0.88) : px0 + pw * (0.3 + R() * 0.4),
-        cy = py0 + ph * (corner ? 0.2 + R() * 0.6 : R() < 0.5 ? 0.15 : 0.85),
-        rr = S0 * (0.06 + R() * 0.04);
-      sheet += `<g filter="url(#fxrough)" pointer-events="none"><circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(rr)}" fill="#6f4520" fill-opacity="${fxOp('coffee', 0.07)}" stroke="#6f4520" stroke-opacity="${fxOp('coffee', 0.38)}" stroke-width="${r1(rr * 0.07)}"/><circle cx="${r1(cx + rr * 0.1)}" cy="${r1(cy - rr * 0.06)}" r="${r1(rr * 0.93)}" fill="none" stroke="#6f4520" stroke-opacity="${fxOp('coffee', 0.18)}" stroke-width="${r1(rr * 0.03)}" stroke-dasharray="${r1(rr * 2.2)} ${r1(rr * 1.4)}"/></g>`;
-    }
+  sheet += stainsSVG(P, S0, !thumb);
   if (fxOn('folds')) {
     const xs = [0.25, 0.5, 0.75].map((k) => px0 + pw * k),
       ym = py0 + ph / 2;
@@ -902,7 +891,9 @@ function applyFxPreset(id) {
   ui();
   render();
 }
+// a new paper: grain, crumples, torn and burnt edges fall differently. The stains stay where they are.
 function fxShuffle() {
+  stainKeepSeed();
   S.fx.seed = 1 + Math.floor(Math.random() * 9999);
   render();
 }
@@ -939,7 +930,7 @@ function fxChip(id) {
   const chip = `<button class="chip sm ${on ? 'on' : ''}" onclick="setFx('${id}')">${esc(t('fx_' + id))}</button>`;
   if (!on || FX_NO_AMT.includes(id)) return chip;
   const v = fxPct(id);
-  return `<div class="fxe">${chip}<input type="range" min="0" max="200" step="5" value="${v}" aria-label="${esc(t('fx_' + id))}" oninput="setFxAmt('${id}', +this.value); this.nextElementSibling.textContent = this.value + ' %'"/><b>${v} %</b></div>`;
+  return `<div class="fxe${stainIs(id) ? ' stn' : ''}">${chip}${stainIs(id) ? stainCountUI(id) : ''}<input type="range" min="0" max="200" step="5" value="${v}" aria-label="${esc(t('fx_' + id))}" oninput="setFxAmt('${id}', +this.value); this.nextElementSibling.textContent = this.value + ' %'"/><b>${v} %</b></div>`;
 }
 // what a group holds besides its effects: above them (FX_GROUP_TOP) or below (FX_GROUP_END). Each returns HTML.
 const FX_GROUP_TOP = {
@@ -961,7 +952,10 @@ const FX_GROUP_TOP = {
   },
 };
 const FX_GROUP_END = {
-  stains: () => `<button class="chip sm" onclick="fxShuffle()">${esc(t('fx_shuffle'))}</button>`,
+  paper: () =>
+    `<div class="row"><button class="chip sm" onclick="fxShuffle()">${esc(t('fx_shuffle_paper'))}</button></div>`,
+  // size, tint, shuffle and "Edit stains" (73-stains.js)
+  stains: () => stainPanel(),
 };
 const fxPlain = () => S.fx.fx.filter((id) => !FX_DECOR.includes(id));
 const fxCap = (s) => s.charAt(0).toLocaleUpperCase(S.lang) + s.slice(1);
@@ -995,7 +989,7 @@ function fxUI() {
         `<details class="fxg" data-g="${c}"${open ? ' open' : ''}><summary onclick="fxFold('${c}', event)"><span>${esc(t('fxc_' + c))}</span>${n ? `<b class="fxn">${n}</b>` : ''}</summary>` +
         (FX_GROUP_TOP[c] ? FX_GROUP_TOP[c]() : '') +
         `<div class="fxes">${ids.map(fxChip).join('')}</div>` +
-        (FX_GROUP_END[c] ? `<div class="row">${FX_GROUP_END[c]()}</div>` : '') +
+        (FX_GROUP_END[c] ? FX_GROUP_END[c]() : '') +
         '</details>'
       );
     })
@@ -1045,7 +1039,7 @@ function randomLook() {
   const fx = [
     ...maybe(0.5, ['paper', 'crumple', 'dried']),
     ...maybe(0.35, ['burnt', 'torn', 'curl', 'roll', 'folds']),
-    ...maybe(0.25, ['coffee', 'water']),
+    ...maybe(0.25, ['coffee', 'ring2', 'spill', 'drops', 'water', 'blot', 'age']),
     ...maybe(0.6, ['spotlight', 'vignette', 'gradient', 'shadow', 'window', 'blinds', 'leaves', 'sunbeam', 'dusk']),
     ...maybe(0.35, ['sepia', 'mono', 'chroma', 'glow', 'scanlines', 'halftone']),
     ...maybe(0.35, ['compass', 'rhumb', 'border']),

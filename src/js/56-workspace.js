@@ -150,6 +150,7 @@ function thumbKey() {
     S.tb,
     S.page,
     S.deco,
+    S.stains,
     CK.map((k) => document.getElementById(k).checked),
     ['title', 'sub', 'titlePos', 'subPos', 'frameSel', 'footerLabel', 'autoText'].map((k) => {
       const el = document.getElementById(k);

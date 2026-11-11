@@ -1231,7 +1231,7 @@ function render(target) {
       out += `<rect class="dropband" x="3" y="${(b.y0 + 3).toFixed(1)}" width="${W - 6}" height="${(b.y1 - b.y0 - 6).toFixed(1)}" rx="6" fill="${ds.accent}" fill-opacity="${DROP_BANDS.hot === b.id ? 0.16 : 0.06}" stroke="${ds.accent}" stroke-width="${DROP_BANDS.hot === b.id ? 2 : 1}" stroke-dasharray="5 4" pointer-events="none"/>`;
   if (target) {
     target.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    target.innerHTML = defs + fxWrap(out, bg, ink, ds.accent);
+    target.innerHTML = defs + fxWrap(out, bg, ink, ds.accent, true);
     window._links = links;
     return;
   }

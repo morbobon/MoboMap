@@ -34,6 +34,7 @@ const S = {
   active: 0,
   partners: [],
   logo: { scale: 1, link: '' }, // the brand logo's size on this map and its own link (71-page-items.js)
+  stains: null, // stains: how many, size, tint, own shuffle, placed by hand – null = standard (73-stains.js)
   deco: null, // decorations: compass, border, rhumb lines, scale bar, graticule, stamps – null = standard (72-decor.js)
   page: null, // page areas: header, footer, map fill, spacing rings – null = the standard (79-page.js)
   texts: [], // custom text items (76-texts.js)

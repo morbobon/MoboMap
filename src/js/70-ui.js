@@ -944,6 +944,11 @@ window.addEventListener('pointerup', (e) => {
     decoUI();
     zoomChanged();
   }
+  // a stain keeps the place on the sheet it was dropped at (73-stains.js)
+  if (textDrag.key.startsWith('sn:')) {
+    stainDrop(textDrag.key);
+    zoomChanged();
+  }
   if (textDrag.moved && textDrag.key.startsWith('tx:')) {
     txDrop(textDrag.key);
     zoomChanged();
@@ -969,7 +974,7 @@ svg.addEventListener('dblclick', (e) => {
   if (lockOn('edit')) return;
   if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
   if (lockOn('items')) return;
-  if (g && decoDbl(g.dataset.drag)) return;
+  if (g && (decoDbl(g.dataset.drag) || stainDbl(g.dataset.drag))) return;
   // the partner block goes back to the footer (a logo in it: see below)
   if (g && g.dataset.drag === 'ptblock') return pbFree() && pbBack();
   // a free partner logo goes back to the footer
@@ -993,7 +998,7 @@ let SNAP_GUIDES = null;
 // map (labels, hubs, stamps, texts that follow the map).
 let DROP_BANDS = null;
 function dropBands(key) {
-  if (/^(rh|sm|co|lb):/.test(key)) return null;
+  if (/^(rh|sm|co|lb|sn):/.test(key)) return null;
   if (key.startsWith('tx:') && (txOf(key) || {}).anchor === 'map') return null;
   const pg = pageOpts(),
     pt = /^pt/.test(key),

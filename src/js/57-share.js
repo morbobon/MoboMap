@@ -131,6 +131,9 @@ function shareParams() {
   // decorations (72-decor.js)
   const dcc = decoCode(p.deco);
   if (dcc !== decoCode(d.deco)) q.set('dc', dcc);
+  // stains (73-stains.js)
+  const snc = stainCode(stainClean(p.stains));
+  if (snc !== stainCode(stainClean(d.stains))) q.set('sn', snc);
   const gs = p.groups.map((g, i) => {
     const f = [
       String(g.color).replace('#', ''),
@@ -180,6 +183,7 @@ function projectFromUrl(search) {
     'll',
     'pg',
     'dc',
+    'sn',
     'c',
     'f',
     'st',
@@ -339,6 +343,7 @@ function projectFromUrl(search) {
   if (q.has('pg')) p.page = pageFromCode(g('pg'));
   if (q.has('pb')) p.pblock = pbFromCode(g('pb'));
   if (q.has('dc')) p.deco = decoFromCode(g('dc'));
+  if (q.has('sn')) p.stains = stainFromCode(g('sn'));
   if (q.has('lg') || q.has('ll'))
     p.logo = logoClean({
       scale: q.has('lg') ? +g('lg') / 100 : (p.logo || {}).scale,

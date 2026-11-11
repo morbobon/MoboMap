@@ -1127,6 +1127,39 @@ body.no-strip .look {
 body.no-strip .look .lthumb {
   display: none;
 }
+/* a stain (73-stains.js): how many of it, between its chip and its strength */
+.fxe.stn {
+  grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.1fr) 40px;
+}
+.fxe .stn-n {
+  width: 44px;
+  padding: 3px 4px;
+  font-size: 12px;
+}
+#stainUI {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+/* Edit stains: a stain shows the area that grabs it instead of the glow of other items */
+#svg .drg.stn:hover {
+  filter: none;
+}
+#svg .drg.stn > circle {
+  stroke: #111;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  stroke-opacity: 0.55;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 1px #fff);
+}
+#svg .drg.stn:hover > circle {
+  stroke-opacity: 1;
+  stroke-width: 2.5;
+}
+#stainUI .note {
+  margin: 0;
+}
 body.no-strip .look .lname {
   padding: 5px 12px;
 }
