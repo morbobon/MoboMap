@@ -840,7 +840,7 @@ svg.addEventListener(
     e.stopImmediatePropagation(); // not a map pan
     e.preventDefault();
     const key = g.dataset.drag;
-    const base = ((S.drag || {})[key] || [0, 0]).slice();
+    const base = ((S.drag || {})[key] || (key === 'compass' && DECO_CAUTO) || [0, 0]).slice();
     let box = null;
     try {
       // the group's children without its own offset

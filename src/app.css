@@ -2321,3 +2321,7 @@ body:not(.lv-simple) .lvs {
 #svg.gest .fxc1 {
   filter: url(#fxcontentg);
 }
+/* so is the dried-paper texture */
+#svg.gest .fxg {
+  display: none;
+}

@@ -295,15 +295,15 @@ const FX_PRESETS = {
     mod: {
       bg: '#e2c99a',
       land: '#d9bc86',
-      line: '#4a2f14',
-      ink: '#3d2610',
-      lc: '#3d2610',
-      lw: 1.1,
+      line: '#2b1909',
+      ink: '#251507',
+      lc: '#251507',
+      lw: 1.4,
       lab: 'hand',
       wl: 1,
     },
     surface: '#3a2a1b',
-    deco: { compass: 'nautical', compassSize: 1.5, border: 'wave', flourish: 'curl', auto: 'chart' },
+    deco: { compass: 'nautical', compassSize: 1.5, border: 'wave', flourish: 'curl', auto: 'treasure' },
   },
   pirateisle: {
     title: 'ribbon',
@@ -761,7 +761,10 @@ function fxWrap(content, bg, ink, accent, thumb) {
       ov('#d8b57c', `style="mix-blend-mode:multiply" opacity="${fxOp('paper', 0.32)}"`) +
       ov('#000', `filter="url(#fxpaper)" opacity="${fxOp('paper', 0.5)}"`);
   if (fxOn('dried'))
-    sheet += ov('#fff', `filter="url(#fxdried)" style="mix-blend-mode:multiply" opacity="${fxOp('dried', 0.55)}"`);
+    sheet += ov(
+      '#fff',
+      `class="fxg" filter="url(#fxdried)" style="mix-blend-mode:multiply" opacity="${fxOp('dried', 0.55)}"`,
+    );
   if (fxOn('crumple'))
     sheet += ov('#fff', `filter="url(#fxcrumple)" style="mix-blend-mode:multiply" opacity="${fxOp('crumple', 0.6)}"`);
   // the edges of an old sheet have darkened unevenly: more in the corners, in patches along the sides

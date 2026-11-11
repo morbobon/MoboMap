@@ -4,6 +4,7 @@ let LEGEND_AT = [];
 // target: an SVG element to draw into instead of the page (look thumbnails) – no other side effects then
 function render(target) {
   if (!target) LEGEND_AT = [];
+  DECO_KEEP = [];
   const links = window._links;
   // texts the user dragged: S.drag[key] = [dx, dy] in page units; dragG wraps an element so it can be moved
   const dragOf = (k) => (S.drag && S.drag[k]) || [0, 0];
@@ -598,7 +599,7 @@ function render(target) {
   out += fxMap(allPath, ink, ds.accent, landInk);
   // up to here the map body: what the repeated world shows in every copy. What follows exists once.
   const bodyEnd = out.length;
-  out += decoMapTop(ink, ds.accent, landInk);
+  out += decoMapTop(ink, ds.accent);
   // major cities (country views, or focused units in the world view)
   const CL =
     S.map !== 'world'
@@ -1004,6 +1005,7 @@ function render(target) {
       out += dragG(key, lg);
       const [ldx, ldy] = dragOf(key);
       if (!target) LEGEND_AT.push([x - 8 + ldx, top + ldy, x - 8 + lw + ldx, top + list.length * 18 + 12 + ldy]);
+      DECO_KEEP.push([x - 8 + ldx, top + ldy, x - 8 + lw + ldx, top + list.length * 18 + 12 + ldy]);
       return top;
     };
     if (items.length) bottom = box(items, 'legend') - 16;
@@ -1017,6 +1019,17 @@ function render(target) {
     const pick = (cands) => (guard ? readable(cands.filter(isHex), textBgs, 3) : cands.find(isHex) || ink);
     // effects that reach past the text ends move it in from the page edge
     const inward = (h, side) => (h === 'l' ? side : h === 'r' ? -side : 0);
+    // (the drawings the map places by itself keep clear of the title and the subtitle: 72-decor.js)
+    const keep = (key, text, x, a, y0, y1, font, weight, size, lsp, pad) => {
+      const w = textW(text, font, weight, size, lsp),
+        x0 = (a === 'c' ? x - w / 2 : a === 'r' ? x - w : x) - pad,
+        [kx, ky] = dragOf(key);
+      DECO_KEEP.push([x0 + kx, y0 + ky, x0 + w + 2 * pad + kx, y1 + ky]);
+    };
+    if (title) {
+      const x = hx(tp[1]) + inward(tp[1], tex.side);
+      keep('title', t, x, tp[1], ty - ts - tex.up, ty + Math.max(tex.down, ts * 0.3), txFont(tbT.font, ds.head, ds), tbT.weight || 700, ts, ls, tex.side + ts * 0.5); // prettier-ignore
+    }
     if (title)
       out += dragG(
         'title',
@@ -1048,6 +1061,7 @@ function render(target) {
       const sy = sPos === 'under' ? ty + subDy : sPos[0] === 't' ? top : bot;
       const sx =
         hx(sh) + (sh === 'l' ? 2 : 0) + (sPos === 'under' ? inward(sh, tex.side) : 0) + inward(sh, SFX_SIDE[sfx] || 0);
+      keep('sub', sp.titleCaps ? sub.toUpperCase() : sub, sx, sh, sy - subSize - 4, sy + 8, txFont(tbS.font, lf, ds), tbS.weight || 600, subSize, sp.titleCaps ? 3 : 0, 8); // prettier-ignore
       out += dragG(
         'sub',
         subSvg({
@@ -1191,7 +1205,11 @@ function render(target) {
         target,
       }) +
       '</g>';
+  // the drawings the map places by itself, now that the title and the legend are where they are (72-decor.js)
+  const cauto = DECO_CAUTO;
+  out = out.replace(DECO_AUTO_AT, () => decoAuto(ink, landInk));
   out += fxContentTop(ink, ds.accent);
+  if (target) DECO_CAUTO = cauto;
   if (!target && typeof SNAP_GUIDES !== 'undefined' && SNAP_GUIDES) {
     const gcol = ds.accent;
     if (SNAP_GUIDES.x != null)
