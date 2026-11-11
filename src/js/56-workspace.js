@@ -279,18 +279,12 @@ document.addEventListener('keydown', (e) => {
 // called at the end of every page render
 function afterRender() {
   renderLooks();
+  lvMarks();
   scheduleThumbs();
   const di = document.getElementById('dataInfo');
   if (di) {
     const a = attrDef();
     di.textContent = a ? t(a.n) : t('off');
-  }
-  const dsum = document.getElementById('displayInfo');
-  if (dsum) {
-    const on = ['labels', 'showCities', 'showNeighbours', 'relief', 'detail', 'focusHide'].filter(
-      (k) => document.getElementById(k).checked,
-    ).length;
-    dsum.textContent = on + '/6';
   }
   // a transparent hit area behind every draggable, so the gaps between letters grab the text too
   document.querySelectorAll('#svg .drg').forEach((g) => {

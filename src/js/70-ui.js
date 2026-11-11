@@ -112,10 +112,14 @@ function ui() {
   rp.innerHTML =
     `<option value="">${esc(t('add_region'))}</option>` +
     presets.map(([r, n]) => `<option value="${esc(r)}">${esc(n)}</option>`).join('');
-  document.getElementById('langSel').innerHTML = Object.keys(T)
-    .map((l) => `<option value="${l}">${LANGN[l]}</option>`)
-    .join('');
-  document.getElementById('langSel').value = S.lang;
+  // the language: in the top bar and in the Settings window
+  for (const id of ['langSel', 'langSel2']) {
+    const ls = document.getElementById(id);
+    ls.innerHTML = Object.keys(T)
+      .map((l) => `<option value="${l}">${LANGN[l]}</option>`)
+      .join('');
+    ls.value = S.lang;
+  }
   document.getElementById('layouts').innerHTML = LAYOUTS.map(
     (l, i) =>
       (i && LAYOUTS[i - 1].g === l.g ? '' : `<div class="laygrp">${esc(t('lay_g_' + l.g))}</div>`) +
@@ -144,7 +148,7 @@ function ui() {
     `<input type="checkbox" class="on" ${g.off ? '' : 'checked'} title="${esc(t('grp_on_t'))}" onclick="event.stopPropagation()" onchange="setGroupOn(${i},this.checked)">`;
   // a card's drag handle: dropped on another card the group becomes its subgroup (33-group-tree.js)
   const grip = (i) =>
-    `<span class="grip" draggable="true" title="${esc(t('grp_drag_t'))}" ondragstart="event.stopPropagation();document.body.classList.add('grpdrag');event.dataTransfer.setData('text/x-grp','${i}');event.dataTransfer.effectAllowed='move'">⋮⋮</span>`;
+    `<span class="grip" data-lv="adv" draggable="true" title="${esc(t('grp_drag_t'))}" ondragstart="event.stopPropagation();document.body.classList.add('grpdrag');event.dataTransfer.setData('text/x-grp','${i}');event.dataTransfer.effectAllowed='move'">⋮⋮</span>`;
   const drop = (i) =>
     ` ondragover="if(event.dataTransfer.types.includes('text/x-grp')){event.preventDefault();this.classList.add('dropto')}" ondragleave="this.classList.remove('dropto')" ondrop="event.preventDefault();event.stopPropagation();this.classList.remove('dropto');nestGroup(+event.dataTransfer.getData('text/x-grp'),${i})"`;
   const cls = (g) => (g.parent ? ' sub' : '') + (isSuper(g) ? ' super' : '') + (g.off ? ' off' : '');
@@ -159,9 +163,9 @@ function ui() {
   <div class="warn" id="warn${i}" style="${g.bad.length ? 'display:block' : ''}">${g.bad.length ? t('not_recognised') + ': ' + esc(g.bad.join(', ')) : ''}</div>`
   }
   <div class="row" style="margin-top:6px">${cols.map((c) => `<button class="sw sm ${g.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="event.stopPropagation();S.groups[${i}].color='${c}';ui();render()"></button>`).join('')}<input type="color" value="${g.color}" title="${esc(t('custom_colour'))}" style="width:26px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:none" onclick="event.stopPropagation()" oninput="S.groups[${i}].color=this.value;render()"></div>
-  <label class="op" title="${esc(t('grp_opacity_t'))}" onclick="event.stopPropagation()"><span>${esc(t('grp_opacity'))}</span><input type="range" min="0.1" max="1" step="0.05" value="${g.op ?? 1}" oninput="S.groups[${i}].op=+this.value;this.nextElementSibling.textContent=Math.round(this.value*100)+'%';render()"><b>${Math.round((g.op ?? 1) * 100)}%</b></label>
+  <label class="op" data-lv="adv" title="${esc(t('grp_opacity_t'))}" onclick="event.stopPropagation()"><span>${esc(t('grp_opacity'))}</span><input type="range" min="0.1" max="1" step="0.05" value="${g.op ?? 1}" oninput="S.groups[${i}].op=+this.value;this.nextElementSibling.textContent=Math.round(this.value*100)+'%';render()"><b>${Math.round((g.op ?? 1) * 100)}%</b></label>
   <div class="row" style="margin-top:6px">${HLS.map((h) => `<button class="chip sm ${g.hl.has(h.id) ? 'on' : ''}" title="${esc(t('hl_' + h.id + '_t'))}" onclick="event.stopPropagation();toggleHL(${i},'${h.id}')">${esc(t('hl_' + h.id))}</button>`).join('')}</div>
-  <div class="row gopts">${opt(i, 'legend', g.legend !== false, 'grp_legend')}${isSuper(g) ? opt(i, 'sepLegend', g.sepLegend, 'grp_seplegend') : opt(i, 'nameLabel', g.nameLabel, 'grp_namelabel')}</div>
+  <div class="row gopts" data-lv="adv">${opt(i, 'legend', g.legend !== false, 'grp_legend')}${isSuper(g) ? opt(i, 'sepLegend', g.sepLegend, 'grp_seplegend') : opt(i, 'nameLabel', g.nameLabel, 'grp_namelabel')}</div>
  </div>`;
   const compact = (g, i) =>
     `<div class="grp compact${cls(g)}" title="${esc(t('active_group'))}" onclick="activateGroup(${i})"${drop(i)}>${grip(i)}${onBox(g, i)}<span class="dot" style="background:${swatch(g)};border-color:${g.color}"></span><span class="nm">${esc(g.name)}</span><span class="cnt">${areasOf(g).size}</span>${removeBtn(i)}</div>`;
@@ -196,6 +200,7 @@ function ui() {
   decoUI();
   textsUI();
   lockUI();
+  lvMarks();
 }
 function setDS(v) {
   if (typeof PENDING_LINK !== 'undefined' && PENDING_LINK && PENDING_LINK.ds !== v) PENDING_LINK = null;
@@ -811,10 +816,9 @@ function applyUiMode() {
     us.value = uiStyle();
   }
   const b = document.getElementById('uiMode');
-  // light/dark only applies when the UI follows the profile
-  b.style.display = fixed ? 'none' : '';
-  b.textContent = UI_ICONS[m];
-  b.title = t('ui_mode') + ': ' + t('ui_' + m);
+  // light/dark only applies when the UI follows the profile (its row in the Settings window goes with it)
+  b.parentElement.style.display = fixed ? 'none' : '';
+  b.textContent = UI_ICONS[m] + ' ' + t('ui_' + m);
 }
 function cycleUiMode() {
   localStorage.setItem('mobomap.ui', UI_MODES[(UI_MODES.indexOf(uiMode()) + 1) % UI_MODES.length]);

@@ -925,12 +925,6 @@ body.fs #fsExit {
 #dsEdit {
   margin-top: 8px;
 }
-#uiStyle {
-  width: auto;
-  padding: 5px 8px;
-  font-size: 12px;
-}
-
 #panelBtn.on,
 #stripBtn.on {
   background: var(--btn);
@@ -975,9 +969,6 @@ header .btns {
   header #langSel,
   header select.hdr {
     max-width: 130px;
-  }
-  header #uiStyle {
-    max-width: 150px;
   }
 }
 
@@ -1130,7 +1121,8 @@ header h1 .home:hover {
   text-underline-offset: 3px;
 }
 #printDlg,
-#homeDlg {
+#homeDlg,
+#setDlg {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--card);
@@ -1140,7 +1132,8 @@ header h1 .home:hover {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
 #printDlg::backdrop,
-#homeDlg::backdrop {
+#homeDlg::backdrop,
+#setDlg::backdrop {
   background: rgba(0, 0, 0, 0.45);
 }
 /* Export → Print…: paper size, resolution, file */
@@ -1179,7 +1172,8 @@ header h1 .home:hover {
   justify-content: flex-end;
 }
 #printDlg h3,
-#homeDlg h3 {
+#homeDlg h3,
+#setDlg h3 {
   margin: 0 0 6px;
   font-size: 16px;
 }
@@ -1991,4 +1985,138 @@ body.viewer .stage {
 }
 #decoUI + #frameSel {
   margin-top: 8px;
+}
+
+/* ---- Simple / Advanced mode (82-levels.js): Simple hides every control tagged data-lv="adv" or "pro" ---- */
+body.lv-simple [data-lv] {
+  display: none !important;
+}
+[data-lv='pro']:not(details)::after,
+details[data-lv='pro'] > summary::after {
+  content: 'Pro';
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  vertical-align: 1px;
+}
+/* the switch: in the top bar and in the Settings window */
+.lvsw {
+  display: inline-flex;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--btn);
+}
+.lvsw button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.lvsw button.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+/* "Customised": a hidden setting of this section is not at its default */
+.lvc {
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 2px 10px;
+  font-size: 11px;
+  color: var(--mute);
+}
+.lvc::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.lvc span {
+  margin-right: auto;
+}
+body.lv-simple .sec.lv-cust > .lvc {
+  display: flex;
+}
+/* a section with nothing basic in it shows its heading and the marker only */
+body.lv-simple .sec[data-lv].lv-cust {
+  display: block !important;
+}
+body.lv-simple .sec[data-lv].lv-cust > .body {
+  display: none !important;
+}
+body.lv-simple .sec[data-lv].lv-cust > h2 {
+  cursor: default;
+  pointer-events: none;
+}
+body.lv-simple .sec[data-lv].lv-cust > h2 .chev {
+  visibility: hidden;
+}
+/* Settings window */
+#setDlg {
+  width: min(400px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  box-sizing: border-box;
+}
+#setDlg h3 {
+  margin-bottom: 12px;
+}
+#setDlg .setrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+#setDlg .setrow > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#setDlg .setrow select {
+  width: auto;
+  min-width: 0;
+  max-width: 60%;
+}
+#setDlg .note {
+  margin: -4px 0 14px;
+}
+#setDlg .ck {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+#setDlg .setbtns {
+  justify-content: space-between;
+  margin-top: 16px;
+}
+#setDlg .setbtns button {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  body.more-open header .btns > .lvsw {
+    grid-column: 1 / -1;
+    padding: 0;
+  }
+  body.more-open header .btns > .lvsw button {
+    flex: 1;
+    min-height: 38px;
+  }
 }

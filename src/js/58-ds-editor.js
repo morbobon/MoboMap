@@ -152,7 +152,8 @@ function dsEditHl(n) {
   dsEditForm();
   dsEditPreview();
 }
-function dsEditLogo(file) {
+// done: called when the logo is in the draft (the Logo section's own button saves at once, 82-levels.js)
+function dsEditLogo(file, done) {
   if (!file) return;
   readImage(file, (l, img) => {
     // large images are scaled down (profiles live in the browser's limited storage)
@@ -170,6 +171,7 @@ function dsEditLogo(file) {
     DSE.draft.company.logo = Object.assign({}, DSE.draft.company.logo, { src, aspect: l.aspect });
     dsEditForm();
     dsEditPreview();
+    if (done) done();
   });
 }
 let dseRaf = 0;
@@ -177,6 +179,7 @@ function dsEditPreview() {
   if (dseRaf) return;
   dseRaf = requestAnimationFrame(() => {
     dseRaf = 0;
+    if (!DSE.draft) return; // saved or cancelled meanwhile
     const n = normDS(JSON.parse(JSON.stringify(DSE.draft)), 'user');
     if (!DS[n.id]) DSORDER.push(n.id);
     DS[n.id] = n;

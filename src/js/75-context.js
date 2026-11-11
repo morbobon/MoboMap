@@ -6,6 +6,12 @@ function jumpTo(sel) {
   const find = () => (typeof sel === 'function' ? sel() : document.querySelector(sel));
   let el = find();
   if (!el) return;
+  // a control that Simple mode hides: Advanced first (82-levels.js)
+  if (lvHidden(el)) {
+    setLevel('adv');
+    toast(t('lv_switched'));
+    el = find() || el;
+  }
   const tab = el.closest('aside .tab');
   if (tab) {
     if (isPhone()) document.body.classList.add('sheet-open');

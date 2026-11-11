@@ -54,8 +54,6 @@
         >
           ⛶
         </button>
-        <select id="uiStyle" class="hdr" onchange="setUiStyle(this.value)" data-i18n-title="ui_style"></select>
-        <button id="uiMode" class="hdr" onclick="cycleUiMode()"></button>
         <select
           id="langSel"
           onchange="setLang(this.value)"
@@ -73,6 +71,19 @@
             this.value = '';
           "
         />
+        <span class="lvsw" id="lvSwitch" role="group" data-i18n-title="lv_t">
+          <button data-lvset="simple" onclick="setLevel('simple')" data-i18n="lv_simple"></button>
+          <button data-lvset="adv" onclick="setLevel('adv')" data-i18n="lv_adv"></button>
+        </span>
+        <button
+          id="setBtn"
+          class="hdr"
+          onclick="openSettings()"
+          data-i18n-title="set_title"
+          data-i18n-label="set_title"
+        >
+          ⚙
+        </button>
         <button id="moreBtn" class="hdr" onclick="toggleMore(event)" data-i18n-title="more_t">⋯</button>
         <span class="expwrap">
           <button class="exp" id="expBtn" onclick="toggleExportMenu(event)"><span data-i18n="export"></span> ▾</button>
@@ -80,7 +91,7 @@
             <button onclick="exportMap('png')">PNG</button>
             <button onclick="exportMap('jpg')">JPG</button>
             <button onclick="exportMap('pdf')">PDF · A4</button>
-            <button onclick="openPrint()" data-i18n="print_menu"></button>
+            <button onclick="openPrint()" data-i18n="print_menu" data-lv="pro"></button>
           </span>
         </span>
       </div>
@@ -109,13 +120,14 @@
 
               <select
                 id="projSel"
+                data-lv="adv"
                 onchange="
                   S.proj = this.value;
                   ui();
                   render();
                 "
               ></select>
-              <label class="ck" id="repWorldRow" data-i18n-title="rep_world_t"
+              <label class="ck" id="repWorldRow" data-lv="adv" data-i18n-title="rep_world_t"
                 ><input
                   type="checkbox"
                   id="repWorld"
@@ -125,7 +137,7 @@
                   " />
                 <span data-i18n="rep_world"></span
               ></label>
-              <select id="farSel" onchange="setFar(this.value)">
+              <select id="farSel" data-lv="adv" onchange="setFar(this.value)">
                 <option value="inset" data-i18n="far_inset"></option>
                 <option value="show" data-i18n="far_show"></option>
                 <option value="hide" data-i18n="far_hide"></option>
@@ -144,15 +156,15 @@
                 ><input type="checkbox" id="showCities" checked onchange="render()" />
                 <span data-i18n="show_cities"></span
               ></label>
-              <label class="ck"
+              <label class="ck" data-lv="adv"
                 ><input type="checkbox" id="showNeighbours" checked onchange="render()" />
                 <span data-i18n="show_neighbours"></span
               ></label>
 
-              <label class="ck"
+              <label class="ck" data-lv="adv"
                 ><input type="checkbox" id="relief" onchange="render()" /> <span data-i18n="show_relief"></span
               ></label>
-              <label class="ck"
+              <label class="ck" data-lv="adv"
                 ><input
                   type="checkbox"
                   id="focusHide"
@@ -162,19 +174,11 @@
                   " />
                 <span data-i18n="focus_hide"></span
               ></label>
-              <label class="ck" data-i18n-title="autodetail_t"
-                ><input type="checkbox" id="autoDetail" checked onchange="setAutoDetail(this.checked)" />
-                <span data-i18n="autodetail"></span
-              ></label>
-              <label class="ck"
-                ><input type="checkbox" id="homeAsk" checked onchange="setHomeAsk(this.checked)" />
-                <span data-i18n="home_ask"></span
-              ></label>
 
-              <label class="ck"
+              <label class="ck" data-lv="adv"
                 ><input type="checkbox" id="detail" checked onchange="render()" /> <span data-i18n="detail_coast"></span
               ></label>
-              <label class="lvl" data-i18n-title="detail_level_t"
+              <label class="lvl" data-lv="adv" data-i18n-title="detail_level_t"
                 ><span data-i18n="detail_level"></span
                 ><input
                   type="range"
@@ -185,7 +189,7 @@
                   value="0"
                   oninput="setDetailLevel(+this.value)" /><b id="detailLevelV"></b
               ></label>
-              <label class="lvl" data-i18n-title="city_min_t"
+              <label class="lvl" data-lv="adv" data-i18n-title="city_min_t"
                 ><span data-i18n="city_min"></span
                 ><input
                   type="range"
@@ -200,7 +204,7 @@
           </section>
         </div>
         <div class="tab" data-tab="highlight">
-          <section class="sec" data-sec="data">
+          <section class="sec" data-sec="data" data-lv="adv">
             <h2 onclick="toggleSec('data')">
               <span class="chev"></span><span data-i18n="sec_data"></span><span class="sum" id="dataInfo"></span>
             </h2>
@@ -239,7 +243,7 @@
               <div id="groups"></div>
               <div class="row">
                 <button class="chip" onclick="addGroup()"><span data-i18n="new_group"></span></button>
-                <button class="chip" id="addSubBtn" onclick="addSubgroup()" data-i18n-title="add_sub_t">
+                <button class="chip" id="addSubBtn" data-lv="adv" onclick="addSubgroup()" data-i18n-title="add_sub_t">
                   <span data-i18n="add_sub"></span>
                 </button>
                 <button class="chip" onclick="clearGroups()"><span data-i18n="clear_groups"></span></button>
@@ -260,7 +264,7 @@
               <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
             </h2>
             <div class="body">
-              <label class="ck" data-i18n-title="guard_t"
+              <label class="ck" data-lv="adv" data-i18n-title="guard_t"
                 ><input
                   type="checkbox"
                   id="guard"
@@ -272,9 +276,9 @@
                 <span data-i18n="guard"></span
               ></label>
               <div class="grid3" id="styles"></div>
-              <div class="fxcat" data-i18n="fxc_decor"></div>
-              <div id="decoUI"></div>
-              <select id="frameSel" onchange="render()">
+              <div class="fxcat" data-lv="adv" data-i18n="fxc_decor"></div>
+              <div id="decoUI" data-lv="adv"></div>
+              <select id="frameSel" data-lv="adv" onchange="render()">
                 <option value="auto" data-i18n="frame_auto"></option>
                 <option value="on" data-i18n="frame_on"></option>
                 <option value="off" data-i18n="frame_off"></option>
@@ -289,6 +293,7 @@
               <select id="fxPreset" onchange="applyFxPreset(this.value)"></select>
               <select
                 id="fxFrame"
+                data-lv="adv"
                 onchange="
                   S.fx.frame = this.value;
                   S.fx.preset = '';
@@ -296,9 +301,9 @@
                   render();
                 "
               ></select>
-              <div id="fxLight"></div>
-              <div id="fxList"></div>
-              <div class="row">
+              <div id="fxLight" data-lv="adv"></div>
+              <div id="fxList" data-lv="adv"></div>
+              <div class="row" data-lv="adv">
                 <label class="ck"
                   ><span data-i18n="fx_surface"></span>
                   <input
@@ -323,7 +328,7 @@
               <div class="grid4" id="layouts"></div>
             </div>
           </section>
-          <section class="sec" data-sec="areas">
+          <section class="sec" data-sec="areas" data-lv="adv">
             <h2 onclick="toggleSec('areas')"><span class="chev"></span><span data-i18n="sec_areas"></span></h2>
             <div class="body">
               <label class="pgl"
@@ -345,7 +350,7 @@
               <div class="note" id="pgRingNa" data-i18n="pg_r_na" hidden></div>
             </div>
           </section>
-          <section class="sec" data-sec="headfoot">
+          <section class="sec" data-sec="headfoot" data-lv="adv">
             <h2 onclick="toggleSec('headfoot')"><span class="chev"></span><span data-i18n="sec_headfoot"></span></h2>
             <div class="body">
               <label class="ck" data-i18n-title="pg_header_t"
@@ -438,7 +443,7 @@
                 "
                 data-i18n-ph="ph_sub"
               />
-              <div class="row2">
+              <div class="row2" data-lv="adv">
                 <label
                   ><span data-i18n="pos_title_l"></span
                   ><select id="titlePos" onchange="render()">
@@ -462,7 +467,7 @@
                     <option value="br" data-i18n="pos_br"></option></select
                 ></label>
               </div>
-              <div class="row2">
+              <div class="row2" data-lv="adv">
                 <label
                   ><span data-i18n="tfx_l"></span
                   ><select id="titleFx" onchange="setTextFx('title', this.value)"></select
@@ -472,13 +477,13 @@
                   ><select id="subFx" onchange="setTextFx('sub', this.value)"></select
                 ></label>
               </div>
-              <div id="txList"></div>
-              <div class="row">
+              <div id="txList" data-lv="adv"></div>
+              <div class="row" data-lv="adv">
                 <button class="chip" onclick="addText()" data-i18n-title="tx_add_t">
                   + <span data-i18n="tx_add"></span>
                 </button>
               </div>
-              <label class="ck"
+              <label class="ck" data-lv="adv"
                 ><input type="checkbox" id="txTest" onchange="txTest(this.checked)" /> <span data-i18n="tr_test"></span
               ></label>
               <div class="row">
@@ -487,10 +492,6 @@
                 </button>
                 <span class="note" data-i18n="drag_hint"></span>
               </div>
-              <label class="ck"
-                ><input type="checkbox" id="snapCk" checked onchange="setSnap(this.checked)" />
-                <span data-i18n="snap"></span
-              ></label>
             </div>
           </section>
         </div>
@@ -501,7 +502,7 @@
             </h2>
             <div class="body">
               <select id="ds2" onchange="setDS(this.value)" data-i18n-title="sec_ds"></select>
-              <label class="ck" data-i18n-title="ds_colours_t"
+              <label class="ck" data-lv="adv" data-i18n-title="ds_colours_t"
                 ><input
                   type="checkbox"
                   id="dsColours"
@@ -512,8 +513,8 @@
                 <span data-i18n="ds_colours"></span
               ></label>
               <div class="row" id="dsSw"></div>
-              <button class="chip" onclick="dsEditOpen()"><span data-i18n="dse_open"></span></button>
-              <details id="dsEdit">
+              <button class="chip" data-lv="adv" onclick="dsEditOpen()"><span data-i18n="dse_open"></span></button>
+              <details id="dsEdit" data-lv="adv">
                 <summary data-i18n="dse_title"></summary>
                 <div id="dsEditBody"></div>
                 <input
@@ -531,7 +532,7 @@
                   <button class="chip" onclick="dsEditCancel()"><span data-i18n="dse_cancel"></span></button>
                 </div>
               </details>
-              <details id="manage">
+              <details id="manage" data-lv="pro">
                 <summary data-i18n="manage_profiles"></summary>
                 <div class="row">
                   <button class="chip" onclick="document.getElementById('dsFile').click()">
@@ -582,7 +583,22 @@
               <label class="ck"
                 ><input type="checkbox" id="showLogo" checked onchange="render()" /> <span data-i18n="show_logo"></span
               ></label>
-              <label
+              <div class="row">
+                <button class="chip" id="ownLogoBtn" onclick="document.getElementById('ownLogoFile').click()">
+                  <span data-i18n="own_logo"></span>
+                </button>
+                <input
+                  type="file"
+                  id="ownLogoFile"
+                  accept="image/*"
+                  hidden
+                  onchange="
+                    ownLogo(this.files[0]);
+                    this.value = '';
+                  "
+                />
+              </div>
+              <label data-lv="adv"
                 ><span data-i18n="tx_size"></span> <b id="logoSizeV"></b
                 ><input
                   type="range"
@@ -593,8 +609,14 @@
                   value="100"
                   oninput="logoSet('scale', this.value / 100)"
               /></label>
-              <input type="url" id="logoLink" data-i18n-ph="ph_link" oninput="logoSet('link', this.value)" />
-              <p class="note" data-i18n="logo_note"></p>
+              <input
+                type="url"
+                id="logoLink"
+                data-lv="adv"
+                data-i18n-ph="ph_link"
+                oninput="logoSet('link', this.value)"
+              />
+              <p class="note" data-lv="adv" data-i18n="logo_note"></p>
             </div>
           </section>
           <section class="sec" data-sec="partners">
@@ -610,6 +632,7 @@
               <input
                 type="text"
                 id="footerLabel"
+                data-lv="adv"
                 value=""
                 oninput="
                   this.dataset.auto = '0';
@@ -617,8 +640,8 @@
                 "
                 data-i18n-ph="ph_footer"
               />
-              <div id="partners"></div>
-              <details>
+              <div id="partners" data-lv="adv"></div>
+              <details data-lv="adv">
                 <summary data-i18n="add_partner"></summary>
                 <input type="text" id="pName" data-i18n-ph="ph_name" />
                 <input type="url" id="pLink" data-i18n-ph="ph_link" />
@@ -641,10 +664,10 @@
                 </div>
                 <p class="note" data-i18n="partner_note"></p>
               </details>
-              <label class="ck" data-i18n-title="pb_bd_t"
+              <label class="ck" data-lv="adv" data-i18n-title="pb_bd_t"
                 ><input type="checkbox" id="pbBd" onchange="pbSet('bd', this.checked)" /> <span data-i18n="pb_bd"></span
               ></label>
-              <div id="pbBorder" hidden>
+              <div id="pbBorder" data-lv="adv" hidden>
                 <div class="row2">
                   <label
                     ><span data-i18n="dc_thick"></span> <b id="pbWV"></b
@@ -669,7 +692,7 @@
                   /></label>
                 </div>
               </div>
-              <div class="row2">
+              <div class="row2" data-lv="adv">
                 <label class="wide"
                   ><span data-i18n="pb_size"></span> <b id="pbSizeV"></b
                   ><input
@@ -682,8 +705,10 @@
                     oninput="pbSet('scale', this.value / 100)"
                 /></label>
               </div>
-              <button class="chip on" id="pbBack" onclick="pbBack()" hidden><span data-i18n="pt_back"></span></button>
-              <p class="note" data-i18n="pb_note"></p>
+              <button class="chip on" id="pbBack" data-lv="adv" onclick="pbBack()" hidden>
+                <span data-i18n="pt_back"></span>
+              </button>
+              <p class="note" data-lv="adv" data-i18n="pb_note"></p>
             </div>
           </section>
         </div>
@@ -708,7 +733,9 @@
           <button id="psBtn" class="chip" onclick="psPop()"></button>
           <div class="lockgrp">
             <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
-            <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
+            <button id="lockMore" class="chip" data-lv="adv" onclick="lockPop()" data-i18n-title="lock_opts_t">
+              ▾
+            </button>
           </div>
           <div id="psPop" hidden>
             <div class="row"><b data-i18n="ps_l"></b> <span class="note" id="psVal"></span></div>
@@ -815,6 +842,43 @@
         <button class="chip" onclick="homeSave('cancel')" data-i18n="home_cancel"></button>
       </div>
       <label class="ck"><input type="checkbox" id="homeNoAsk" /> <span data-i18n="home_noask"></span></label>
+    </dialog>
+    <dialog id="setDlg">
+      <h3 data-i18n="set_title"></h3>
+      <div class="setrow">
+        <span data-i18n="set_mode"></span>
+        <span class="lvsw" role="group">
+          <button data-lvset="simple" onclick="setLevel('simple')" data-i18n="lv_simple"></button>
+          <button data-lvset="adv" onclick="setLevel('adv')" data-i18n="lv_adv"></button>
+        </span>
+      </div>
+      <p class="note" data-i18n="set_mode_note"></p>
+      <label class="setrow"
+        ><span data-i18n="set_lang"></span
+        ><select id="langSel2" onchange="setLang(this.value)"></select
+      ></label>
+      <label class="setrow"
+        ><span data-i18n="ui_style"></span
+        ><select id="uiStyle" onchange="setUiStyle(this.value)"></select
+      ></label>
+      <div class="setrow">
+        <span data-i18n="ui_mode"></span><button id="uiMode" class="chip" onclick="cycleUiMode()"></button>
+      </div>
+      <label class="ck"
+        ><input type="checkbox" id="snapCk" checked onchange="setSnap(this.checked)" /> <span data-i18n="snap"></span
+      ></label>
+      <label class="ck" data-i18n-title="autodetail_t"
+        ><input type="checkbox" id="autoDetail" checked onchange="setAutoDetail(this.checked)" />
+        <span data-i18n="autodetail"></span
+      ></label>
+      <label class="ck"
+        ><input type="checkbox" id="homeAsk" checked onchange="setHomeAsk(this.checked)" />
+        <span data-i18n="home_ask"></span
+      ></label>
+      <div class="row setbtns">
+        <button class="chip" onclick="settingsReset()" data-i18n="lbl_reset"></button>
+        <button class="exp" onclick="closeSettings()" data-i18n="set_close"></button>
+      </div>
     </dialog>
     <script>
       /*__JS__*/
