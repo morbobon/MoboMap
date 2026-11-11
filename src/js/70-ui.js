@@ -188,6 +188,7 @@ function ui() {
   });
   document.getElementById('addSubBtn').disabled = !S.groups.length;
   partnersUI();
+  logoUI();
   textsUI();
   lockUI();
 }
@@ -825,7 +826,8 @@ window.addEventListener('pointermove', (e) => {
 });
 window.addEventListener('pointerup', (e) => {
   if (!textDrag) return;
-  // a partner logo snaps into a footer row / slot (Ctrl or snapping off: stays where dropped)
+  // a partner logo snaps into a footer row / slot when dropped near the footer (not with Ctrl or snapping off);
+  // dropped anywhere else it becomes a free logo
   if (textDrag.moved && textDrag.key.startsWith('pt:'))
     partnerDrop(textDrag.key, textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
   // a text item keeps the place it was dropped at (page- or map-anchored)
@@ -853,6 +855,9 @@ svg.addEventListener('dblclick', (e) => {
   const g = e.target.closest && e.target.closest('.drg');
   if (lockOn('edit')) return;
   if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
+  // a free partner logo goes back to the footer
+  const pi = g ? S.partners.findIndex((p) => 'pt:' + p.id === g.dataset.drag && partnerFree(p)) : -1;
+  if (pi >= 0) return partnerBack(pi);
   if (!g || !S.drag || !S.drag[g.dataset.drag]) return;
   const d = Object.assign({}, S.drag);
   delete d[g.dataset.drag];

@@ -116,6 +116,11 @@ function shareParams() {
   if (tx !== txParam(d)) q.set('tx', tx);
   const lk = lockParam(p.lock);
   if (lk) q.set('lk', lk);
+  // the brand logo: its size in % and its own link
+  const lgo = logoClean(p.logo),
+    lgd = logoClean(d.logo);
+  if (lgo.scale !== lgd.scale) q.set('lg', Math.round(lgo.scale * 100));
+  if (lgo.link !== lgd.link) q.set('ll', lgo.link);
   const gs = p.groups.map((g, i) => {
     const f = [
       String(g.color).replace('#', ''),
@@ -160,6 +165,8 @@ function projectFromUrl(search) {
   const known = [
     'tx',
     'lk',
+    'lg',
+    'll',
     'c',
     'f',
     'st',
@@ -314,6 +321,11 @@ function projectFromUrl(search) {
   }
   if (q.has('tx')) txFromParam(g('tx'), p);
   if (q.has('lk')) p.lock = lockFromParam(g('lk'));
+  if (q.has('lg') || q.has('ll'))
+    p.logo = logoClean({
+      scale: q.has('lg') ? +g('lg') / 100 : (p.logo || {}).scale,
+      link: q.has('ll') ? g('ll') : (p.logo || {}).link,
+    });
   if (q.has('g'))
     p.groups = g('g')
       ? g('g')

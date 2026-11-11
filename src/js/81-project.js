@@ -56,6 +56,7 @@ function projectState() {
     subPos: document.getElementById('subPos').value,
     ...txOut(),
     ...lockOut(),
+    ...logoOut(),
     footerLabel: document.getElementById('footerLabel').value,
     partners: S.partners,
     footer: footerOpts(),
@@ -175,6 +176,7 @@ function loadProject(p, quiet, noDraw) {
   orderGroups();
   txLoad(p);
   S.lock = lockClean(p.lock);
+  S.logo = logoClean(p.logo);
   S.partners = (p.partners || D.partners).map((q) => ({
     name: q.name || '',
     link: q.link || '',
@@ -183,6 +185,8 @@ function loadProject(p, quiet, noDraw) {
     ...(q.hidden ? { hidden: true } : {}),
     ...(q.row ? { row: +q.row || 0 } : {}),
     ...(q.scale && +q.scale !== 1 ? { scale: +q.scale } : {}),
+    // a free logo: its centre as fractions of the page (74-partners.js)
+    ...(Array.isArray(q.at) && q.at.length === 2 && q.at.every(Number.isFinite) ? { at: [q.at[0], q.at[1]] } : {}),
   }));
   S.footer = Object.assign({}, FOOTER_DEFAULT, p.footer || {});
   if (p.partnerOrder) applyPartnerOrder(p.partnerOrder);

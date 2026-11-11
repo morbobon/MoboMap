@@ -55,10 +55,8 @@ function pdfLinks(pdf, x0, y0, r) {
     const [ax, ay] = fxToArt(x, y);
     pdf.link(x0 + ax * r, y0 + ay * r, w * FXL.s * r, h * FXL.s * r, { url });
   };
+  // the brand logo's, the partners' and the texts' links, where they are drawn (60-render.js)
   for (const l of window._links || []) lk(l.x, l.y, l.w, l.h, l.url);
-  const D = DS[S.ds];
-  const lo = (S.drag && S.drag.logo) || [0, 0];
-  if (D.company.link) lk(W - PAD.l - 240 + lo[0], 30 + lo[1], 260, 70, D.company.link);
 }
 async function exportMap(fmt) {
   toast(t('ts_generating') + ' ' + fmt.toUpperCase() + ' …');

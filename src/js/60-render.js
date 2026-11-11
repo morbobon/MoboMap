@@ -960,6 +960,12 @@ function render(target) {
     }
   }
   out += textItemsSvg({ ds, ink, bg, dark, guard, textBgs, hcol, Lt, dragG });
+  // the logo's own size on this map (S.logo.scale): it grows from its top right corner, where it meets the margins
+  const logoS = logoScale(),
+    lax = W - PAD.l + 12;
+  const logoSized = (inner) =>
+    logoS === 1 ? inner : `<g transform="translate(${lax} 46) scale(${logoS}) translate(${-lax} -46)">${inner}</g>`;
+  let logoBox = null; // [x, y, w, h] as drawn at size 1
   if (document.getElementById('showLogo').checked) {
     const L = D.company.logo;
     if (L.src) {
@@ -978,28 +984,52 @@ function render(target) {
           textBgs
             .filter(isHex)
             .some((b) => contrast('#ffffff', b) < 4.5 || contrast(ds.headingOnDark || ds.accent, b) < 3));
-      if (!box)
+      if (!box) {
         out += dragG(
           'logo',
-          `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`,
+          logoSized(
+            `<image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="46" width="${lw}" height="${lh.toFixed(1)}"/>`,
+          ),
         );
-      else
+        logoBox = [lax - lw, 46, lw, lh];
+      } else {
         out += dragG(
           'logo',
-          `<rect x="${W - PAD.l + 12 - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`,
+          logoSized(
+            `<rect x="${W - PAD.l + 12 - lw - 22}" y="38" width="${lw + 44}" height="${(lh + 30).toFixed(1)}" fill="${L.boxColor}"/><image href="${L.src}" x="${W - PAD.l + 12 - lw}" y="53" width="${lw}" height="${lh.toFixed(1)}"/>`,
+          ),
         );
+        logoBox = [lax - lw - 22, 38, lw + 44, lh + 30];
+      }
     } else {
       const txt = loc(L.text) || loc(D.company.name);
-      if (txt)
+      if (txt) {
         out += dragG(
           'logo',
-          `<text x="${W - PAD.l + 12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - PAD.l + 12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`,
+          logoSized(
+            `<text x="${W - PAD.l + 12}" y="72" text-anchor="end" font-family="'${ds.head}'" font-weight="700" font-size="20" fill="${ink}">${esc(txt)}</text><text x="${W - PAD.l + 12}" y="90" text-anchor="end" font-family="'${lf}'" font-size="10" letter-spacing="2" fill="${ink}" opacity=".7">${esc(loc(L.sub))}</text>`,
+          ),
         );
+        const tw = textW(txt, ds.head, 700, 20);
+        logoBox = [lax - tw, 52, tw, 42];
+      }
     }
   }
   out += '</g>';
   // footer with partner logos
   window._links = [];
+  // the logo's link (its own, else the profile's) is clickable in the PDF export, as the partners' links are
+  const logoUrl = txLink(S.logo.link) || D.company.link;
+  if (logoBox && logoUrl) {
+    const [dx, dy] = dragOf('logo');
+    window._links.push({
+      x: lax + (logoBox[0] - lax) * logoS + dx,
+      y: 46 + (logoBox[1] - 46) * logoS + dy,
+      w: logoBox[2] * logoS,
+      h: logoBox[3] * logoS,
+      url: logoUrl,
+    });
+  }
   if (FOOT) {
     const fy = H - FOOT;
     if (S.zoom.k !== 1 || S.zoom.x || S.zoom.y)
@@ -1032,7 +1062,24 @@ function render(target) {
       target,
     });
     out += '</g>';
-  }
+  } else if (partnersLoose())
+    // every partner shown is a free logo: no footer, the logos where they were put
+    out +=
+      '<g pointer-events="none">' +
+      partnersSvg({
+        fy: H - footerBand(),
+        ink,
+        dark,
+        bg,
+        lf,
+        head: ds.head,
+        label: '',
+        tOp,
+        dragOf,
+        links: window._links,
+        target,
+      }) +
+      '</g>';
   out += fxContentTop(ink, ds.accent);
   if (!target && typeof SNAP_GUIDES !== 'undefined' && SNAP_GUIDES) {
     const gcol = ds.accent;

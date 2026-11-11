@@ -302,7 +302,9 @@ function afterRender() {
     }
   });
   txAfterRender();
-  if (HIST.restoring || (typeof textDrag !== 'undefined' && textDrag)) return;
+  piPlace(); // the resize handle follows its item (71-page-items.js)
+  // a drag in progress (an item, or its resize handle) is one undo step, taken when it ends
+  if (HIST.restoring || (typeof textDrag !== 'undefined' && textDrag) || PI.drag) return;
   clearTimeout(HIST.timer);
   HIST.timer = setTimeout(
     () => {

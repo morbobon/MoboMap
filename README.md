@@ -35,8 +35,9 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
   Statistics use fixed classes with sequential colour ramps (red = burden, blue = development), a grey "No data" class and a source line with the data year in the legend.
 - **Terrain relief** – elevation bands and contours from ETOPO1 (0.25°, low detail): hypsometric tints in the topographic style, or subtle shading on top of any style (Display → Terrain relief); sea depths too.
 - **Projections**: Miller (default for the world), Local (Lambert azimuthal equal-area, default for countries), Robinson, Equal Earth, Natural Earth, Mollweide, Winkel Tripel, Mercator, Plate carrée.
-- **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos (1–4 rows, order and rows by dragging in the list or right on the map – it snaps into a row and slot, Ctrl places it freely – a visibility toggle per partner for this map, and auto-scaling so many logos stay inside a configurable side margin), legend. **Automatic title/subtitle** from the focus, the selection and the "Colour by" attribute; title and subtitle can each be placed top/bottom × left/centre/right.
-- **Export** PNG / JPG (3×) and PDF (A4, clickable partner links). **Projects** save/open as `.mobomap.json`.
+- **Layouts** (landscape, portrait/A4, square, 16:9), footer with partner logos (1–4 rows, order and rows by dragging in the list or right on the map – dropped near the footer a logo snaps into a row and slot, dropped anywhere else on the page it stays there as a free logo and the others close the gap – a visibility toggle per partner for this map, and auto-scaling so many logos stay inside a configurable side margin), legend. **Automatic title/subtitle** from the focus, the selection and the "Colour by" attribute; title and subtitle can each be placed top/bottom × left/centre/right.
+- **Page items** – the brand logo, the partner logos and the texts are moved and sized the same way: drag one to move it, **scroll over it** or drag the **handle on its corner** (shown on the hovered item, or the tapped one on a touch screen) to resize it; the fields in the panel follow. The brand logo has its own size and link per map (Brand → Logo; `lg=`, `ll=` in links); a free partner logo goes back to the footer by dropping it there, a double-click, the context menu or ⤓ in the list. Not on a locked map.
+- **Export** PNG / JPG (3×) and PDF (A4, clickable logo, partner and text links). **Projects** save/open as `.mobomap.json`.
 - **UI in 11 languages** – English (default), Danish, German, French, Spanish, Swedish, Norwegian, Finnish, Dutch, Italian, Turkish (country and region names too) – and **light/dark mode** that follows the operating system, with a switch in the top bar (auto → light → dark).
 - **10 design systems** built in – Aurora (dark), Nordic minimal (used by the start project), Sunset, Ocean, Mono / brutalist, Pastel, Tech / dark, Corporate blue, Green and a template – chosen in the top bar.
 
@@ -193,6 +194,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   56-workspace               tabs, export menu, looks strip with thumbnails, undo/redo
   60-render                  render(): builds the SVG
   70-ui                      side panel, focus/drill-down, groups, map events
+  71-page-items              page items: resize by wheel or corner handle (logo, partner logos, texts), the brand logo's size and link
   76-texts                   text items: the list, placing (page / map), drawing, link parameter
   77-locks                   map locks and viewer mode, the lock button, two-finger double tap, page scale
   78-triggers                visibility rules of texts: triggers, transitions, ends, steps, links

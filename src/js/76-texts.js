@@ -314,8 +314,8 @@ function delText(key) {
   textsUI();
   render();
 }
-// rebuild: the card changes with the value (anchor, auto colour …)
-function txSet(key, prop, val, rebuild) {
+// rebuild: the card changes with the value (anchor, auto colour …); quiet: the caller draws
+function txSet(key, prop, val, rebuild, quiet) {
   const it = txOf(key);
   if (!it) return;
   if (prop === 'size' || prop === 'weight') val = Math.max(0, +val || 0);
@@ -330,8 +330,21 @@ function txSet(key, prop, val, rebuild) {
     if (n) n.textContent = txName(key);
   }
   if (rebuild) textsUI();
-  render();
+  if (!quiet) render();
 }
+// a text's size on the map: the wheel over it, or its corner handle (71-page-items.js); the card's field follows
+pageItem({
+  has: (key) => (txBuilt(key) || key.startsWith('tx:')) && !!txOf(key),
+  get: (key) => +txOf(key).size || (key === 'title' ? Math.round(W * 0.038) : key === 'sub' ? 14 : 28),
+  set: (key, v) => txSet(key, 'size', v, false, true),
+  lo: 6,
+  hi: 400,
+  step: 1,
+  sync: (key) => {
+    const f = document.querySelector(`#txList details[data-key="${key}"] .txsz`);
+    if (f && f !== document.activeElement) f.value = txOf(key).size || '';
+  },
+});
 function txName(key) {
   if (txBuilt(key)) return t(key === 'title' ? 'ph_title' : 'ph_sub');
   return (txOf(key).text || '').split('\n')[0].slice(0, 30) || t('tx_new');
@@ -383,7 +396,7 @@ function txCard(key, open) {
   h += `<div class="row2">${lab('tx_font', sel('font', fonts, it.font))}${lab('tx_weight', sel('weight', weights, it.weight || (built ? 0 : 700)))}</div>`;
   h += `<div class="row2">${lab(
     'tx_size',
-    `<input type="number" min="6" max="400" step="1" value="${it.size || ''}" placeholder="${esc(t('tx_auto'))}" oninput="${set('size', 'this.value')}"/>`,
+    `<input type="number" class="txsz" min="6" max="400" step="1" value="${it.size || ''}" placeholder="${esc(t('tx_auto'))}" oninput="${set('size', 'this.value')}"/>`,
   )}${lab(
     'tx_colour',
     `<span class="row txcol"><input type="color" value="${it.color || '#222222'}" oninput="${set('color', 'this.value')};this.nextElementSibling.classList.remove('on')"/><button class="chip sm${it.color ? '' : ' on'}" onclick="${set('color', "''", true)}">${esc(t('tx_auto'))}</button></span>`,

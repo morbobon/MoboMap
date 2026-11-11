@@ -1078,6 +1078,38 @@ body.no-strip .look .lname {
 #wrap.dragging * {
   cursor: grabbing !important;
 }
+/* the resize handle on the corner of the hovered or tapped page item (71-page-items.js) */
+#pih {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  box-sizing: border-box;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--accent2);
+  box-shadow: 0 1px 4px #0006;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+#pih.bl {
+  cursor: nesw-resize;
+}
+#pih[hidden] {
+  display: none;
+}
+@media (pointer: coarse) {
+  #pih {
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+  }
+}
+#wrap.resizing,
+#wrap.resizing * {
+  cursor: nwse-resize !important;
+}
 
 .about {
   margin: 18px 4px 6px;

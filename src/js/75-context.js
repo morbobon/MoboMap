@@ -113,6 +113,7 @@ function ctxItems(target, pt) {
           document.querySelector(secOf('footer')),
       ),
     );
+    if (p && partnerFree(p)) add(t('pt_back'), () => partnerBack(S.partners.indexOf(p)));
   }
   if (key && S.drag && S.drag[key])
     add(t('ctx_reset_one'), () => {
