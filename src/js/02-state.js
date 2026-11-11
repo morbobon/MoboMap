@@ -33,6 +33,8 @@ const S = {
   groups: [],
   active: 0,
   partners: [],
+  texts: [], // custom text items (76-texts.js)
+  tb: { title: {}, sub: {} }, // the title's and subtitle's own font, size, colour … (76-texts.js)
   visited: new Set(), // maps opened this session (example selection only on first visit)
 };
 // off: hidden from the map (kept in the panel, projects and links)

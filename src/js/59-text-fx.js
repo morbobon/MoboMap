@@ -137,6 +137,7 @@ const r1 = (n) => (+n).toFixed(1);
 // o: { fx, text, x, y, anchor, size, font, weight, ls, fill, halo, bg, dark, ds, pick, Lt }
 function titleSvg(o) {
   const { fx, text, x, y, anchor, size: s, font, weight, ls } = o;
+  const u = o.uid || ''; // makes the effect's ids unique (text items)
   const T = (attrs, dx = 0, dy = 0) =>
     `<text x="${r1(x + dx)}" y="${r1(y + dy)}" text-anchor="${anchor}" font-family="'${font}'" font-weight="${weight}" font-size="${s}" letter-spacing="${ls}" ${attrs}>${esc(text)}</text>`;
   const plain = (fill = o.fill, halo = o.halo) => T(`fill="${fill}" ${halo || ''}`);
@@ -155,7 +156,7 @@ function titleSvg(o) {
   const box = `x="-30%" y="-60%" width="160%" height="220%"`;
   switch (fx) {
     case 'shadow':
-      return `<filter id="tfxShadow" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.05)}"/><feOffset dx="${r1(sx * s * 0.07)}" dy="${r1(sy * s * 0.07)}" result="o"/><feFlood flood-color="#000" flood-opacity="${o.dark ? 0.75 : 0.38}"/><feComposite in2="o" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxShadow)">${plain()}</g>`;
+      return `<filter id="tfxShadow${u}" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.05)}"/><feOffset dx="${r1(sx * s * 0.07)}" dy="${r1(sy * s * 0.07)}" result="o"/><feFlood flood-color="#000" flood-opacity="${o.dark ? 0.75 : 0.38}"/><feComposite in2="o" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxShadow${u})">${plain()}</g>`;
     case 'long': {
       const n = Math.round(s * 0.45);
       const k = Math.hypot(sx, sy) || 1;
@@ -184,18 +185,18 @@ function titleSvg(o) {
         plain()
       );
     case 'glow':
-      return `<filter id="tfxGlow" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.14)}"/><feComponentTransfer result="b"><feFuncA type="linear" slope="1.6"/></feComponentTransfer><feFlood flood-color="${accent}" flood-opacity=".85"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxGlow)">${plain()}</g>`;
+      return `<filter id="tfxGlow${u}" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.14)}"/><feComponentTransfer result="b"><feFuncA type="linear" slope="1.6"/></feComponentTransfer><feFlood flood-color="${accent}" flood-opacity=".85"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxGlow${u})">${plain()}</g>`;
     case 'neon': {
       // the tube: a pale core on dark pages; on light pages the (readable) colour itself
       const nc = o.dark ? ds.accent || accent : accent;
       const core = o.dark ? mix(nc, '#ffffff', 0.6) : nc;
-      return `<filter id="tfxNeon" ${box}><feGaussianBlur in="SourceGraphic" stdDeviation="${r1(s * 0.05)}" result="a"/><feGaussianBlur in="SourceGraphic" stdDeviation="${r1(s * 0.18)}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="a"/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxNeon)">${T(`fill="${core}" stroke="${nc}" stroke-width="${r1(Math.max(1, s * 0.025))}" paint-order="stroke"`)}</g>`;
+      return `<filter id="tfxNeon${u}" ${box}><feGaussianBlur in="SourceGraphic" stdDeviation="${r1(s * 0.05)}" result="a"/><feGaussianBlur in="SourceGraphic" stdDeviation="${r1(s * 0.18)}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="a"/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxNeon${u})">${T(`fill="${core}" stroke="${nc}" stroke-width="${r1(Math.max(1, s * 0.025))}" paint-order="stroke"`)}</g>`;
     }
     case 'foil':
-      return `<linearGradient id="tfxFoil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6a1f"/><stop offset=".42" stop-color="#f7e7a1"/><stop offset=".52" stop-color="#c9a227"/><stop offset=".7" stop-color="#fff1bd"/><stop offset="1" stop-color="#7a5a14"/></linearGradient><filter id="tfxFoilS" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.03)}"/><feOffset dx="${r1(sx * s * 0.04)}" dy="${r1(sy * s * 0.04)}" result="o"/><feFlood flood-color="#000" flood-opacity=".45"/><feComposite in2="o" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxFoilS)">${T(`fill="url(#tfxFoil)" stroke="#5c430e" stroke-width=".6"`)}</g>`;
+      return `<linearGradient id="tfxFoil${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6a1f"/><stop offset=".42" stop-color="#f7e7a1"/><stop offset=".52" stop-color="#c9a227"/><stop offset=".7" stop-color="#fff1bd"/><stop offset="1" stop-color="#7a5a14"/></linearGradient><filter id="tfxFoilS${u}" ${box}><feGaussianBlur in="SourceAlpha" stdDeviation="${r1(s * 0.03)}"/><feOffset dx="${r1(sx * s * 0.04)}" dy="${r1(sy * s * 0.04)}" result="o"/><feFlood flood-color="#000" flood-opacity=".45"/><feComposite in2="o" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><g filter="url(#tfxFoilS${u})">${T(`fill="url(#tfxFoil${u})" stroke="#5c430e" stroke-width=".6"`)}</g>`;
     case 'gradient': {
       const c2 = o.pick([ds.accent, ds.accent2, ds.primary].filter((c) => c !== o.fill));
-      return `<linearGradient id="tfxGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${o.fill}"/><stop offset="1" stop-color="${c2}"/></linearGradient>${T(`fill="url(#tfxGrad)" ${o.halo || ''}`)}`;
+      return `<linearGradient id="tfxGrad${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${o.fill}"/><stop offset="1" stop-color="${c2}"/></linearGradient>${T(`fill="url(#tfxGrad${u})" ${o.halo || ''}`)}`;
     }
     case 'stamp': {
       const sc = o.pick([ds.accent2, ds.accent, ds.primary, o.fill]);
@@ -204,7 +205,7 @@ function titleSvg(o) {
         by = capTop - p,
         bw = w + p * 2,
         bh = s * 0.92 + p * 2;
-      return `<filter id="tfxStamp" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.9" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in" result="e"/><feDisplacementMap in="e" in2="n" scale="${r1(Math.max(1.5, s * 0.05))}"/></filter><g filter="url(#tfxStamp)" transform="rotate(-3 ${r1(cx)} ${r1(y - s * 0.3)})" opacity=".9"><rect x="${r1(bx)}" y="${r1(by)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.1)}" fill="none" stroke="${sc}" stroke-width="${r1(s * 0.07)}"/><rect x="${r1(bx + s * 0.13)}" y="${r1(by + s * 0.13)}" width="${r1(bw - s * 0.26)}" height="${r1(bh - s * 0.26)}" rx="${r1(s * 0.05)}" fill="none" stroke="${sc}" stroke-width="${r1(s * 0.025)}"/>${T(`fill="${sc}"`)}</g>`;
+      return `<filter id="tfxStamp${u}" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.4 0 0 0 1.9" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in" result="e"/><feDisplacementMap in="e" in2="n" scale="${r1(Math.max(1.5, s * 0.05))}"/></filter><g filter="url(#tfxStamp${u})" transform="rotate(-3 ${r1(cx)} ${r1(y - s * 0.3)})" opacity=".9"><rect x="${r1(bx)}" y="${r1(by)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.1)}" fill="none" stroke="${sc}" stroke-width="${r1(s * 0.07)}"/><rect x="${r1(bx + s * 0.13)}" y="${r1(by + s * 0.13)}" width="${r1(bw - s * 0.26)}" height="${r1(bh - s * 0.26)}" rx="${r1(s * 0.05)}" fill="none" stroke="${sc}" stroke-width="${r1(s * 0.025)}"/>${T(`fill="${sc}"`)}</g>`;
     }
     case 'marker': {
       const mc = ds.accent || accent;
@@ -275,7 +276,7 @@ function titleSvg(o) {
         bw = w + px * 2,
         bh = s * 0.92 + py * 2;
       const sr = s * 0.055;
-      let g = `<linearGradient id="tfxBrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0dfa8"/><stop offset=".45" stop-color="#c49f52"/><stop offset=".55" stop-color="#b48f43"/><stop offset="1" stop-color="#e2c77d"/></linearGradient><rect x="${r1(bx + 2)}" y="${r1(by + 3)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.12)}" fill="#000" fill-opacity=".25"/><rect x="${r1(bx)}" y="${r1(by)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.12)}" fill="url(#tfxBrass)" stroke="#6b4f1f" stroke-width="1.2"/><rect x="${r1(bx + 4)}" y="${r1(by + 4)}" width="${r1(bw - 8)}" height="${r1(bh - 8)}" rx="${r1(s * 0.08)}" fill="none" stroke="#fff6d8" stroke-opacity=".6"/>`;
+      let g = `<linearGradient id="tfxBrass${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0dfa8"/><stop offset=".45" stop-color="#c49f52"/><stop offset=".55" stop-color="#b48f43"/><stop offset="1" stop-color="#e2c77d"/></linearGradient><rect x="${r1(bx + 2)}" y="${r1(by + 3)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.12)}" fill="#000" fill-opacity=".25"/><rect x="${r1(bx)}" y="${r1(by)}" width="${r1(bw)}" height="${r1(bh)}" rx="${r1(s * 0.12)}" fill="url(#tfxBrass${u})" stroke="#6b4f1f" stroke-width="1.2"/><rect x="${r1(bx + 4)}" y="${r1(by + 4)}" width="${r1(bw - 8)}" height="${r1(bh - 8)}" rx="${r1(s * 0.08)}" fill="none" stroke="#fff6d8" stroke-opacity=".6"/>`;
       for (const [qx, qy] of [
         [bx + s * 0.18, by + s * 0.18],
         [bx + bw - s * 0.18, by + s * 0.18],

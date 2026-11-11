@@ -188,6 +188,7 @@ function ui() {
   });
   document.getElementById('addSubBtn').disabled = !S.groups.length;
   partnersUI();
+  textsUI();
 }
 function setDS(v) {
   if (typeof PENDING_LINK !== 'undefined' && PENDING_LINK && PENDING_LINK.ds !== v) PENDING_LINK = null;
@@ -792,6 +793,11 @@ window.addEventListener('pointerup', (e) => {
   // a partner logo snaps into a footer row / slot (Ctrl or snapping off: stays where dropped)
   if (textDrag.moved && textDrag.key.startsWith('pt:'))
     partnerDrop(textDrag.key, textDrag.box, e.ctrlKey || e.metaKey || !snapOn()) && zoomChanged();
+  // a text item keeps the place it was dropped at (page- or map-anchored)
+  if (textDrag.moved && textDrag.key.startsWith('tx:')) {
+    txDrop(textDrag.key);
+    zoomChanged();
+  }
   if (SNAP_GUIDES) {
     SNAP_GUIDES = null;
     zoomChanged();
@@ -810,6 +816,7 @@ window.addEventListener('pointerup', (e) => {
 });
 svg.addEventListener('dblclick', (e) => {
   const g = e.target.closest && e.target.closest('.drg');
+  if (g && g.dataset.drag.startsWith('tx:')) return txEdit(g.dataset.drag);
   if (!g || !S.drag || !S.drag[g.dataset.drag]) return;
   const d = Object.assign({}, S.drag);
   delete d[g.dataset.drag];

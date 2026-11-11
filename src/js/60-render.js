@@ -793,12 +793,16 @@ function render(target) {
     document.getElementById('title').value = a.title;
     document.getElementById('sub').value = a.sub;
   }
-  const title = document.getElementById('title').value,
-    sub = document.getElementById('sub').value;
+  // the title and the subtitle are text items too: S.tb holds their own font, size, weight, colour and "hide"
+  const tbT = S.tb.title,
+    tbS = S.tb.sub;
+  const title = tbT.hide ? '' : document.getElementById('title').value,
+    sub = tbS.hide ? '' : document.getElementById('sub').value;
   const showText = document.getElementById('showText').checked;
   let hcol = sp.bg ? sp.heading || ink0 : dark ? ds.headingOnDark : ds.heading;
   if (guard) hcol = readable([hcol, ds.heading, ds.headingOnDark, ds.accent, ds.primary, ink0, ink], textBgs, 3);
-  const ts = Math.round(W * 0.038);
+  const ts = +tbT.size || Math.round(W * 0.038),
+    subSize = +tbS.size || 14;
   let tp = document.getElementById('titlePos').value;
   if (tp === 'auto') tp = 't' + (sp.titleAlign || 'left')[0];
   let sPos = document.getElementById('subPos').value;
@@ -813,7 +817,7 @@ function render(target) {
   const Lt = fxLight();
   const tex = title ? titleFxExtent(tfx, ts, Lt) : { up: 0, down: 0, side: 0, bot: 0 };
   // subtitle under the title: its usual 24 below the baseline, or clear of the decoration
-  const subDy = tex.down ? Math.max(24, tex.bot + 18) : 24;
+  const subDy = (tex.down ? Math.max(24, tex.bot + 18) : 24) + Math.max(0, subSize - 14);
   const ty = tp[0] === 't' ? top + tex.up * 0.5 : sPos === 'under' && sub ? bot - subDy : bot - tex.down;
   const textTop = {}; // top edge of bottom-placed text per side
   if (showText) {
@@ -909,10 +913,10 @@ function render(target) {
           y: ty,
           anchor: anc(tp[1]),
           size: ts,
-          font: ds.head,
-          weight: 700,
+          font: txFont(tbT.font, ds.head, ds),
+          weight: tbT.weight || 700,
           ls,
-          fill: hcol,
+          fill: tbT.color || hcol,
           halo:
             guard && isHex(bg) && (S.focus || S.zoom.k > 1.2)
               ? `stroke="${bg}" stroke-opacity=".85" stroke-width="6" paint-order="stroke"`
@@ -938,11 +942,11 @@ function render(target) {
           x: sx,
           y: sy,
           anchor: anc(sh),
-          size: 14,
-          font: lf,
-          weight: 600,
+          size: subSize,
+          font: txFont(tbS.font, lf, ds),
+          weight: tbS.weight || 600,
           ls: sp.titleCaps ? 3 : 0,
-          fill: ink,
+          fill: tbS.color || ink,
           halo: guard && isHex(bg) ? `stroke="${bg}" stroke-opacity=".85" stroke-width="3" paint-order="stroke"` : '',
           ds,
           pick,
@@ -951,6 +955,7 @@ function render(target) {
       );
     }
   }
+  out += textItemsSvg({ ds, ink, bg, dark, guard, textBgs, hcol, Lt, dragG });
   if (document.getElementById('showLogo').checked) {
     const L = D.company.logo;
     if (L.src) {

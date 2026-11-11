@@ -16,6 +16,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Effects & frames** – 34 effects (aged paper, grain, crumpled, coffee and water stains, burnt/torn edges, curled corner, papyrus roll, gallery spotlight, window light, blind shadows, dappled leaves, sunbeams, dusk, glass, emboss, gold foil, sepia, halftone, compass rose, rhumb lines, map border …) with an **intensity per effect**, an overall strength, **light direction** (shadows, relief, spotlight, glass and frame shading follow it) and warmth; 26 frames from realistic wood and metal (oak, walnut, driftwood, ebony, brushed steel, brass, copper, gold, floater …) to graphic ones (card, polaroid, stamp, tape, pins, neon).
 - **Title & subtitle flair** – optional title effects (drop shadow, long shadow, 3D block, retro outline, letterpress, soft glow, neon sign, gold foil, colour gradient, rubber stamp, highlighter, brush swash, ribbon banner, old-map cartouche, brass plaque) and subtitle effects (side rules, ornaments, pill, accent bar, underline, spaced capitals, italic serif). *Auto* follows the design system (`defaults.titleFx` / `subFx`), else the map style (vintage → cartouche, neon → neon sign …); choosing a design system, a style or a look sets them again, and the Page tab overrides them.
 - **Colour only part of the map** – "Colour by" can be limited to one continent or region, the focused area, or the highlighted areas; everything else keeps the map style.
+- **Text items** – besides the title and the subtitle, any number of texts of your own (Page → Text on the map → *Add text*, or right-click the map → *Add text here*): several lines, font (the design system's or any embedded one), size, weight, colour, alignment, any title effect, an optional background box. A text follows either **the page** or **the map** (it then moves with zoom, pan, focus and projection); drag it where it should be. The title and the subtitle are two built-in items with the same font, size, weight and colour settings. Saved in projects and links (`tx=`).
 - **Contrast guard** – title, text, labels and dividers pick the profile colour that stays readable on what is really behind them; **design-system colours** let styles with their own palette use the profile instead.
 - **Cities** – zoom to a city from Focus (31 Danish towns, Natural Earth cities elsewhere), with markers that avoid each other.
 - **Frame** – the thin frame around the page follows the map style or can be switched on/off for any style; the legend stays inside it.
@@ -189,6 +190,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   56-workspace               tabs, export menu, looks strip with thumbnails, undo/redo
   60-render                  render(): builds the SVG
   70-ui                      side panel, focus/drill-down, groups, map events
+  76-texts                   text items: the list, placing (page / map), drawing, link parameter
   80-export, 81-project      PNG/JPG/PDF export, project save/open
   99-start                   boot
 src/i18n.json, i18n-extra.json   UI strings per language

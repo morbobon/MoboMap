@@ -23,7 +23,7 @@ function jumpTo(sel) {
 }
 const secOf = (id) => `.sec[data-sec="${id}"]`;
 // the item at a map element: { title, items: [{ label, go }] }, the first item being its own settings
-function ctxItems(target) {
+function ctxItems(target, pt) {
   const items = [],
     add = (label, go) => items.push({ label, go });
   const drg = target.closest && target.closest('.drg');
@@ -78,6 +78,10 @@ function ctxItems(target) {
   } else if (key === 'title' || key === 'sub') {
     title = document.getElementById(key).value || t('sec_text');
     add(t('sec_text'), () => jumpTo('#' + key));
+  } else if (key.startsWith('tx:') && txOf(key)) {
+    title = txName(key);
+    add(t('sec_text'), () => txEdit(key));
+    add(t('delete'), () => delText(key));
   } else if (key === 'legend') {
     title = t('ctx_legend');
     add(t('sec_pageel'), () => jumpTo('#legend'));
@@ -105,6 +109,14 @@ function ctxItems(target) {
   // the page and the map as a whole (also what the sea or the background offers first)
   if (!title) title = S.country ? countryName(S.country) : t('world');
   if (!c && !key && (S.focus || S.country)) add(t('ctx_out'), () => focusClick(null));
+  // a new text where the pointer is: on the map it follows the map, beside it the page
+  if (pt && !key)
+    add(t('tx_add_here'), () => {
+      const it = addText({ align: 'c' });
+      if (!unit || !txPlace(it, pt[0], pt[1], 'map')) txPlace(it, pt[0], pt[1], 'page');
+      txEdit(txKey(it));
+      render();
+    });
   add(t('sec_style'), () => jumpTo('#styles'));
   add(t('sec_display'), () => jumpTo(secOf('display')));
   add(t('sec_fx'), () => jumpTo(secOf('fx')));
@@ -112,7 +124,7 @@ function ctxItems(target) {
   return { title, items };
 }
 function showCtx(target, cx, cy) {
-  const { title, items } = ctxItems(target);
+  const { title, items } = ctxItems(target, svgPoint({ clientX: cx, clientY: cy }));
   const m = document.getElementById('ctx');
   m.innerHTML =
     `<button class="ctxhd" data-i="0">${esc(title)}</button>` +
