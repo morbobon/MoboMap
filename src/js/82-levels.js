@@ -98,6 +98,7 @@ const LV_CUST = {
     is: () =>
       S.guard === false ||
       document.getElementById('frameSel').value !== 'auto' ||
+      // (the user's changes to the style are not hidden: "Custom (from …)" with its own Reset shows in Simple too)
       !!decoOut().deco ||
       (lvDecor(S.fx.fx).length > 0 && lvDecor(S.fx.fx).join() !== lvDecor((lvStart().fx || {}).fx).join()),
     reset: () => {
@@ -205,6 +206,8 @@ function lvReset(id) {
 }
 function lvShow(id) {
   setLevel('adv');
+  // what the Map style section hides is behind its Customise foldout
+  if (id === 'style') return styleCustomise();
   jumpTo(secOf(id));
 }
 

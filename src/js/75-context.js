@@ -21,6 +21,9 @@ function jumpTo(sel) {
   }
   const sec = el.closest('.sec');
   if (sec && sec.classList.contains('closed')) toggleSec(sec.dataset.sec);
+  // a control inside a folded group (Customise under Map style)
+  const fold = el.parentNode.closest('details');
+  if (fold) fold.open = true;
   el.scrollIntoView({ block: 'center', behavior: 'smooth' });
   el.classList.remove('flash');
   void el.offsetWidth; // restart the animation

@@ -281,25 +281,39 @@
               <span class="chev"></span><span data-i18n="sec_style"></span><span class="sum" id="styleNo"></span>
             </h2>
             <div class="body">
-              <label class="ck" data-lv="adv" data-i18n-title="guard_t"
-                ><input
-                  type="checkbox"
-                  id="guard"
-                  checked
-                  onchange="
-                    S.guard = this.checked;
-                    render();
-                  " />
-                <span data-i18n="guard"></span
-              ></label>
+              <div class="fxcat" data-i18n="stp_presets"></div>
               <div class="grid3" id="styles"></div>
-              <div class="fxcat" data-lv="adv" data-i18n="fxc_decor"></div>
-              <div id="decoUI" data-lv="adv"></div>
-              <select id="frameSel" data-lv="adv" onchange="render()">
-                <option value="auto" data-i18n="frame_auto"></option>
-                <option value="on" data-i18n="frame_on"></option>
-                <option value="off" data-i18n="frame_off"></option>
-              </select>
+              <div class="row stnow" id="stNow" hidden>
+                <b id="stNowName"></b>
+                <button class="chip sm" onclick="styleReset()" data-i18n="lv_reset"></button>
+              </div>
+              <div class="row">
+                <button class="chip sm lvs" onclick="styleCustomise()" data-i18n="stp_customise"></button>
+                <button class="chip sm" id="stSave" data-lv="adv" onclick="saveStyle()" data-i18n="stp_save"></button>
+              </div>
+              <details class="fxg" id="stCust" data-lv="adv">
+                <summary onclick="styleFold(event)"><span data-i18n="stp_customise"></span></summary>
+                <div id="stCustUI"></div>
+                <div class="fxcat" data-i18n="stp_more"></div>
+                <label class="ck" data-i18n-title="guard_t"
+                  ><input
+                    type="checkbox"
+                    id="guard"
+                    checked
+                    onchange="
+                      S.guard = this.checked;
+                      render();
+                    " />
+                  <span data-i18n="guard"></span
+                ></label>
+                <select id="frameSel" onchange="render()">
+                  <option value="auto" data-i18n="frame_auto"></option>
+                  <option value="on" data-i18n="frame_on"></option>
+                  <option value="off" data-i18n="frame_off"></option>
+                </select>
+                <div class="fxcat" data-i18n="fxc_decor"></div>
+                <div id="decoUI"></div>
+              </details>
             </div>
           </section>
           <section class="sec" data-sec="fx">

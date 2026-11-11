@@ -2224,3 +2224,93 @@ body.lv-simple .sec[data-lv].lv-cust > h2 .chev {
     min-height: 38px;
   }
 }
+
+/* ---- style presets and Customise (Look tab, Map style; 32-style-custom.js) ---- */
+.stsw {
+  display: block;
+  height: 14px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.stsw i {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 3px;
+  bottom: -4px;
+  border-radius: 5px 5px 0 0;
+  border: 1.5px solid;
+}
+.tile.on.mod {
+  outline: 2px dashed var(--accent2);
+  outline-offset: 1px;
+}
+.tile.mine {
+  position: relative;
+}
+.tile.mine .ldel {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  line-height: 15px;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  display: none;
+}
+.tile.mine:hover .ldel {
+  display: block;
+}
+#styles .stsaved {
+  grid-column: 1 / -1;
+}
+.stnow {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.stnow b {
+  font-size: 12px;
+  color: var(--ui-strong);
+}
+/* the way from Simple to the controls behind Customise; in Advanced the foldout itself is there */
+body:not(.lv-simple) .lvs {
+  display: none;
+}
+#stCust {
+  margin-top: 6px;
+}
+#stCustUI .stcols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 4px 0 6px;
+}
+#stCustUI .stcols label {
+  font-size: 10px;
+  color: var(--mute);
+  text-align: center;
+}
+#stCustUI input[type='color'] {
+  width: 100%;
+  height: 24px;
+  padding: 0;
+  display: block;
+}
+#stCustUI .fxrow select.half {
+  grid-column: auto;
+}
+#stCust #frameSel {
+  margin: 4px 0;
+}
+#stNow[hidden],
+#stSave[hidden] {
+  display: none;
+}

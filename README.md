@@ -10,6 +10,7 @@ Single-file, offline-capable generator for stylised maps with highlighted units,
 - **Design systems / company profiles** as JSON: colours, fonts, logo, partners, footer. Built in, loaded from a sidecar file, or imported in the app. The UI re-themes itself from the active profile.
 - **Visual design-system editor** – colour pickers for every colour role, highlight palette, fonts, logo (width, box), footer text and divider (style, colour, opacity, thickness, length) with a live preview on the map; built-in profiles are saved as your own copy.
 - **28 map styles** – flat, silhouette, atlas, paper cut, glass, neon, blueprint, halftone, 3D block, slate, poster, retro, **topographic (real elevation)**, doodle, typographic, vintage, word map, midnight, **flag sticker**, **network**, **pixel mosaic**, **stone relief** …
+- **Style presets and Customise** (Look → Map style) – each map style is a **preset**, shown with its colours in small. **Customise** (Advanced; in Simple the button switches to Advanced and says so) changes a preset from the inside: **colours** (the style's own, the design system's, or your own background, land, borders and text), **border width**, **land fill** (one colour, shades, groups, patchwork), **names on the map** (normal, capitals, bold, own colour), **background** (plain, colour fade, starry sky, wave lines, concrete wall) and **depth** (raised land, land glow, terrain shading); the contrast guard, the page frame and the decorations are in the same foldout. The result is a custom style, the preset plus your changes: it shows as **Custom (from Dark neon)** with **Reset**, can be saved with **Save style** (kept in the browser, listed under the presets) and travels in links (`sm=`), projects, undo and saved looks. Only what differs from the preset is stored. A style's special drawing (neon tubes, blueprint grid, flags, pixels, words …) stays with its preset.
 - **Focus / drill-down** – World → continent (zoom) → country (switches to its regions, local equal-area projection, major cities, neighbouring countries in grey for context) → region (zoom). Small far-away islands (e.g. Bouvet, overseas departments) are left out of country views.
 - **Far-away parts** – Alaska and Hawaii, the Canary Islands, Madeira and the Azores, Svalbard, French overseas regions, Bornholm …: shown in **inset boxes** (each in its own equal-area projection, placed in the emptiest corner), in place, or hidden (main part only). Detected automatically from distance to the main landmass and share of the area.
 - **Zoom and pan** – mouse wheel zooms around the cursor, drag to pan; "Reset zoom" or a new focus resets. Exports and saved projects keep the zoom. A detailed map (relief, the repeated world) that would move slowly is shown as a picture of itself while it is moved, so wheel, drag and pinch stay smooth; it is drawn again, sharp, as soon as the view rests.
@@ -190,6 +191,7 @@ src/js/NN-*.js             the app, concatenated in name order:
   10-layouts                 page sizes, viewport globals
   20-design-systems          profiles: normalise, import/export, editor, theme
   30-map-styles, 31-highlight-modes   style ids + SP style table, palette, highlight modes
+  32-style-custom            style presets + Customise: the user's changes to a style (S.styleMod, link parameter sm), saved styles
   40-datasets                MAPS, country decoding (admin-1), setData(), name lookup
   41-projections             world projections + local equal-area
   42-viewport                focus/framing, layout, map -> screen, the repeated world (FILL, REP)
@@ -228,6 +230,8 @@ tools/examples.mjs         renders docs/examples/*.jpg from the example projects
 ```
 
 Map styles are a config table (`SP` in `src/js/30-map-styles.js`): colours, texture filter, labels, title alignment – a new look is usually one entry plus its i18n keys `st_<id>` and `st_<id>_d`.
+
+A look (`FX_PRESETS` in `src/js/55-fx.js`, or a saved one) is put on the map by `lookApply()` in `src/js/56-workspace.js`. Besides `fx` and `frame` it can carry `surface`, `title`, `sub`, `style`, `mod` (changes to that style, the fields of `S.styleMod`), `ownPalette`, `deco` (decoration settings, as `S.deco`) and `stains` (stain settings, as `S.stains`). A look with a style and no `mod` gives the plain preset; a look without `deco` or `stains` only takes away what a look put there.
 
 ## Translations
 

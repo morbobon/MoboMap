@@ -19,6 +19,7 @@ const S = {
     strength: 1,
     light: { dir: 250, warm: 0 },
   }, // effects & picture frame (55-fx.js)
+  styleMod: null, // the user's own changes to the map style (32-style-custom.js); null = the preset as it is
   dsColours: false, // map styles use the design system's colours (keeping their effects)
   guard: true, // contrast guard: readable text and visible highlights
   drag: {}, // texts moved by hand: { title | sub | legend | logo | co:<unit> | lb:<unit>: [dx, dy] }

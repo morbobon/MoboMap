@@ -131,6 +131,9 @@ function shareParams() {
   // decorations (72-decor.js)
   const dcc = decoCode(p.deco);
   if (dcc !== decoCode(d.deco)) q.set('dc', dcc);
+  // the user's changes to the map style (32-style-custom.js)
+  const smc = styleCode(styleClean(p.styleMod, p.style));
+  if (smc !== styleCode(styleClean(d.styleMod, d.style || 'flat'))) q.set('sm', smc);
   // stains (73-stains.js)
   const snc = stainCode(stainClean(p.stains));
   if (snc !== stainCode(stainClean(d.stains))) q.set('sn', snc);
@@ -184,6 +187,7 @@ function projectFromUrl(search) {
     'pg',
     'dc',
     'sn',
+    'sm',
     'c',
     'f',
     'st',
@@ -344,6 +348,9 @@ function projectFromUrl(search) {
   if (q.has('pb')) p.pblock = pbFromCode(g('pb'));
   if (q.has('dc')) p.deco = decoFromCode(g('dc'));
   if (q.has('sn')) p.stains = stainFromCode(g('sn'));
+  if (q.has('sm')) p.styleMod = styleFromCode(g('sm'), p.style);
+  // another style than the start map's does not inherit the start map's changes to its own
+  else if (q.has('st')) p.styleMod = null;
   if (q.has('lg') || q.has('ll'))
     p.logo = logoClean({
       scale: q.has('lg') ? +g('lg') / 100 : (p.logo || {}).scale,

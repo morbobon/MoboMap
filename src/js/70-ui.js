@@ -127,11 +127,7 @@ function ui() {
   ).join('');
   // section summaries (visible when a section is collapsed)
   document.getElementById('layoutInfo').textContent = layoutName(layoutOf(S.layout));
-  document.getElementById('styleNo').textContent = t('st_' + S.style);
-  document.getElementById('styles').innerHTML = STYLES.map(
-    (s) =>
-      `<button class="tile ${S.style === s.id ? 'on' : ''}" title="${esc(t('st_' + s.id + '_d'))}" onclick="setStyle('${s.id}')"><b>${esc(t('st_' + s.id))}</b></button>`,
-  ).join('');
+  styleUI();
   const cols = D.highlight;
   // Groups: the active one fully expanded, the others as one compact line; none at all is allowed
   const swatch = (g) =>

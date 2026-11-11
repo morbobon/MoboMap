@@ -59,8 +59,11 @@ function textFxFromDS(D) {
   });
 }
 // choosing a map style: its own flair, else back to auto (the design system's)
-function setStyle(id) {
+// mod, dsc: a saved style brings its changes and its colour source (32-style-custom.js); a preset is itself
+function setStyle(id, mod, dsc) {
   S.style = id;
+  S.styleMod = styleClean(mod, id);
+  if (dsc != null) S.dsColours = dsc;
   const s = TEXT_FX_STYLE[id] || [];
   S.fx = Object.assign({}, S.fx, { title: s[0] || 'auto', sub: s[1] || 'auto' });
   ui();

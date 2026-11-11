@@ -27,43 +27,19 @@ function render(target) {
         : document.getElementById('detail').checked || !!focusCity() || S.zoom.k > 2,
     all = document.getElementById('labels').checked;
   const ds = Object.assign({ head: D.fonts.heading, body: D.fonts.body }, D.colors);
+  // the style: its preset, the brand profile's colours over it when asked, then the user's own changes
+  // (32-style-custom.js)
+  const md = S.styleMod || {};
   let sp = SP[st] || {};
-  if (S.dsColours) {
-    const L = D.colors;
-    sp = Object.assign({}, sp, {
-      bg: L.bg,
-      land: L.land,
-      landAlt: L.landAlt,
-      // outline draws only borders: they need ink; doodle patterns are white with black lines
-      stroke:
-        st === 'silhouette'
-          ? L.land
-          : st === 'outline'
-            ? readable([L.dark ? L.ink : L.land, L.ink, L.primary], L.bg, 3)
-            : sp.patterns
-              ? '#111111'
-              : st === 'neon'
-                ? readable([L.accent, L.ink], L.bg, 3)
-                : L.stroke,
-      ink: L.ink,
-      dark: !!L.dark,
-      heading: L.dark ? L.headingOnDark : L.heading,
-      labelColor: undefined,
-      textColor: sp.textColor && (light(L.land) ? '#1b1b1b' : '#ffffff'),
-      wordColors: sp.wordColors && D.highlight.slice(0, 3),
-      bgGradient: sp.bgGradient && [mix(L.bg, '#ffffff', 0.08), mix(L.bg, '#000000', 0.3)],
-      extrudeColor: sp.extrudeColor && mix(L.land, '#000000', 0.45),
-      landGlow: sp.landGlow && L.accent,
-      // real elevation stays, but as neutral shading over the profile's land instead of hypsometric tints
-      relief: false,
-      reliefShade: !!sp.relief,
-    });
-  }
+  if (S.dsColours) sp = styleDsSp(st, sp, D);
   const dsc = !!S.dsColours;
   // style line colours that follow the profile with "design-system colours" (blueprint grid, network lines)
-  const bpLine = dsc
-    ? readable([D.colors.dark ? D.colors.ink : D.colors.land, D.colors.ink, D.colors.primary], D.colors.bg, 3)
-    : '#9fd3ff';
+  const cols = styleModCols(md, styleCols(st, sp, ds));
+  const bpLine = cols.mod.line
+    ? md.line
+    : dsc
+      ? readable([D.colors.dark ? D.colors.ink : D.colors.land, D.colors.ink, D.colors.primary], D.colors.bg, 3)
+      : '#9fd3ff';
   const net = dsc
     ? {
         glow: D.colors.accent,
@@ -72,60 +48,20 @@ function render(target) {
         node: D.colors.dark ? D.colors.ink : D.colors.accent,
       }
     : { glow: '#7cc4ff', line: '#9fd6ff', link: '#8fd0ff', node: '#cfeeff' };
-  const dark = sp.dark != null ? sp.dark : ds.dark || st === 'neon' || st === 'blueprint';
-  let bg = ds.bg,
-    land = ds.land,
-    stroke = ds.stroke,
-    ink = ds.ink,
-    landAlt = ds.landAlt;
-  if (st === 'neon') {
-    bg = '#061a2b';
-    land = '#0d2a40';
-    stroke = '#19c6ff';
-    ink = '#e6f7ff';
-  }
-  if (st === 'blueprint') {
-    bg = '#163b5c';
-    land = 'none';
-    stroke = '#9fd3ff';
-    ink = '#dcefff';
-  }
-  if (st === 'outline') {
-    land = ds.dark ? bg : '#ffffff';
-    stroke = ds.dark ? ink : ds.land;
-    if (ds.dark) land = 'transparent';
-  }
-  if (st === 'glass') {
-    bg = ds.dark ? bg : '#dfe6ec';
-    land = ds.dark ? '#2d4454' : '#f3f6f8';
-    stroke = ds.dark ? '#5a7a90' : '#b9c6d0';
-    landAlt = land;
-  }
-  if (st === 'silhouette') {
-    stroke = land;
-  }
-  if (st === 'atlas') {
-    bg = ds.dark ? bg : '#ffffff';
-    land = ds.dark ? land : '#b9d3e6';
-    landAlt = land;
-    stroke = ds.dark ? stroke : '#ffffff';
-  }
-  if (st === 'patchwork') {
-    stroke = '#ffffff';
-  }
-  if (st === 'paper') {
-    stroke = mix(land, bg, 0.35);
-  }
-  if (sp.bg) {
-    bg = sp.bg;
-    land = sp.land;
-    stroke = sp.stroke;
-    ink = sp.ink;
-    landAlt = sp.landAlt || mix(land, bg, 0.25);
-  }
-  if (sp.pixel) {
-    stroke = 'none';
-  }
+  const bg = cols.bg,
+    land = cols.land,
+    stroke = cols.stroke,
+    landAlt = cols.landAlt;
+  let ink = cols.ink;
+  // an own background decides by itself whether the page is dark
+  const dark = cols.mod.bg ? !light(bg) : sp.dark != null ? sp.dark : ds.dark || st === 'neon' || st === 'blueprint';
+  if (S.styleMod) sp = styleModSp(md, sp, st, bg, cols.mod.bg, D.colors.accent);
+  // how the land is filled, and whether it stands on an extruded base
+  const fillK = md.fill || st,
+    extr = md.ex != null ? !!md.ex : st === 'extrude' || !!sp.extrude;
+  // the land of a blueprint is drawn in the style's own blue, or in the user's
+  const bpLand = cols.mod.land || dsc ? land : '#1d4a73';
+  if (!target) STYLE_NOW = { bg, land: st === 'blueprint' ? bpLand : land, line: stroke, ink };
   const guard = S.guard !== false;
   const ink0 = ink;
   // backgrounds behind page text: the gradient stops, the neon vignette, the stone concrete overlay
@@ -291,7 +227,7 @@ function render(target) {
   if (sp.stone) out += '';
   if (sp.landGlow)
     out += `<path d="${allPath}" fill="none" stroke="${sp.landGlow}" stroke-width="14" filter="url(#landglow)" opacity=".5"/>`;
-  if (st === 'extrude' || sp.extrude) {
+  if (extr) {
     const ec = sp.extrudeColor || mix(land, '#000', 0.45);
     for (let i = 14; i > 0; i--)
       out += `<path d="${allPath}" transform="translate(${-i * 0.6},${i * 1.1})" fill="${i === 1 ? 'url(#extrSide)' : ec}" stroke="${mix(ec, '#fff', 0.12)}" stroke-width=".6"/>`;
@@ -305,17 +241,17 @@ function render(target) {
   const baseFill = (k) => {
     if (sp.flag) return S.map === 'world' ? (FLAGS[k.c] ? `url(#fl_${k.c})` : mix(land, '#888888', 0.3)) : land;
     if (st === 'halftone') return 'url(#dotsBase)';
-    if (st === 'blueprint') return dsc ? land : '#1d4a73';
+    if (st === 'blueprint') return bpLand;
     if (AT && !sp.patterns && !sp.text && attrInScope(k)) return attrColor(AT, AT.f(k), ATC, land);
-    if (st === 'shades') {
+    if (fillK === 'shades') {
       const i = (codeNum(k.c) * 7) % 5;
       return [land, landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12)][i];
     }
-    if (st === 'regions') {
+    if (fillK === 'regions') {
       const n = Math.max(2, Object.keys(GEO.groups).length);
       return mix(land, bg, (0.75 * REGI[k.r]) / (n - 1));
     }
-    if (st === 'patchwork') {
+    if (fillK === 'patchwork') {
       return PATCH[(codeNum(k.c) * 13 + (REGI[k.r] || 0)) % PATCH.length];
     }
     if (sp.patterns) {
@@ -335,7 +271,7 @@ function render(target) {
             : st === 'silhouette'
               ? 0
               : 0.9;
-  const strokeBase = st === 'silhouette' ? 'none' : stroke;
+  const strokeBase = st === 'silhouette' && !md.lw ? 'none' : stroke;
   out += `<g id="unsel"${st === 'paper' ? ' filter="url(#paper)"' : sp.filter ? ' filter="url(#' + sp.filter + ')"' : ''}>`;
   // a faded group shows the map through it: its units get their normal land fill here, under relief and land fx
   const clearHL = (hl) => sp.pixel || (st === 'outline' && !HL_FILLS.some((m) => hl.has(m)));
@@ -448,8 +384,8 @@ function render(target) {
     out += `<path d="${allPath}" fill="none" stroke="${mix(land, '#000', 0.2)}" stroke-width="1" pointer-events="none"/>`;
   // region names cross land, sea and highlights: colour chosen for all of them under the guard
   const regBgs = [
-    st === 'regions' ? land : isHex(land) ? land : bg,
-    st === 'regions' ? mix(land, bg, 0.75) : bg,
+    fillK === 'regions' ? land : isHex(land) ? land : bg,
+    fillK === 'regions' ? mix(land, bg, 0.75) : bg,
   ].filter(isHex);
   const regOrig = ds.dark ? ink : '#355a78';
   const regWorst = (c, op) => Math.min(...(regBgs.length ? regBgs : [bg]).map((b) => contrast(mix(c, b, 1 - op), b)));
@@ -680,7 +616,7 @@ function render(target) {
   const labelBg = sp.patterns
     ? '#ffffff'
     : st === 'blueprint' && !dsc
-      ? '#1d4a73'
+      ? bpLand
       : sp.network
         ? mix(land, bg, 0.45)
         : st === 'outline' || !isHex(land)
@@ -689,15 +625,15 @@ function render(target) {
             ? [bg, mix(bg, land, 0.35)]
             : st === 'glass' || st === 'slate'
               ? [land, mix(land, '#ffffff', 0.45)]
-              : st === 'regions'
+              : fillK === 'regions'
                 ? [land, mix(land, bg, 0.75)]
                 : land;
   if (guard) labelFill = readable([labelFill, '#222222', '#ffffff'], labelBg, 3, 0.9);
   // what a unit label can sit on, besides its own fill: other style fills, the page, highlights, outlines
   const labelOn = [...(Array.isArray(labelBg) ? labelBg : [labelBg])];
-  if (st === 'shades') labelOn.push(landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12));
-  if (st === 'patchwork') labelOn.push(...PATCH);
-  if (st === 'regions') labelOn.push(mix(land, bg, 0.75));
+  if (fillK === 'shades') labelOn.push(landAlt, mix(land, bg, 0.25), mix(land, bg, 0.4), mix(land, '#000', 0.12));
+  if (fillK === 'patchwork') labelOn.push(...PATCH);
+  if (fillK === 'regions') labelOn.push(mix(land, bg, 0.75));
   if (isHex(bg)) labelOn.push(bg);
   for (const g of groups)
     if (g.sel.size && (g.hl.has('fill') || g.hl.has('outline'))) {
@@ -932,7 +868,7 @@ function render(target) {
   const title = tbT.hide ? '' : document.getElementById('title').value,
     sub = tbS.hide ? '' : document.getElementById('sub').value;
   const showText = document.getElementById('showText').checked;
-  let hcol = sp.bg ? sp.heading || ink0 : dark ? ds.headingOnDark : ds.heading;
+  let hcol = cols.mod.ink ? md.ink : sp.bg ? sp.heading || ink0 : dark ? ds.headingOnDark : ds.heading;
   if (guard) hcol = readable([hcol, ds.heading, ds.headingOnDark, ds.accent, ds.primary, ink0, ink], textBgs, 3);
   const ts = +tbT.size || Math.round(W * 0.038),
     subSize = +tbS.size || 14;

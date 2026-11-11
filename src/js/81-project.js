@@ -61,6 +61,7 @@ function projectState() {
     ...logoOut(),
     ...pageOut(),
     ...pbOut(),
+    ...styleOut(),
     ...decoOut(),
     ...stainOut(),
     footerLabel: document.getElementById('footerLabel').value,
@@ -186,6 +187,7 @@ function loadProject(p, quiet, noDraw) {
   S.logo = logoClean(p.logo);
   S.page = pageClean(p.page);
   S.pblock = pbClean(p.pblock);
+  S.styleMod = styleClean(p.styleMod);
   S.deco = decoClean(p.deco);
   S.stains = stainClean(p.stains);
   S.partners = (p.partners || D.partners).map((q) => ({

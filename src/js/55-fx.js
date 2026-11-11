@@ -881,13 +881,8 @@ function setFx(id) {
 function applyFxPreset(id) {
   const p = FX_PRESETS[id];
   if (!p) return;
-  S.fx = Object.assign({}, S.fx, { fx: p.fx.slice(), frame: p.frame, preset: id });
-  if (p.surface) S.fx.surface = p.surface;
-  if (p.style) S.style = p.style;
-  if (p.ownPalette) S.dsColours = false;
-  // a look brings its own title flair; one without goes back to auto (design system / map style)
-  S.fx.title = p.title || 'auto';
-  S.fx.sub = p.sub || 'auto';
+  lookApply(p);
+  S.fx.preset = id;
   ui();
   render();
 }
@@ -1064,6 +1059,7 @@ function randomLook() {
     '#e6e3de',
   ]);
   S.style = pick(styles);
+  S.styleMod = null;
   S.fx = Object.assign({}, S.fx, {
     fx: [...new Set(fx)],
     frame,

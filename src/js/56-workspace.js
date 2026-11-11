@@ -58,6 +58,38 @@ function allLooks() {
 function lookOf(id) {
   return allLooks().find((l) => l.id === id);
 }
+// Put a look on the map (state only: the caller draws). Every look, built-in (FX_PRESETS in 55-fx.js) or saved,
+// goes through here, and so do the thumbnails. A look is { fx, frame } plus any of:
+//   surface      the wall colour
+//   title, sub   title flair (without: auto, from design system / map style)
+//   style        the map style preset, and with it
+//   mod          the changes to that style (32-style-custom.js); a look with a style and no mod gives the plain preset
+//   ownPalette   the style keeps its own colours (design-system colours off)
+//   deco         decoration settings (72-decor.js), as S.deco
+//   stains       stain settings (73-stains.js), as S.stains
+// A look without a style leaves the map style and the user's changes to it alone. A look without deco or stains
+// only takes away what a look put there: settings the user made by hand stay.
+function lookApply(l) {
+  S.fx = Object.assign({}, S.fx, {
+    fx: l.fx.slice(),
+    frame: l.frame,
+    // a look brings its own title flair; one without goes back to auto (design system / map style)
+    title: l.title || 'auto',
+    sub: l.sub || 'auto',
+  });
+  if (l.surface) S.fx.surface = l.surface;
+  if (l.style && STYLES.some((s) => s.id === l.style)) {
+    S.style = l.style;
+    S.styleMod = styleClean(l.mod, l.style);
+  }
+  if (l.ownPalette) S.dsColours = false;
+  const fromLook = (cur, code, key) => allLooks().some((o) => o[key] && code(o[key]) === code(cur));
+  const stCode = (o) => stainCode(stainClean(o));
+  if (l.deco) S.deco = decoClean(l.deco);
+  else if (S.deco && fromLook(S.deco, decoCode, 'deco')) S.deco = null;
+  if (l.stains) S.stains = stainClean(l.stains);
+  else if (S.stains && fromLook(S.stains, stCode, 'stains')) S.stains = null;
+}
 function applyLook(id) {
   const l = lookOf(id);
   if (!l) return;
@@ -65,15 +97,8 @@ function applyLook(id) {
     applyFxPreset(id);
     if (id === 'none') S.fx.preset = 'none';
   } else {
-    S.fx = Object.assign({}, S.fx, {
-      fx: l.fx.slice(),
-      frame: l.frame,
-      preset: id,
-      title: l.title || 'auto',
-      sub: l.sub || 'auto',
-    });
-    if (l.surface) S.fx.surface = l.surface;
-    if (l.style && STYLES.some((s) => s.id === l.style)) S.style = l.style;
+    lookApply(l);
+    S.fx.preset = id;
     ui();
     render();
   }
@@ -92,6 +117,10 @@ function saveLook() {
     style: S.style,
     title: S.fx.title || 'auto',
     sub: S.fx.sub || 'auto',
+    // only what is not standard: changes to the style, decoration and stain settings
+    ...(styleClean(S.styleMod) ? { mod: styleClean(S.styleMod) } : {}),
+    ...decoOut(),
+    ...stainOut(),
   });
   localStorage.setItem(LOOKS_KEY, JSON.stringify(looks));
   S.fx.preset = id;
@@ -144,6 +173,7 @@ function thumbKey() {
     S.detailLevel,
     S.cityMin,
     S.dsColours,
+    S.styleMod,
     S.guard,
     S.drag,
     S.texts,
@@ -177,19 +207,16 @@ function nextThumb() {
   if (!l) return nextThumb();
   if (!thumbSvg) thumbSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   // apply the look temporarily, draw it off-page, restore
-  const keep = { style: S.style, fx: S.fx, fxl: FXL };
-  S.fx = Object.assign({}, S.fx, {
-    fx: l.fx.slice(),
-    frame: l.frame,
-    surface: l.surface || S.fx.surface,
-    title: l.title || 'auto',
-    sub: l.sub || 'auto',
-  });
-  if (l.style && STYLES.some((s) => s.id === l.style)) S.style = l.style;
+  const keep = { style: S.style, mod: S.styleMod, dsc: S.dsColours, deco: S.deco, stains: S.stains, fx: S.fx, fxl: FXL }; // prettier-ignore
   try {
+    lookApply(l);
     render(thumbSvg);
   } finally {
     S.style = keep.style;
+    S.styleMod = keep.mod;
+    S.dsColours = keep.dsc;
+    S.deco = keep.deco;
+    S.stains = keep.stains;
     S.fx = keep.fx;
     FXL = keep.fxl;
   }
