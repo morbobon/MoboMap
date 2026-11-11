@@ -8,7 +8,8 @@
 //   hubs …        rhumb hubs: how many (0 = as the map suggests), 16 / 32 lines, one more at the compass,
 //                 hubAt[i] = [lon, lat] for a hub the user dragged
 //   scale, unit   scale bar: 'off' | 'line' | 'bar', km or miles
-//   grat …        graticule: a line every N degrees (0 = off), with degree numbers
+//   grat …        graticule: a line every N degrees (0 = off), with degree numbers; how far it reaches (gratExt),
+//                 line weight, strength, solid / dashed / dotted, colour, over or under the land
 //   flourish …    corner flourishes
 //   stamps        [{ k: kind, x: lon, y: lat, s: size }] – they sit on the map and follow it
 const DECO_DEFAULT = {
@@ -30,6 +31,12 @@ const DECO_DEFAULT = {
   unit: 'km',
   grat: 0,
   gratLabels: false,
+  gratExt: 'world',
+  gratW: 1,
+  gratOp: 0.32,
+  gratLine: 'solid',
+  gratCol: 'ink',
+  gratUnder: false,
   flourish: 'off',
   flourishSize: 1,
   stamps: [],
@@ -38,7 +45,10 @@ const DECO_COMPASS = ['classic', 'star', 'arrow', 'ring', 'nautical', 'fleur'];
 const DECO_BORDER = ['single', 'double', 'thickthin', 'chart', 'ruler', 'dotted', 'rope', 'meander', 'wave', 'corners'];
 const DECO_CORNER = ['square', 'round', 'orn'];
 const DECO_SCALE = ['off', 'line', 'bar'];
-const DECO_GRAT = [0, 5, 10, 15, 30];
+const DECO_GRAT = [0, 1, 2, 5, 10, 15, 30];
+const DECO_GEXT = ['world', 'area', 'land'];
+const DECO_GLINE = ['solid', 'dashed', 'dotted'];
+const DECO_GEXT_NOTE = { world: 'dc_ge_world_n', area: 'dc_ge_area_n', land: 'dc_ge_land_n' };
 const DECO_FLOUR = ['off', 'curl', 'deco', 'leaf'];
 const DECO_STAMP = ['ship', 'serpent', 'whale', 'skull', 'anchor', 'flag', 'chest', 'palm', 'cross'];
 const DECO_NAME = {
@@ -75,6 +85,11 @@ const DECO_NAME = {
   chest: 'dc_sm_chest',
   palm: 'dc_sm_palm',
   cross: 'dc_sm_cross',
+  world: 'dc_ge_world',
+  area: 'dc_ge_area',
+  land: 'dc_ge_land',
+  solid: 'pb_ls_solid',
+  dashed: 'pb_ls_dashed',
   ink: 'dc_col_ink',
   accent: 'dc_col_accent',
   own: 'dc_col_own',
@@ -112,6 +127,12 @@ function decoClean(o) {
     unit: o.unit === 'mi' ? 'mi' : 'km',
     grat: pick(+o.grat, DECO_GRAT, 0),
     gratLabels: !!o.gratLabels,
+    gratExt: pick(o.gratExt, DECO_GEXT, D.gratExt),
+    gratW: num(o.gratW, 0.3, 4, 1),
+    gratOp: num(o.gratOp, 0.05, 1, D.gratOp),
+    gratLine: pick(o.gratLine, DECO_GLINE, D.gratLine),
+    gratCol: col(o.gratCol),
+    gratUnder: !!o.gratUnder,
     flourish: pick(o.flourish, DECO_FLOUR, D.flourish),
     flourishSize: num(o.flourishSize, 0.4, 3, 1),
     stamps: (Array.isArray(o.stamps) ? o.stamps : [])
@@ -131,8 +152,9 @@ function decoOut() {
 // link form: tokens joined by dots. A token is a code and a whole number, an index or a colour (a = accent, else
 // six hex digits): c compass style, cz size %, cc colour, co opacity %, cn true north; b border style, bw thickness %,
 // bd distance in tenths of a percent, bc colour, bk corners; h hubs, l16 sixteen lines, hc a hub at the compass,
-// hp<i>_<lon*100>_<lat*100> a moved hub; s scale bar style, sm miles; g graticule step, gl its numbers;
-// f flourish, fz its size %; t<kind>_<lon*1000>_<lat*1000>_<size %> a stamp. E.g. "c5.cca.b4.g10.gl"
+// hp<i>_<lon*100>_<lat*100> a moved hub; s scale bar style, sm miles; g graticule step, gl its numbers, ge its
+// extent (1 map area, 2 land shown), gw line weight %, go strength %, gs line (1 dashed, 2 dotted), gc colour,
+// gu under the land; f flourish, fz its size %; t<kind>_<lon*1000>_<lat*1000>_<size %> a stamp. E.g. "c5.cca.b4.g10.gl"
 function decoCode(o) {
   const p = decoClean(o),
     D = DECO_DEFAULT,
@@ -157,6 +179,12 @@ function decoCode(o) {
   if (p.unit === 'mi') a.push('sm');
   if (p.grat) a.push('g' + p.grat);
   if (p.gratLabels) a.push('gl');
+  if (p.gratExt !== D.gratExt) a.push('ge' + DECO_GEXT.indexOf(p.gratExt));
+  if (p.gratW !== 1) a.push('gw' + pct(p.gratW));
+  if (p.gratOp !== D.gratOp) a.push('go' + pct(p.gratOp));
+  if (p.gratLine !== D.gratLine) a.push('gs' + DECO_GLINE.indexOf(p.gratLine));
+  if (p.gratCol !== 'ink') a.push('gc' + colC(p.gratCol));
+  if (p.gratUnder) a.push('gu');
   if (p.flourish !== 'off') a.push('f' + DECO_FLOUR.indexOf(p.flourish));
   if (p.flourishSize !== 1) a.push('fz' + pct(p.flourishSize));
   for (const s of p.stamps)
@@ -167,7 +195,7 @@ function decoFromCode(str) {
   const o = { hubAt: [], stamps: [] };
   const colD = (v) => (v === 'a' ? 'accent' : '#' + v);
   for (const tok of String(str || '').split('.')) {
-    const m = /^(cz|cc|co|cn|bw|bd|bc|bk|hc|hp|sm|gl|fz|[cbhlsgft])(.*)$/.exec(tok);
+    const m = /^(cz|cc|co|cn|bw|bd|bc|bk|hc|hp|sm|gl|ge|gw|go|gs|gc|gu|fz|[cbhlsgft])(.*)$/.exec(tok);
     if (!m) continue;
     const v = m[2],
       n = v === '' ? NaN : +v,
@@ -190,6 +218,12 @@ function decoFromCode(str) {
     else if (m[1] === 'sm') o.unit = 'mi';
     else if (m[1] === 'g') o.grat = n;
     else if (m[1] === 'gl') o.gratLabels = true;
+    else if (m[1] === 'ge') o.gratExt = DECO_GEXT[n];
+    else if (m[1] === 'gw') o.gratW = n / 100;
+    else if (m[1] === 'go') o.gratOp = n / 100;
+    else if (m[1] === 'gs') o.gratLine = DECO_GLINE[n];
+    else if (m[1] === 'gc') o.gratCol = colD(v);
+    else if (m[1] === 'gu') o.gratUnder = true;
     else if (m[1] === 'f') o.flourish = DECO_FLOUR[n];
     else if (m[1] === 'fz') o.flourishSize = n / 100;
     else if (m[1] === 't') o.stamps.push({ k: DECO_STAMP[q[0]], x: q[1] / 1000, y: q[2] / 1000, s: q[3] / 100 });
@@ -647,9 +681,13 @@ function decoScale(ink) {
 }
 
 // ---------- graticule ----------
+// Lines on round degrees counted from 0, so the equator and Greenwich are always on a line. How far they reach
+// (gratExt): 'world' – over the world, ending at its edge; 'area' – to the edges of the area the map fills
+// (MAPBOX, 42-viewport.js), on a cylindrical projection also past the poles and past 180°; 'land' – only around
+// the land that is drawn, rounded outward to the step.
 let DECO_GRAT_LINES = null; // the lines of the last drawing, for the degree numbers: [{ deg, mer, pts }]
-// the longitudes and latitudes in view: [lon0, lon1, lat0, lat1]
-function decoGratRange(step) {
+// the longitudes and latitudes in view: [lon0, lon1, lat0, lat1]; cap: the highest latitude that gets lines
+function decoGratRange(step, cap) {
   const lons = [],
     lats = [];
   let miss = 0;
@@ -667,53 +705,165 @@ function decoGratRange(step) {
     // the world repeated: the degrees run on past 180, over every copy that is drawn
     const wx = P(0, 90)[0],
       lon = (x) => ((x - wx) / REP.per) * 360 - 180;
-    return [lon(REP.e0), lon(REP.e1), Math.max(-85, r[2]), Math.min(85, r[3])];
+    return [lon(REP.e0), lon(REP.e1), Math.max(-cap, r[2]), Math.min(cap, r[3])];
   }
-  return [Math.max(-180, r[0]), Math.min(180, r[1]), Math.max(-85, r[2]), Math.min(85, r[3])];
+  return [Math.max(-180, r[0]), Math.min(180, r[1]), Math.max(-cap, r[2]), Math.min(cap, r[3])];
 }
-function decoGrat(ink) {
-  DECO_GRAT_LINES = null;
-  const step = decoOpts().grat;
-  if (!step) return '';
-  const r = decoGratRange(step);
-  if (!r) return '';
-  const lines = [],
-    up = (v) => Math.ceil(v / step - 1e-9) * step;
-  const sample = (f, a, b, k) => {
-    const pts = [];
-    for (let i = 0; i <= k; i++) {
-      const [lon, lat] = f(a + ((b - a) * i) / k),
-        [x, y] = worldPt(lon + 180, 90 - lat);
-      pts.push(Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null);
+// the land that is drawn, in degrees and rounded outward to the step: [lon0, lon1, lat0, lat1]
+function decoGratLand(step, cap) {
+  const b = [Infinity, Infinity, -Infinity, -Infinity],
+    add = (x, y) => {
+      if (x < b[0]) b[0] = x;
+      if (y < b[1]) b[1] = y;
+      if (x > b[2]) b[2] = x;
+      if (y > b[3]) b[3] = y;
+    };
+  if (GEO.geo)
+    for (const k of GEO.units) {
+      if (!k.b || insOf(k) || (S.focusHide && !inFocus(k))) continue;
+      // (a unit across the 180° line reaches all the way round)
+      const wide = k.b[2] - k.b[0] > 180;
+      add(wide ? 0 : k.b[0], k.b[1]);
+      add(wide ? 360 : k.b[2], k.b[3]);
     }
-    return pts;
-  };
-  if ((r[1] - r[0] + r[3] - r[2]) / step > 160) return '';
-  for (let lon = up(r[0]); lon <= r[1] + 1e-9; lon += step)
-    if (REP || lon < 180 || r[0] > -180)
-      lines.push({
-        deg: REP ? ((((lon + 180) % 360) + 360) % 360) - 180 : lon,
-        mer: true,
-        pts: sample((v) => [lon, v], r[2], r[3], 36),
-      });
-  for (let lat = up(r[2]); lat <= r[3] + 1e-9; lat += step)
-    lines.push({ deg: lat, mer: false, pts: sample((v) => [v, lat], r[0], r[1], 72) });
+  else
+    for (let i = 0; i <= 4; i++)
+      for (let j = 0; j <= 4; j++) {
+        const p = worldInv((M[0] + (mw * i) / 4) * sc + ox, (M[1] + (mh * j) / 4) * sc + oy);
+        if (p) add(p[0], p[1]);
+      }
+  if (b[0] > b[2]) return null;
+  const dn = (v) => Math.floor(v / step + 1e-9) * step,
+    up = (v) => Math.ceil(v / step - 1e-9) * step;
+  return [
+    Math.max(-180, dn(b[0] - 180)),
+    Math.min(180, up(b[2] - 180)),
+    Math.max(-cap, dn(90 - b[3])),
+    Math.min(cap, up(90 - b[1])),
+  ];
+}
+// under: the call from under the land (fxUnder) – the grid is drawn there or over the map (fxMap), never both
+function decoGrat(ink, accent, under) {
+  const o = decoOpts();
+  if (under || !o.gratUnder) DECO_GRAT_LINES = null;
+  if (!o.grat || o.gratUnder !== under) return '';
+  // (more lines than can be drawn well – a fine step on a whole world: the next coarser step that fits)
+  for (const step of DECO_GRAT) {
+    const g = step >= o.grat ? decoGratDraw(o, step, ink, accent) : null;
+    if (g != null) return g;
+  }
+  return '';
+}
+// the grid with a line every `step` degrees; null: too many lines
+function decoGratDraw(o, step, ink, accent) {
+  const pj = PROJS[S.proj] || {},
+    cap = S.proj === 'mercator' ? 85 : 90,
+    lines = [],
+    up = (v) => Math.ceil(v / step - 1e-9) * step,
+    norm = (lon) => (lon === 180 ? 180 : ((((lon + 180) % 360) + 360) % 360) - 180);
   let d = '';
-  for (const l of lines) {
-    let pen = false,
-      last = null;
-    for (const p of l.pts) {
-      // a jump across the page is the map's edge (the 180° line), not a line to draw
-      if (!p || (last && Math.hypot(p[0] - last[0], p[1] - last[1]) > W * 0.4)) pen = false;
-      if (p) ((d += (pen ? 'L' : 'M') + decoN(p[0]) + ' ' + decoN(p[1])), (pen = true));
-      last = p;
+  if (o.gratExt === 'area' && S.map === 'world' && GEO.geo && pj.cyl) {
+    // every line is straight: meridians from edge to edge of the area, past the poles; parallels right across
+    const m = Math.max(W, H) / 2,
+      wx = P(0, 90)[0],
+      per = 200 * Math.PI * sc,
+      x0 = REP ? REP.e0 : MAPBOX[0] - m,
+      x1 = REP ? REP.e1 : MAPBOX[2] + m,
+      y0 = MAPBOX[1] - m,
+      y1 = MAPBOX[3] + m,
+      lonAt = (x) => ((x - wx) / per) * 360 - 180;
+    if ((lonAt(x1) - lonAt(x0) + 2 * cap) / step > 700) return null;
+    const run = (ax, ay, bx, by, k) =>
+      Array.from({ length: k + 1 }, (_, i) => [ax + ((bx - ax) * i) / k, ay + ((by - ay) * i) / k]);
+    for (let lon = up(lonAt(x0)); lon <= lonAt(x1) + 1e-9; lon += step) {
+      const x = wx + ((lon + 180) / 360) * per;
+      d += `M${decoN(x)} ${decoN(y0)}V${decoN(y1)}`;
+      lines.push({ deg: norm(lon), mer: true, pts: run(x, y0, x, y1, 24) });
+    }
+    for (let lat = up(-cap); lat <= cap + 1e-9; lat += step) {
+      const y = P(180, 90 - lat)[1];
+      d += `M${decoN(x0)} ${decoN(y)}H${decoN(x1)}`;
+      lines.push({ deg: lat, mer: false, pts: run(x0, y, x1, y, 48) });
+    }
+  } else {
+    const land = o.gratExt === 'land' ? decoGratLand(step, cap) : null,
+      r = decoGratRange(step, o.gratExt === 'world' ? 85 : cap);
+    if (!r || (o.gratExt === 'land' && !land)) return '';
+    let spans = [[r[0], r[1]]],
+      la0 = r[2],
+      la1 = r[3];
+    if (land) {
+      la0 = Math.max(la0, land[2]);
+      la1 = Math.min(la1, land[3]);
+      if (land[1] - land[0] < 360) {
+        // (the world repeated: the land's box once in every copy)
+        spans = [];
+        for (
+          let j = REP ? Math.ceil((r[0] - land[1]) / 360) : 0;
+          j <= (REP ? Math.floor((r[1] - land[0]) / 360) : 0);
+          j++
+        ) {
+          const a = Math.max(r[0], land[0] + 360 * j),
+            b = Math.min(r[1], land[1] + 360 * j);
+          if (a <= b) spans.push([a, b]);
+        }
+      }
+    }
+    const sample = (f, a, b, k) => {
+      const pts = [];
+      for (let i = 0; i <= k; i++) {
+        const [lon, lat] = f(a + ((b - a) * i) / k),
+          [x, y] = worldPt(lon + 180, 90 - lat);
+        pts.push(Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null);
+      }
+      return pts;
+    };
+    if ((spans.reduce((s, p) => s + p[1] - p[0], 0) + la1 - la0) / step > 300) return null;
+    for (const [a, b] of spans)
+      for (let lon = up(a); lon <= b + 1e-9; lon += step)
+        // (on a country's own projection 180° east and west are the same line; elsewhere they are the two edges)
+        if (REP || lon < 180 || a > -180 || !pj.local)
+          lines.push({ deg: norm(lon), mer: true, pts: sample((v) => [lon, v], la0, la1, 36) });
+    const lats = [];
+    for (let lat = up(la0); lat <= la1 + 1e-9; lat += step) lats.push(lat);
+    // (Mercator ends at 85°: where the land's box is cut off there, a line closes it)
+    if (land) for (const e of [la0, la1]) if (Math.abs(e) === cap && !lats.includes(e)) lats.push(e);
+    for (const lat of lats)
+      for (const [a, b] of spans) lines.push({ deg: lat, mer: false, pts: sample((v) => [v, lat], a, b, 72) });
+    for (const l of lines) {
+      let pen = false,
+        last = null;
+      for (const p of l.pts) {
+        // a jump across the page is the map's edge (the 180° line), not a line to draw
+        if (!p || (last && Math.hypot(p[0] - last[0], p[1] - last[1]) > W * 0.4)) pen = false;
+        if (p) ((d += (pen ? 'L' : 'M') + decoN(p[0]) + ' ' + decoN(p[1])), (pen = true));
+        last = p;
+      }
     }
   }
   DECO_GRAT_LINES = lines;
-  return `<path data-grat d="${d}" fill="none" stroke="${ink}" stroke-width=".5" stroke-opacity=".32" pointer-events="none"/>`;
+  if (REP && REP.tile && (REP.e0 > FILL[0] + 1 || REP.e1 < FILL[2] - 1)) {
+    // the map body is one turn of the world and copies of it: the numbers need the lines of the copies too
+    const js = [],
+      mv = (pts, j) => pts.map((p) => p && [p[0] + j * REP.per, p[1]]);
+    for (let j = Math.floor((FILL[0] - REP.p1) / REP.per); j <= Math.ceil((FILL[2] - REP.p0) / REP.per); j++)
+      if (REP.p1 + j * REP.per > FILL[0] && REP.p0 + j * REP.per < FILL[2]) js.push(j);
+    DECO_GRAT_LINES = [];
+    for (const l of lines)
+      if (l.mer) for (const j of js) DECO_GRAT_LINES.push({ deg: l.deg, mer: true, pts: mv(l.pts, j) });
+      else DECO_GRAT_LINES.push({ deg: l.deg, mer: false, pts: js.flatMap((j) => mv(l.pts, j)) });
+  }
+  const w = 0.5 * o.gratW,
+    dash =
+      o.gratLine === 'dashed'
+        ? ` stroke-dasharray="${decoN(4 * w + 2)} ${decoN(3 * w + 1.5)}"`
+        : o.gratLine === 'dotted'
+          ? ` stroke-dasharray="0 ${decoN(3 * w + 1.5)}" stroke-linecap="round"`
+          : '';
+  return `<path data-grat d="${d}" fill="none" stroke="${decoCol(o.gratCol, ink, accent)}" stroke-width="${o.gratW === 1 ? '.5' : +w.toFixed(2)}" stroke-opacity="${o.gratOp === 0.32 ? '.32' : o.gratOp}"${dash} pointer-events="none"/>`;
 }
-// the numbers: where a line leaves the map area, or where it ends inside it
-function decoGratLabels(ink) {
+// the numbers: where a line leaves the map area, or where it ends inside it; none under a legend
+function decoGratLabels(ink, accent) {
   if (!DECO_GRAT_LINES || !decoOpts().gratLabels) return '';
   const A = decoArea(),
     n = decoN,
@@ -722,6 +872,9 @@ function decoGratLabels(ink) {
   const put = (side, x, y, anchor, text) => {
     const at = side === 't' || side === 'b' ? x : y;
     if (used[side].some((v) => Math.abs(v - at) < 24)) return;
+    const tw = text.length * 5.2,
+      x0 = anchor === 'middle' ? x - tw / 2 : anchor === 'end' ? x - tw : x;
+    if (LEGEND_AT.some((b) => x0 < b[2] + 2 && x0 + tw > b[0] - 2 && y - 9 < b[3] + 2 && y + 2 > b[1] - 2)) return;
     used[side].push(at);
     s += `<text x="${n(x)}" y="${n(y)}" text-anchor="${anchor}">${text}</text>`;
   };
@@ -760,7 +913,7 @@ function decoGratLabels(ink) {
       if (ri[0] - le[0] > 60) put('r', Math.min(ri[0] + 3, A[2] - 24), ri[1] + 3, 'start', text);
     }
   }
-  return `<g data-gratlabels font-family="Georgia,serif" font-size="9" fill="${ink}" opacity=".85" pointer-events="none">${s}</g>`;
+  return `<g data-gratlabels font-family="Georgia,serif" font-size="9" fill="${decoCol(decoOpts().gratCol, ink, accent)}" opacity=".85" pointer-events="none">${s}</g>`;
 }
 
 // ---------- stamps ----------
@@ -795,15 +948,18 @@ function decoStamps(ink, accent) {
     })
     .join('');
 }
-// a new stamp goes to the middle of the map area (a little aside for each one already there)
+// a new stamp goes to the middle of the map area (a little aside for each one already there), never under a legend
 function decoStampAdd(k) {
   const A = decoArea(),
     o = decoOpts(),
     step = Math.min(W, H) * 0.11;
   let p = null;
-  for (let i = 0; i < 8 && !p; i++) {
-    const j = o.stamps.length + i;
-    p = worldInv((A[0] + A[2]) / 2 + ((j % 5) - 2) * step, (A[1] + A[3]) / 2 + ((Math.floor(j / 5) % 3) - 1) * step);
+  for (let i = 0; i < 15 && !p; i++) {
+    const j = o.stamps.length + i,
+      x = (A[0] + A[2]) / 2 + ((j % 5) - 2) * step,
+      y = (A[1] + A[3]) / 2 + ((Math.floor(j / 5) % 3) - 1) * step,
+      r = Math.min(W, H) * 0.035;
+    if (!LEGEND_AT.some((b) => x > b[0] - r && x < b[2] + r && y > b[1] - r && y < b[3] + r)) p = worldInv(x, y);
   }
   if (!p) return toast(t('dc_offmap'));
   decoSet('stamps', o.stamps.concat([{ k, x: p[0] - 180, y: 90 - p[1], s: 1 }]));
@@ -900,7 +1056,8 @@ function decoFlourish(ink) {
 // (the graticule is part of the map body, which the repeated world copies: fxMap in 55-fx.js)
 const decoMapTop = (ink, accent) => decoStamps(ink, accent) + decoHubGrips();
 // over everything, in page units: degree numbers, flourishes, scale bar, compass
-const decoTop = (ink, accent) => decoGratLabels(ink) + decoFlourish(ink) + decoScale(ink) + decoCompass(ink, accent);
+const decoTop = (ink, accent) =>
+  decoGratLabels(ink, accent) + decoFlourish(ink) + decoScale(ink) + decoCompass(ink, accent);
 
 // ---------- the panel ----------
 function decoUI() {
@@ -983,7 +1140,14 @@ function decoUI() {
         t('dc_gr_step'),
         sel('grat', DECO_GRAT.filter(Boolean), o.grat, (v) => v + '°'),
       ) +
-      ck('gratLabels', o.gratLabels, t('dc_gr_labels'));
+      row(t('dc_gr_ext'), sel('gratExt', DECO_GEXT, o.gratExt)) +
+      `<div class="note">${esc(t(DECO_GEXT_NOTE[o.gratExt]) + (o.gratExt === 'area' && S.map === 'world' && !(PROJS[S.proj] || {}).cyl ? ' ' + t('dc_ge_curved') : ''))}</div>` +
+      ck('gratLabels', o.gratLabels, t('dc_gr_labels')) +
+      row(t('dc_thick'), pct('gratW', 30, 400, o.gratW)) +
+      row(t('dc_strength'), pct('gratOp', 5, 100, o.gratOp)) +
+      row(t('dc_gr_line'), sel('gratLine', DECO_GLINE, o.gratLine)) +
+      colour('gratCol', o.gratCol) +
+      ck('gratUnder', o.gratUnder, t('dc_gr_under'));
   if (o.flourish !== 'off')
     h +=
       head(t('dc_flour')) +

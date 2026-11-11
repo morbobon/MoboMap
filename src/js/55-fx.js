@@ -447,9 +447,9 @@ const fxToContent = ([x, y]) => [(x - FXL.tx) / FXL.s, (y - FXL.ty) / FXL.s];
 const fxToArt = (x, y) => [x * FXL.s + FXL.tx, y * FXL.s + FXL.ty];
 
 // ---------- hooks called from render() (content coordinates) ----------
-// under the map: drop shadow, rhumb lines
-function fxUnder(allPath, ink) {
-  let o = '';
+// under the map: the graticule when it lies under the land, rhumb lines, drop shadow
+function fxUnder(allPath, ink, accent) {
+  let o = decoGrat(ink, accent, true);
   // hubs at real places (like the compass-rose hubs of old sea charts): they follow projection, zoom and pan
   o += decoRhumb(ink);
   if (fxOn('shadow')) {
@@ -465,11 +465,11 @@ function fxLand(allPath) {
   return `<clipPath id="fxlandclip"><path d="${allPath}"/></clipPath><g clip-path="url(#fxlandclip)" pointer-events="none">${fxTwice('foil', (o) => `<rect width="${W}" height="${H}" filter="url(#fxfoil)" opacity="${o}"/>`)}</g>`;
 }
 // over the map (after the highlight groups): emboss / deboss
-function fxMap(allPath, ink) {
+function fxMap(allPath, ink, accent) {
   let o = '';
   if (fxOn('emboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxemboss)" pointer-events="none"/>`;
   if (fxOn('deboss')) o += `<path d="${allPath}" fill="#000" filter="url(#fxdeboss)" pointer-events="none"/>`;
-  return o + decoGrat(ink);
+  return o + decoGrat(ink, accent, false);
 }
 // over everything in content space: the decorations (compass rose, scale bar …)
 const fxContentTop = (ink, accent) => decoTop(ink, accent);

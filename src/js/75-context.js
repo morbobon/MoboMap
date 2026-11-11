@@ -99,7 +99,7 @@ function ctxItems(target, pt) {
     add(t('delete'), () => delText(key));
   } else if (key === 'legend') {
     title = t('ctx_legend');
-    add(t('sec_pageel'), () => jumpTo('#legend'));
+    add(t('sec_texts'), () => jumpTo('#legend'));
   } else if (key === 'logo') {
     title = t('sec_logo');
     add(t('sec_logo'), () => jumpTo(secOf('logo')));

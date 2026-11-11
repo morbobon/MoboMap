@@ -1,5 +1,9 @@
+// where the legend boxes of the last drawing lie, in page units [x0, y0, x1, y1]: degree numbers and new stamps
+// keep clear of them (72-decor.js)
+let LEGEND_AT = [];
 // target: an SVG element to draw into instead of the page (look thumbnails) – no other side effects then
 function render(target) {
+  if (!target) LEGEND_AT = [];
   const links = window._links;
   // texts the user dragged: S.drag[key] = [dx, dy] in page units; dragG wraps an element so it can be moved
   const dragOf = (k) => (S.drag && S.drag[k]) || [0, 0];
@@ -272,7 +276,7 @@ function render(target) {
   for (const R of insetRects()) {
     out += `<rect x="${R.x.toFixed(1)}" y="${R.y.toFixed(1)}" width="${R.w.toFixed(1)}" height="${R.h.toFixed(1)}" fill="${bg}" fill-opacity=".92" stroke="${st === 'neon' ? stroke : ink0}" stroke-opacity=".45" stroke-width="1" ${st === 'blueprint' ? 'stroke-dasharray="4 3"' : ''}/>`;
   }
-  out += fxUnder(allPath, ink);
+  out += fxUnder(allPath, ink, ds.accent);
   if (sp.flag && S.map !== 'world') {
     const iso = S.country || 'DNK',
       fl = FLAGS[iso];
@@ -618,7 +622,7 @@ function render(target) {
     const tr = g.hl.has('emboss') ? ' transform="translate(0,-6)"' : '';
     out += `<mask id="om${gi}" maskUnits="userSpaceOnUse" ${bgR}><rect ${bgR} fill="#fff"/><path d="${d}" fill="#000"${tr}/></mask><path d="${d}" fill="none" stroke="${g.color}" stroke-width="6.4" stroke-linejoin="round" mask="url(#om${gi})"${tr} pointer-events="none"/>`;
   });
-  out += fxMap(allPath, ink);
+  out += fxMap(allPath, ink, ds.accent);
   // up to here the map body: what the repeated world shows in every copy. What follows exists once.
   const bodyEnd = out.length;
   out += decoMapTop(ink, ds.accent);
@@ -1024,6 +1028,8 @@ function render(target) {
         y += 18;
       });
       out += dragG(key, lg);
+      const [ldx, ldy] = dragOf(key);
+      if (!target) LEGEND_AT.push([x - 8 + ldx, top + ldy, x - 8 + lw + ldx, top + list.length * 18 + 12 + ldy]);
       return top;
     };
     if (items.length) bottom = box(items, 'legend') - 16;

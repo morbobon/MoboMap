@@ -136,14 +136,15 @@ function setLayout(id) {
 //           Zoomed further in there are no copies: the outlines are written for what is in view.
 //   p0, p1  the one turn a copy shows
 //   n       how many <use> copies to each side
+// MAPBOX: the same area on any map, country maps included (the graticule runs to its edge: 72-decor.js)
 let FILL = null,
-  REP = null;
+  REP = null,
+  MAPBOX = [0, 0, 0, 0];
 const repeatOn = () => S.map === 'world' && S.repeat !== false && !!(PROJS[S.proj] || {}).cyl;
 function setFill(pg, box) {
   FILL = REP = null;
-  if (S.map !== 'world') return;
   const L = fxLayout();
-  FILL =
+  MAPBOX =
     pg.fill === 'area'
       ? [PAD.l, PAD.t, W - PAD.r, H - PAD.b]
       : pg.fill === 'page'
@@ -151,6 +152,8 @@ function setFill(pg, box) {
         : L.active && L.P
           ? [(L.P[0] - L.tx) / L.s, (L.P[1] - L.ty) / L.s, (L.P[2] - L.tx) / L.s, (L.P[3] - L.ty) / L.s]
           : [0, 0, W, H];
+  if (S.map !== 'world') return;
+  FILL = MAPBOX;
   if (!repeatOn()) return;
   const per = 200 * Math.PI * sc,
     cx = (FILL[0] + FILL[2]) / 2,
