@@ -75,6 +75,21 @@ function ctxItems(target, pt) {
       S.map === 'world' && hasDetail(c) ? 'ctx_open' : S.focus === c ? 'ctx_out' : S.map === 'world' ? '' : 'ctx_zoom';
     if (nav) add(t(nav), () => focusClick(c));
     if (attrDef()) add(t('sec_data'), () => jumpTo(secOf('data')));
+    // a text that a click on this area shows (an info box on a pin, say)
+    if (k)
+      add(t('tr_add_area'), () => {
+        const it = addText({
+          text: nm(k),
+          align: 'c',
+          box: true,
+          size: 22,
+          rule: { on: 'click', target: 'u:' + c, fx: 'scale', until: 'away' },
+        });
+        const [x, y] = kc(k);
+        if (!txPlace(it, x, y - 24, 'map')) txPlace(it, x, y - 24, 'page');
+        txEdit(txKey(it));
+        render();
+      });
   } else if (key === 'title' || key === 'sub') {
     title = document.getElementById(key).value || t('sec_text');
     add(t('sec_text'), () => jumpTo('#' + key));

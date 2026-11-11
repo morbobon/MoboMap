@@ -435,7 +435,7 @@ svg.addEventListener('click', (e) => {
   const c = p.dataset.c;
   if (touch) lastTap = { c, t: Date.now(), gi: S.groups.findIndex((o) => o.sel.has(c)), groups: S.groups.length };
   // locked highlights: a click selects nothing
-  if (lockOn('hl')) return;
+  if (lockOn('hl') || txTesting()) return;
   const g = activeGroup();
   if (g.sel.has(c)) g.sel.delete(c);
   else {

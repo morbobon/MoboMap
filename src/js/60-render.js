@@ -3,9 +3,13 @@ function render(target) {
   const links = window._links;
   // texts the user dragged: S.drag[key] = [dx, dy] in page units; dragG wraps an element so it can be moved
   const dragOf = (k) => (S.drag && S.drag[k]) || [0, 0];
+  // (texts with a visibility rule, a link or "not in export" get a wrapper of their own: 78-triggers.js)
   const dragG = (k, inner) => {
     const [dx, dy] = dragOf(k);
-    return `<g class="drg" data-drag="${esc(k)}" pointer-events="all"${dx || dy ? ` transform="translate(${dx.toFixed(1)},${dy.toFixed(1)})"` : ''}>${inner}</g>`;
+    return txWrap(
+      k,
+      `<g class="drg" data-drag="${esc(k)}" pointer-events="all"${dx || dy ? ` transform="translate(${dx.toFixed(1)},${dy.toFixed(1)})"` : ''}>${inner}</g>`,
+    );
   };
   setLayout(S.layout);
   fxLayout();

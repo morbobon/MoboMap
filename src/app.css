@@ -1682,3 +1682,86 @@ body.viewer {
 body.viewer .stage {
   padding: 18px;
 }
+
+/* text visibility rules (78-triggers.js): the transitions switch with the class "off" */
+#svg .txi {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 0.45s ease,
+    transform 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.15),
+    filter 0.5s ease,
+    clip-path 0.7s ease;
+}
+#svg .txi.ghost {
+  opacity: 0.45;
+}
+#svg .txi.off {
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 0.25s;
+}
+#svg .txi.fx-none {
+  transition: none;
+}
+#svg .txi.fx-scale.off {
+  transform: scale(0.04);
+}
+#svg .txi.fx-slide.off {
+  transform: translateY(28px);
+}
+#svg .txi.fx-blur.off {
+  filter: blur(10px);
+}
+#svg .txi.fx-type,
+#svg .txi.fx-wipe {
+  clip-path: inset(-30% -6% -30% -6%);
+}
+#svg .txi.fx-type.off,
+#svg .txi.fx-wipe.off {
+  clip-path: inset(-30% 100% -30% -6%);
+}
+#svg .txi.fx-type:not(.off) {
+  transition:
+    opacity 0.15s,
+    clip-path 1.2s steps(var(--n, 12));
+}
+#svg .txi[data-link]:not(.off) {
+  cursor: pointer;
+}
+#wrap.lock-hl .k.hot {
+  cursor: pointer;
+}
+.txrule {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+}
+#stepBar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 6px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px #0004;
+  font-size: 12px;
+  font-weight: 600;
+}
+#stepBar[hidden] {
+  display: none;
+}
+#stepBar .chip {
+  min-width: 32px;
+  font-size: 14px;
+  line-height: 1;
+}

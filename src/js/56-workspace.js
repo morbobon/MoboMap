@@ -301,6 +301,7 @@ function afterRender() {
       /* not laid out */
     }
   });
+  txAfterRender();
   if (HIST.restoring || (typeof textDrag !== 'undefined' && textDrag)) return;
   clearTimeout(HIST.timer);
   HIST.timer = setTimeout(

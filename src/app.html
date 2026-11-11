@@ -377,6 +377,9 @@
                   + <span data-i18n="tx_add"></span>
                 </button>
               </div>
+              <label class="ck"
+                ><input type="checkbox" id="txTest" onchange="txTest(this.checked)" /> <span data-i18n="tr_test"></span
+              ></label>
               <div class="row">
                 <button class="chip" onclick="resetDrag()" data-i18n-title="drag_reset_t">
                   <span data-i18n="drag_reset"></span>
@@ -589,6 +592,11 @@
               <button id="lockBtn" class="chip" onclick="toggleLock()" aria-pressed="false"></button>
               <button id="lockMore" class="chip" onclick="lockPop()" data-i18n-title="lock_opts_t">▾</button>
             </div>
+          </div>
+          <div id="stepBar" hidden>
+            <button class="chip" onclick="txStep(-1)" data-i18n-title="tr_prev">‹</button>
+            <span id="stepN"></span>
+            <button class="chip" onclick="txStep(1)" data-i18n-title="tr_next">›</button>
           </div>
           <div id="lockPop" hidden>
             <label class="ck"
